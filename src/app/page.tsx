@@ -10,12 +10,12 @@ import { mockHoodies } from '@/data/mock-hoodies';
 import type { Hoodie, Filters, ProductColor, ProductSize, ProductDesign, HoodieCartItem } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Search, X } from 'lucide-react';
+import { Search, X, Shirt } from 'lucide-react'; // Added Shirt icon
 import { SidebarInset } from '@/components/ui/sidebar';
-import { useCart } from '@/context/cart-context'; // Import useCart
+import { useCart } from '@/context/cart-context';
 
 export default function HomePage() {
-  const { editingItem } = useCart(); // Get editingItem from cart context
+  const { editingItem } = useCart();
   const [hoodies, setHoodies] = useState<Hoodie[]>(mockHoodies);
   const [selectedHoodie, setSelectedHoodie] = useState<Hoodie | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -31,17 +31,14 @@ export default function HomePage() {
     setHasMounted(true);
   }, []);
 
-  // Effect to open modal if editingItem changes and is a hoodie from this page
   useEffect(() => {
     if (editingItem?.productType === 'hoodie') {
       const hoodieToEdit = mockHoodies.find(h => h.id === editingItem.productId);
-      if (hoodieToEdit) {
+      if (hoodieToEdit && editingItem.type === 'hoodie' && editingItem.item.cartItemId === (editingItem as { type: 'hoodie'; item: HoodieCartItem }).item.cartItemId) {
         setSelectedHoodie(hoodieToEdit);
         setIsModalOpen(true);
       }
     } else if (!editingItem && isModalOpen && selectedHoodie){
-      // If editingItem is cleared (e.g. cart closed) and modal was for editing, close it.
-      // Check if the modal was for the specific selectedHoodie to avoid closing unrelated modals
       const currentlyEditingThisHoodie = mockHoodies.find(h => h.id === selectedHoodie.id);
       if(currentlyEditingThisHoodie){
          // This logic might need refinement if editingItem can be null for other reasons
@@ -111,7 +108,6 @@ export default function HomePage() {
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setSelectedHoodie(null);
-    // If modal was closed while editing, editingItem is handled by modal itself
   };
 
   if (!hasMounted) {
@@ -140,6 +136,16 @@ export default function HomePage() {
         <SidebarInset>
           <main className="flex-1 p-4 md:p-8 bg-transparent">
             <div className="container mx-auto">
+              <div className="mb-12 text-center">
+                <h1 className="text-5xl font-extrabold text-primary mb-3 flex items-center justify-center gap-3">
+                  <Shirt className="h-12 w-12 text-accent animate-pulse" />
+                  Our Hoodie Collection
+                </h1>
+                <p className="text-xl text-muted-foreground">
+                  Discover your next favorite cœzii hoodie. Filter by color, size, and style to find the perfect fit.
+                </p>
+              </div>
+
               <div className="mb-8 flex flex-col sm:flex-row gap-4 items-center">
                 <div className="relative flex-grow w-full sm:w-auto">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
@@ -175,7 +181,8 @@ export default function HomePage() {
                 </div>
               ) : (
                 <div className="text-center py-10">
-                  <h2 className="text-3xl font-semibold mb-2">No Hoodies Found</h2>
+                   <Shirt className="h-24 w-24 text-muted-foreground/50 mx-auto mb-6" />
+                  <h2 className="text-3xl font-semibold mb-2 text-foreground">No Hoodies Found</h2>
                   <p className="text-lg text-muted-foreground mb-4">
                     Try adjusting your search or filters.
                   </p>
@@ -196,3 +203,4 @@ export default function HomePage() {
     </>
   );
 }
+
