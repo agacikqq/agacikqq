@@ -1,5 +1,6 @@
 
-import type { MatchingBraceletSet } from '@/types';
+import type { MatchingBraceletSet, Bracelet } from '@/types';
+import { mockCharms } from './mock-charms';
 
 export const mockMatchingBracelets: MatchingBraceletSet[] = [
   {
@@ -15,18 +16,24 @@ export const mockMatchingBracelets: MatchingBraceletSet[] = [
     ],
     bracelets: [
       {
-        id: 'sun-bracelet',
+        id: 'sun-bracelet-in-set',
         name: 'Golden Sun Bracelet',
-        image: 'https://picsum.photos/seed/sunBraceletSet/400/400',
+        slug: 'golden-sun-bracelet-in-set',
+        images: ['https://picsum.photos/seed/sunBraceletSet/400/400'],
         materials: 'Gold-plated alloy, Amber bead',
         description: 'Radiant bracelet with a sun charm and warm amber bead.',
+        basePrice: 0, // Covered by set price
+        availableCharms: [mockCharms[0], mockCharms[2], mockCharms[5]], // Star, Moon, Clover
       },
       {
-        id: 'moon-bracelet',
+        id: 'moon-bracelet-in-set',
         name: 'Silver Moon Bracelet',
-        image: 'https://picsum.photos/seed/moonBraceletSet/400/400',
+        slug: 'silver-moon-bracelet-in-set',
+        images: ['https://picsum.photos/seed/moonBraceletSet/400/400'],
         materials: 'Silver-plated alloy, Moonstone bead',
         description: 'Mystical bracelet with a moon charm and serene moonstone bead.',
+        basePrice: 0, // Covered by set price
+        availableCharms: [mockCharms[1], mockCharms[3], mockCharms[4]], // Heart, Initial A, Paw
       },
     ],
   },
@@ -41,18 +48,24 @@ export const mockMatchingBracelets: MatchingBraceletSet[] = [
     ],
     bracelets: [
       {
-        id: 'king-bracelet',
+        id: 'king-bracelet-in-set',
         name: 'King\'s Crown Bracelet',
-        image: 'https://picsum.photos/seed/kingBraceletSet/400/400',
+        slug: 'kings-crown-bracelet-in-set',
+        images: ['https://picsum.photos/seed/kingBraceletSet/400/400'],
         materials: 'Black Lava Stone, Hematite, Crown Charm',
         description: 'Masculine bracelet with lava stones and a king crown charm.',
+        basePrice: 0,
+        availableCharms: [mockCharms[3], mockCharms[4]], // Initial A, Paw
       },
       {
-        id: 'queen-bracelet',
+        id: 'queen-bracelet-in-set',
         name: 'Queen\'s Crown Bracelet',
-        image: 'https://picsum.photos/seed/queenBraceletSet/400/400',
+        slug: 'queens-crown-bracelet-in-set',
+        images: ['https://picsum.photos/seed/queenBraceletSet/400/400'],
         materials: 'Rose Quartz, White Howlite, Crown Charm',
         description: 'Elegant bracelet with rose quartz and a queen crown charm.',
+        basePrice: 0,
+        availableCharms: [mockCharms[0], mockCharms[1], mockCharms[5]], // Star, Heart, Clover
       },
     ],
   },
@@ -68,18 +81,24 @@ export const mockMatchingBracelets: MatchingBraceletSet[] = [
     ],
     bracelets: [
       {
-        id: 'infinity-1',
+        id: 'infinity-1-in-set',
         name: 'Rose Gold Infinity Bracelet',
-        image: 'https://picsum.photos/seed/infinityRose/400/400',
+        slug: 'rose-gold-infinity-in-set',
+        images: ['https://picsum.photos/seed/infinityRose/400/400'],
         materials: 'Rose Gold Plated Sterling Silver',
         description: 'A timeless piece in warm rose gold.',
+        basePrice: 0,
+        availableCharms: [], // This one is not customizable with extra charms in the mock
       },
       {
-        id: 'infinity-2',
+        id: 'infinity-2-in-set',
         name: 'Sterling Silver Infinity Bracelet',
-        image: 'https://picsum.photos/seed/infinitySilver/400/400',
+        slug: 'sterling-silver-infinity-in-set',
+        images: ['https://picsum.photos/seed/infinitySilver/400/400'],
         materials: 'Sterling Silver',
         description: 'Classic and elegant sterling silver.',
+        basePrice: 0,
+        availableCharms: [mockCharms[0], mockCharms[1]], // Star, Heart
       },
     ],
   },

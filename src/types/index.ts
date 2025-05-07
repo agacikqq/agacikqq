@@ -59,15 +59,6 @@ export interface Bracelet {
   availableCharms: Charm[]; // Array of available charms for this bracelet
 }
 
-// Simplified Bracelet Info for use within a Matching Set
-export interface SimpleBraceletInfo {
-  id: string;
-  name: string; // e.g., "Her Moon Bracelet"
-  image: string;
-  materials: string;
-  description?: string; // Short description for this specific part of the set
-}
-
 // Matching Bracelet Set type
 export interface MatchingBraceletSet {
   id: string;
@@ -77,5 +68,5 @@ export interface MatchingBraceletSet {
   setPrice: number; // Price for the whole set
   originalSetPrice?: number; // For sales
   images: string[]; // Images showcasing the set (e.g., both bracelets worn together)
-  bracelets: SimpleBraceletInfo[]; // Details of each bracelet in the set
+  bracelets: Bracelet[]; // Each bracelet in the set is a full Bracelet object, allowing for individual customization
 }

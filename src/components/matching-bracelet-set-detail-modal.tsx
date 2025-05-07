@@ -2,7 +2,7 @@
 'use client';
 
 import Image from 'next/image';
-import type { MatchingBraceletSet, SimpleBraceletInfo } from '@/types';
+import type { MatchingBraceletSet, Bracelet, Charm } from '@/types';
 import {
   Dialog,
   DialogContent,
@@ -15,8 +15,10 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Users, Info, Percent } from 'lucide-react';
-import React, { useState, useEffect } from 'react';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Label } from '@/components/ui/label';
+import { Users, Info, Percent, Gem, ChevronDown, ChevronUp } from 'lucide-react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { toast } from '@/hooks/use-toast';
 
 interface MatchingBraceletSetDetailModalProps {
@@ -25,25 +27,87 @@ interface MatchingBraceletSetDetailModalProps {
   onClose: () => void;
 }
 
+const INCLUDED_CHARMS_PER_BRACELET_IN_SET = 4;
+
 export function MatchingBraceletSetDetailModal({ set, isOpen, onClose }: MatchingBraceletSetDetailModalProps) {
   const [currentMainImage, setCurrentMainImage] = useState<string>('');
+  const [activeCustomizingBraceletId, setActiveCustomizingBraceletId] = useState<string | null>(null);
+  const [braceletCustomizations, setBraceletCustomizations] = useState<Record<string, { selectedCharms: Charm[] }>>({});
 
   useEffect(() => {
     if (set) {
+      const initialCustomizations: Record<string, { selectedCharms: Charm[] }> = {};
+      set.bracelets.forEach(b => {
+        initialCustomizations[b.id] = { selectedCharms: [] };
+      });
+      setBraceletCustomizations(initialCustomizations);
+      setActiveCustomizingBraceletId(null);
       setCurrentMainImage(set.images[0] || '');
+    } else {
+      setBraceletCustomizations({});
+      setActiveCustomizingBraceletId(null);
     }
   }, [set]);
+
+  const totalSetPrice = useMemo(() => {
+    if (!set) return 0;
+    let currentTotal = set.setPrice;
+
+    set.bracelets.forEach(bracelet => {
+      const customization = braceletCustomizations[bracelet.id];
+      if (customization && customization.selectedCharms.length > INCLUDED_CHARMS_PER_BRACELET_IN_SET) {
+        const extraCharms = customization.selectedCharms.slice(INCLUDED_CHARMS_PER_BRACELET_IN_SET);
+        const additionalCost = extraCharms.reduce((sum, charm) => sum + charm.price, 0);
+        currentTotal += additionalCost;
+      }
+    });
+    return currentTotal;
+  }, [set, braceletCustomizations]);
 
   if (!set) return null;
 
   const isOnSale = set.originalSetPrice && set.originalSetPrice > set.setPrice;
   const discountPercent = isOnSale ? Math.round(((set.originalSetPrice! - set.setPrice) / set.originalSetPrice!) * 100) : 0;
 
+  const handleCharmToggleForSetBracelet = (braceletId: string, charm: Charm) => {
+    setBraceletCustomizations(prev => {
+      const currentSelected = prev[braceletId]?.selectedCharms || [];
+      const newSelected = currentSelected.find(c => c.id === charm.id)
+        ? currentSelected.filter(c => c.id !== charm.id)
+        : [...currentSelected, charm];
+      return {
+        ...prev,
+        [braceletId]: { selectedCharms: newSelected },
+      };
+    });
+  };
+
   const handleAddToCart = () => {
+    let customizationDetails = "";
+    if (set) {
+      customizationDetails = set.bracelets.map(bracelet => {
+        const charmsForThisBracelet = braceletCustomizations[bracelet.id]?.selectedCharms || [];
+        const charmNames = charmsForThisBracelet.map(c => c.name).join(', ') || 'Standard (No additional charms)';
+        const numSelected = charmsForThisBracelet.length;
+        
+        let includedMessage = "";
+        if (bracelet.availableCharms && bracelet.availableCharms.length > 0) {
+           includedMessage = numSelected > 0
+            ? ` (First ${Math.min(numSelected, INCLUDED_CHARMS_PER_BRACELET_IN_SET)} of ${numSelected} selected charms included)`
+            : ` (Up to ${INCLUDED_CHARMS_PER_BRACELET_IN_SET} charms can be included)`;
+        } else {
+            includedMessage = " (Not customizable with additional charms)";
+        }
+        
+        return `\n  - ${bracelet.name}: ${charmNames}${includedMessage}`;
+      }).join('');
+    }
+
     toast({
         title: "Set Added to Cart! (Simulated)",
-        description: `${set.name} for AED ${set.setPrice.toFixed(2)}`,
+        description: `${set?.name} for AED ${totalSetPrice.toFixed(2)}. ${customizationDetails ? `Customizations:${customizationDetails}` : ''}`,
         variant: "default",
+        duration: 7000, // Longer duration for detailed message
       });
     onClose();
   };
@@ -104,12 +168,17 @@ export function MatchingBraceletSetDetailModal({ set, isOpen, onClose }: Matchin
             
             <div className="mb-4 flex items-baseline gap-x-3">
               <span className="text-4xl font-extrabold text-accent">
-                AED {set.setPrice.toFixed(2)}
+                AED {totalSetPrice.toFixed(2)}
               </span>
               {isOnSale && set.originalSetPrice && (
                 <span className="text-2xl text-muted-foreground line-through">
                   AED {set.originalSetPrice.toFixed(2)}
                 </span>
+              )}
+               {(totalSetPrice !== set.setPrice) && (
+                 <span className="text-xl text-muted-foreground">
+                    (Set Base: AED {set.setPrice.toFixed(2)})
+                 </span>
               )}
             </div>
 
@@ -126,24 +195,87 @@ export function MatchingBraceletSetDetailModal({ set, isOpen, onClose }: Matchin
                     Bracelets in this Set ({set.bracelets.length})
                 </h4>
                 <div className="space-y-4">
-                    {set.bracelets.map((braceletInfo: SimpleBraceletInfo) => (
-                        <div key={braceletInfo.id} className="flex items-start gap-4 p-3 border rounded-md bg-muted/20">
-                            <Image
-                                src={braceletInfo.image}
-                                alt={braceletInfo.name}
-                                width={80}
-                                height={80}
-                                className="rounded-md object-cover aspect-square"
-                                data-ai-hint={`${braceletInfo.materials.toLowerCase()} bracelet small`}
-                            />
-                            <div>
-                                <h5 className="text-lg font-semibold text-foreground">{braceletInfo.name}</h5>
-                                {braceletInfo.description && <p className="text-sm text-muted-foreground mt-1">{braceletInfo.description}</p>}
-                                <div className="flex items-start gap-2 mt-2">
-                                    <Info className="h-4 w-4 text-primary flex-shrink-0 mt-0.5" />
-                                    <p className="text-sm text-muted-foreground"><span className="font-medium text-foreground/80">Materials:</span> {braceletInfo.materials}</p>
+                    {set.bracelets.map((bracelet: Bracelet) => (
+                        <div key={bracelet.id} className="p-4 border rounded-lg bg-card shadow-sm hover:shadow-md transition-shadow">
+                            <div className="flex items-start gap-4">
+                                <Image
+                                    src={bracelet.images[0]}
+                                    alt={bracelet.name}
+                                    width={80}
+                                    height={80}
+                                    className="rounded-md object-cover aspect-square border"
+                                    data-ai-hint={`${bracelet.materials.toLowerCase()} bracelet small`}
+                                />
+                                <div className="flex-grow">
+                                    <h5 className="text-lg font-semibold text-foreground">{bracelet.name}</h5>
+                                    {bracelet.description && <p className="text-sm text-muted-foreground mt-1">{bracelet.description}</p>}
+                                    <div className="flex items-start gap-2 mt-2">
+                                        <Info className="h-4 w-4 text-primary flex-shrink-0 mt-0.5" />
+                                        <p className="text-sm text-muted-foreground"><span className="font-medium text-foreground/80">Materials:</span> {bracelet.materials}</p>
+                                    </div>
                                 </div>
                             </div>
+
+                            {bracelet.availableCharms && bracelet.availableCharms.length > 0 && (
+                              <Button 
+                                variant="outline" 
+                                size="sm" 
+                                onClick={() => setActiveCustomizingBraceletId(activeCustomizingBraceletId === bracelet.id ? null : bracelet.id)} 
+                                className="mt-3 w-full"
+                              >
+                                {activeCustomizingBraceletId === bracelet.id ? <ChevronUp className="mr-2 h-4 w-4" /> : <ChevronDown className="mr-2 h-4 w-4" />}
+                                {activeCustomizingBraceletId === bracelet.id ? 'Hide Charms' : `Customize Charms for ${bracelet.name}`}
+                              </Button>
+                            )}
+                             {bracelet.availableCharms.length === 0 && (
+                                 <p className="text-sm text-muted-foreground mt-3 text-center">Not customizable with additional charms.</p>
+                             )}
+
+
+                            {activeCustomizingBraceletId === bracelet.id && bracelet.availableCharms.length > 0 && (
+                              <div className="mt-4 pt-4 border-t border-border">
+                                <h5 className="mb-1 text-md font-semibold text-foreground flex items-center">
+                                    <Gem className="mr-2 h-5 w-5 text-primary" />
+                                    Select Charms for {bracelet.name}
+                                </h5>
+                                <p className="text-xs text-muted-foreground mb-3">
+                                  First {INCLUDED_CHARMS_PER_BRACELET_IN_SET} selected charms are included for this bracelet. Additional charms will add to the total set price.
+                                </p>
+                                <ScrollArea className="h-40 pr-3 border rounded-md p-2 bg-background/50">
+                                  <div className="space-y-2">
+                                    {bracelet.availableCharms.map((charm) => (
+                                      <div key={charm.id} className="flex items-center justify-between p-2.5 border rounded-md hover:bg-muted/50 transition-colors">
+                                        <div className="flex items-center space-x-2.5">
+                                          <Image
+                                            src={charm.image}
+                                            alt={charm.name}
+                                            width={32}
+                                            height={32}
+                                            className="rounded-md object-cover"
+                                            data-ai-hint={`${charm.name.toLowerCase()} charm tiny`}
+                                          />
+                                          <div>
+                                            <Label htmlFor={`set-charm-${bracelet.id}-${charm.id}`} className="text-sm font-medium cursor-pointer">
+                                              {charm.name}
+                                            </Label>
+                                            {charm.description && <p className="text-xs text-muted-foreground">{charm.description}</p>}
+                                          </div>
+                                        </div>
+                                        <div className="flex items-center space-x-2.5">
+                                          <span className="text-sm font-semibold text-accent">+AED {charm.price.toFixed(2)}</span>
+                                          <Checkbox
+                                            id={`set-charm-${bracelet.id}-${charm.id}`}
+                                            checked={braceletCustomizations[bracelet.id]?.selectedCharms.some(c => c.id === charm.id)}
+                                            onCheckedChange={() => handleCharmToggleForSetBracelet(bracelet.id, charm)}
+                                            aria-label={`Select charm ${charm.name} for ${bracelet.name}`}
+                                          />
+                                        </div>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </ScrollArea>
+                              </div>
+                            )}
                         </div>
                     ))}
                 </div>
@@ -158,7 +290,7 @@ export function MatchingBraceletSetDetailModal({ set, isOpen, onClose }: Matchin
                 className="w-full bg-accent text-accent-foreground hover:bg-accent/90 sm:w-auto"
                 onClick={handleAddToCart}
               >
-                Add Set to Cart - AED {set.setPrice.toFixed(2)}
+                Add Set to Cart - AED {totalSetPrice.toFixed(2)}
               </Button>
             </DialogFooter>
           </div>
