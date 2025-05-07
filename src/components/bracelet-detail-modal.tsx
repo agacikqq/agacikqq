@@ -26,6 +26,8 @@ interface BraceletDetailModalProps {
   onClose: () => void;
 }
 
+const INCLUDED_CHARMS_COUNT = 4;
+
 export function BraceletDetailModal({ bracelet, isOpen, onClose }: BraceletDetailModalProps) {
   const [selectedCharms, setSelectedCharms] = useState<Charm[]>([]);
   const [currentImage, setCurrentImage] = useState<string>('');
@@ -39,7 +41,15 @@ export function BraceletDetailModal({ bracelet, isOpen, onClose }: BraceletDetai
 
   const totalPrice = useMemo(() => {
     if (!bracelet) return 0;
-    const charmsPrice = selectedCharms.reduce((sum, charm) => sum + charm.price, 0);
+    
+    let charmsPrice = 0;
+    if (selectedCharms.length > INCLUDED_CHARMS_COUNT) {
+      // Calculate price only for charms exceeding the included count.
+      // Assumes selectedCharms are in order of selection.
+      const extraCharms = selectedCharms.slice(INCLUDED_CHARMS_COUNT);
+      charmsPrice = extraCharms.reduce((sum, charm) => sum + charm.price, 0);
+    }
+    // If 4 or fewer charms are selected, their price is covered by the basePrice.
     return bracelet.basePrice + charmsPrice;
   }, [bracelet, selectedCharms]);
 
@@ -55,9 +65,13 @@ export function BraceletDetailModal({ bracelet, isOpen, onClose }: BraceletDetai
 
   const handleAddToCart = () => {
     const charmNames = selectedCharms.map(c => c.name).join(', ') || 'No charms';
+    const includedMessage = selectedCharms.length > 0 
+      ? ` (First ${Math.min(selectedCharms.length, INCLUDED_CHARMS_COUNT)} of ${selectedCharms.length} selected charms included in price)` 
+      : '';
+
     toast({
         title: "Added to Cart! (Simulated)",
-        description: `${bracelet.name} with charms: ${charmNames}. Total: $${totalPrice.toFixed(2)}`,
+        description: `${bracelet.name} with charms: ${charmNames}${includedMessage}. Total: $${totalPrice.toFixed(2)}`,
         variant: "default",
       });
     onClose();
@@ -116,7 +130,7 @@ export function BraceletDetailModal({ bracelet, isOpen, onClose }: BraceletDetai
               <span className="text-4xl font-extrabold text-accent">
                 ${totalPrice.toFixed(2)}
               </span>
-              {selectedCharms.length > 0 && (
+              {selectedCharms.length > 0 && totalPrice !== bracelet.basePrice && (
                  <span className="text-xl text-muted-foreground">
                     (Base: ${bracelet.basePrice.toFixed(2)})
                  </span>
@@ -140,10 +154,13 @@ export function BraceletDetailModal({ bracelet, isOpen, onClose }: BraceletDetai
             {/* Charms Section */}
             {bracelet.availableCharms.length > 0 && (
               <div className="mb-6">
-                <h4 className="mb-3 text-xl font-semibold text-foreground flex items-center">
+                <h4 className="mb-1 text-xl font-semibold text-foreground flex items-center">
                     <Gem className="mr-2 h-5 w-5 text-primary" />
                     Customize with Charms
                 </h4>
+                <p className="text-sm text-muted-foreground mb-3">
+                  The first {INCLUDED_CHARMS_COUNT} selected charms are included in the bracelet price. Additional charms (if any) will be charged at their listed price.
+                </p>
                 <ScrollArea className="h-48 pr-3">
                   <div className="space-y-3">
                     {bracelet.availableCharms.map((charm) => (
