@@ -2,7 +2,7 @@
 'use client';
 
 import Image from 'next/image';
-import type { Bracelet, Charm } from '@/types';
+import type { Bracelet, Charm, BraceletCartItem } from '@/types';
 import {
   Dialog,
   DialogContent,
@@ -18,7 +18,7 @@ import { Separator } from '@/components/ui/separator';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Gem, Info } from 'lucide-react';
 import React, { useState, useEffect, useMemo } from 'react';
-import { toast } from '@/hooks/use-toast';
+import { useCart } from '@/context/cart-context'; // Import useCart
 
 interface BraceletDetailModalProps {
   bracelet: Bracelet | null;
@@ -29,27 +29,37 @@ interface BraceletDetailModalProps {
 const INCLUDED_CHARMS_COUNT = 4;
 
 export function BraceletDetailModal({ bracelet, isOpen, onClose }: BraceletDetailModalProps) {
+  const { addItemToCart, editingItem, setEditingItem } = useCart();
   const [selectedCharms, setSelectedCharms] = useState<Charm[]>([]);
   const [currentImage, setCurrentImage] = useState<string>('');
 
+  const isEditing = editingItem?.productType === 'bracelet' && editingItem?.productId === bracelet?.id;
+
   useEffect(() => {
-    if (bracelet) {
-      setSelectedCharms([]); // Reset selected charms when a new bracelet is opened
-      setCurrentImage(bracelet.images[0] || '');
+    if (isOpen && bracelet) {
+      if (isEditing && editingItem?.productType === 'bracelet') {
+        const editBracelet = editingItem.item as BraceletCartItem;
+        setSelectedCharms(editBracelet.selectedCharms);
+        setCurrentImage(editBracelet.image || bracelet.images[0] || '');
+      } else {
+        setSelectedCharms([]); 
+        setCurrentImage(bracelet.images[0] || '');
+      }
+    } else if (!isOpen) {
+        if (isEditing) {
+            setEditingItem(null);
+        }
     }
-  }, [bracelet]);
+  }, [bracelet, isOpen, isEditing, editingItem, setEditingItem]);
 
   const totalPrice = useMemo(() => {
     if (!bracelet) return 0;
     
     let charmsPrice = 0;
     if (selectedCharms.length > INCLUDED_CHARMS_COUNT) {
-      // Calculate price only for charms exceeding the included count.
-      // Assumes selectedCharms are in order of selection.
       const extraCharms = selectedCharms.slice(INCLUDED_CHARMS_COUNT);
       charmsPrice = extraCharms.reduce((sum, charm) => sum + charm.price, 0);
     }
-    // If 4 or fewer charms are selected, their price is covered by the basePrice.
     return bracelet.basePrice + charmsPrice;
   }, [bracelet, selectedCharms]);
 
@@ -64,22 +74,24 @@ export function BraceletDetailModal({ bracelet, isOpen, onClose }: BraceletDetai
   };
 
   const handleAddToCart = () => {
-    const charmNames = selectedCharms.map(c => c.name).join(', ') || 'No charms';
-    const includedMessage = selectedCharms.length > 0 
-      ? ` (First ${Math.min(selectedCharms.length, INCLUDED_CHARMS_COUNT)} of ${selectedCharms.length} selected charms included in price)` 
-      : '';
-
-    toast({
-        title: "Added to Cart! (Simulated)",
-        description: `${bracelet.name} with charms: ${charmNames}${includedMessage}. Total: AED ${totalPrice.toFixed(2)}`,
-        variant: "default",
-      });
+    const cartItemData: Omit<BraceletCartItem, 'cartItemId' | 'unitPrice' | 'quantity'> = {
+      productId: bracelet.id,
+      name: bracelet.name,
+      image: currentImage || bracelet.images[0],
+      productType: 'bracelet',
+      baseBraceletPrice: bracelet.basePrice,
+      selectedCharms,
+    };
+    addItemToCart(cartItemData);
     onClose();
   };
 
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog open={isOpen} onOpenChange={(open) => {
+        if(!open && isEditing) setEditingItem(null);
+        onClose();
+    }}>
       <DialogContent className="max-w-4xl p-0">
         <ScrollArea className="max-h-[90vh]">
         <div className="grid md:grid-cols-2 gap-0">
@@ -210,7 +222,7 @@ export function BraceletDetailModal({ bracelet, isOpen, onClose }: BraceletDetai
                 className="w-full bg-accent text-accent-foreground hover:bg-accent/90 sm:w-auto"
                 onClick={handleAddToCart}
               >
-                Add to Cart - AED {totalPrice.toFixed(2)}
+                {isEditing ? 'Update Item' : `Add to Cart`} - AED {totalPrice.toFixed(2)}
               </Button>
             </DialogFooter>
           </div>

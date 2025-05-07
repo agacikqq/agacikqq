@@ -70,3 +70,49 @@ export interface MatchingBraceletSet {
   images: string[]; // Images showcasing the set (e.g., both bracelets worn together)
   bracelets: Bracelet[]; // Each bracelet in the set is a full Bracelet object, allowing for individual customization
 }
+
+
+// Cart Item Types
+export interface CartItemBase {
+  cartItemId: string; // Unique ID for this specific instance in the cart
+  productId: string;
+  name: string;
+  image: string;
+  quantity: number;
+  unitPrice: number; // Price of a single unit with its current configuration
+}
+
+export interface HoodieCartItem extends CartItemBase {
+  productType: 'hoodie';
+  selectedColor: ProductColor;
+  selectedSize: ProductSize;
+}
+
+export interface BraceletCustomization {
+  braceletId: string;
+  braceletName: string;
+  selectedCharms: Charm[];
+  // Price for this specific bracelet's extra charms needs to be calculated based on included count
+}
+export interface BraceletCartItem extends CartItemBase {
+  productType: 'bracelet';
+  baseBraceletPrice: number;
+  selectedCharms: Charm[];
+  // unitPrice will be baseBraceletPrice + price of extra charms (beyond included)
+}
+
+export interface MatchingSetCartItem extends CartItemBase {
+  productType: 'matchingSet';
+  setBasePrice: number;
+  braceletsCustomization: BraceletCustomization[];
+  // unitPrice will be setBasePrice + total price of all extra charms for all bracelets in the set (beyond included per bracelet)
+}
+
+export type CartItem = HoodieCartItem | BraceletCartItem | MatchingSetCartItem;
+
+// For re-opening modals for editing
+export type EditingItemState = 
+  | { type: 'hoodie'; item: HoodieCartItem }
+  | { type: 'bracelet'; item: BraceletCartItem; originalBracelet: Bracelet }
+  | { type: 'matchingSet'; item: MatchingSetCartItem; originalSet: MatchingBraceletSet }
+  | null;

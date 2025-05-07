@@ -2,7 +2,7 @@
 'use client';
 
 import Image from 'next/image';
-import type { MatchingBraceletSet, Bracelet, Charm } from '@/types';
+import type { MatchingBraceletSet, Bracelet, Charm, MatchingSetCartItem, BraceletCustomization } from '@/types';
 import {
   Dialog,
   DialogContent,
@@ -19,7 +19,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { Users, Info, Percent, Gem, ChevronDown, ChevronUp } from 'lucide-react';
 import React, { useState, useEffect, useMemo } from 'react';
-import { toast } from '@/hooks/use-toast';
+import { useCart } from '@/context/cart-context'; // Import useCart
 
 interface MatchingBraceletSetDetailModalProps {
   set: MatchingBraceletSet | null;
@@ -30,24 +30,41 @@ interface MatchingBraceletSetDetailModalProps {
 const INCLUDED_CHARMS_PER_BRACELET_IN_SET = 4;
 
 export function MatchingBraceletSetDetailModal({ set, isOpen, onClose }: MatchingBraceletSetDetailModalProps) {
+  const { addItemToCart, editingItem, setEditingItem } = useCart();
   const [currentMainImage, setCurrentMainImage] = useState<string>('');
   const [activeCustomizingBraceletId, setActiveCustomizingBraceletId] = useState<string | null>(null);
   const [braceletCustomizations, setBraceletCustomizations] = useState<Record<string, { selectedCharms: Charm[] }>>({});
 
+  const isEditing = editingItem?.productType === 'matchingSet' && editingItem?.productId === set?.id;
+
   useEffect(() => {
-    if (set) {
-      const initialCustomizations: Record<string, { selectedCharms: Charm[] }> = {};
-      set.bracelets.forEach(b => {
-        initialCustomizations[b.id] = { selectedCharms: [] };
-      });
-      setBraceletCustomizations(initialCustomizations);
+    if (isOpen && set) {
+      if (isEditing && editingItem?.productType === 'matchingSet') {
+        const editSet = editingItem.item as MatchingSetCartItem;
+        const initialCustomizations: Record<string, { selectedCharms: Charm[] }> = {};
+        editSet.braceletsCustomization.forEach(bc => {
+          initialCustomizations[bc.braceletId] = { selectedCharms: bc.selectedCharms };
+        });
+        setBraceletCustomizations(initialCustomizations);
+        setCurrentMainImage(editSet.image || set.images[0] || '');
+      } else {
+        const initialCustomizations: Record<string, { selectedCharms: Charm[] }> = {};
+        set.bracelets.forEach(b => {
+          initialCustomizations[b.id] = { selectedCharms: [] };
+        });
+        setBraceletCustomizations(initialCustomizations);
+        setCurrentMainImage(set.images[0] || '');
+      }
       setActiveCustomizingBraceletId(null);
-      setCurrentMainImage(set.images[0] || '');
-    } else {
+    } else if (!isOpen) {
+      if (isEditing) {
+        setEditingItem(null);
+      }
+      // Reset customizations when modal is closed and not editing or if set changes
       setBraceletCustomizations({});
       setActiveCustomizingBraceletId(null);
     }
-  }, [set]);
+  }, [set, isOpen, isEditing, editingItem, setEditingItem]);
 
   const totalSetPrice = useMemo(() => {
     if (!set) return 0;
@@ -83,37 +100,29 @@ export function MatchingBraceletSetDetailModal({ set, isOpen, onClose }: Matchin
   };
 
   const handleAddToCart = () => {
-    let customizationDetails = "";
-    if (set) {
-      customizationDetails = set.bracelets.map(bracelet => {
-        const charmsForThisBracelet = braceletCustomizations[bracelet.id]?.selectedCharms || [];
-        const charmNames = charmsForThisBracelet.map(c => c.name).join(', ') || 'Standard (No additional charms)';
-        const numSelected = charmsForThisBracelet.length;
-        
-        let includedMessage = "";
-        if (bracelet.availableCharms && bracelet.availableCharms.length > 0) {
-           includedMessage = numSelected > 0
-            ? ` (First ${Math.min(numSelected, INCLUDED_CHARMS_PER_BRACELET_IN_SET)} of ${numSelected} selected charms included)`
-            : ` (Up to ${INCLUDED_CHARMS_PER_BRACELET_IN_SET} charms can be included)`;
-        } else {
-            includedMessage = " (Not customizable with additional charms)";
-        }
-        
-        return `\n  - ${bracelet.name}: ${charmNames}${includedMessage}`;
-      }).join('');
-    }
+    const currentBraceletsCustomization: BraceletCustomization[] = set.bracelets.map(bracelet => ({
+      braceletId: bracelet.id,
+      braceletName: bracelet.name,
+      selectedCharms: braceletCustomizations[bracelet.id]?.selectedCharms || [],
+    }));
 
-    toast({
-        title: "Set Added to Cart! (Simulated)",
-        description: `${set?.name} for AED ${totalSetPrice.toFixed(2)}. ${customizationDetails ? `Customizations:${customizationDetails}` : ''}`,
-        variant: "default",
-        duration: 7000, // Longer duration for detailed message
-      });
+    const cartItemData: Omit<MatchingSetCartItem, 'cartItemId' | 'unitPrice' | 'quantity'> = {
+      productId: set.id,
+      name: set.name,
+      image: currentMainImage || set.images[0],
+      productType: 'matchingSet',
+      setBasePrice: set.setPrice,
+      braceletsCustomization: currentBraceletsCustomization,
+    };
+    addItemToCart(cartItemData);
     onClose();
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog open={isOpen} onOpenChange={(open) => {
+        if (!open && isEditing) setEditingItem(null);
+        onClose();
+    }}>
       <DialogContent className="max-w-4xl p-0">
         <ScrollArea className="max-h-[90vh]">
         <div className="grid md:grid-cols-2 gap-0">
@@ -290,7 +299,7 @@ export function MatchingBraceletSetDetailModal({ set, isOpen, onClose }: Matchin
                 className="w-full bg-accent text-accent-foreground hover:bg-accent/90 sm:w-auto"
                 onClick={handleAddToCart}
               >
-                Add Set to Cart - AED {totalSetPrice.toFixed(2)}
+                {isEditing ? 'Update Set' : 'Add Set to Cart'} - AED {totalSetPrice.toFixed(2)}
               </Button>
             </DialogFooter>
           </div>

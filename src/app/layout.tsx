@@ -5,6 +5,8 @@ import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { ThemeProvider } from '@/components/theme-provider';
+import { CartProvider } from '@/context/cart-context'; // Import CartProvider
+import { CartSidebar } from '@/components/cart-sidebar'; // Import CartSidebar
 
 const dancingScript = Dancing_Script({ // Changed from outfit to dancingScript
   subsets: ['latin'],
@@ -31,13 +33,15 @@ export default function RootLayout({
           enableSystem={false}
           storageKey="coezii-theme"
         >
-          <SidebarProvider>
-            {children}
-          </SidebarProvider>
+          <CartProvider> {/* Wrap with CartProvider */}
+            <SidebarProvider>
+              {children}
+              <CartSidebar /> {/* Add CartSidebar here so it can be toggled */}
+            </SidebarProvider>
+          </CartProvider>
         </ThemeProvider>
         <Toaster />
       </body>
     </html>
   );
 }
-

@@ -1,16 +1,30 @@
 
+'use client';
+
 import Link from 'next/link';
-import { Shirt, ShoppingCart } from 'lucide-react'; // Added ShoppingCart
+import { Shirt, ShoppingCart } from 'lucide-react';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import { ThemeToggleButton } from '@/components/theme-toggle-button';
-import { Button } from '@/components/ui/button'; // Added Button import
+import { Button } from '@/components/ui/button';
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
-} from "@/components/ui/tooltip"; // Added Tooltip imports
+} from "@/components/ui/tooltip";
+import { useCart } from '@/context/cart-context'; // Import useCart
+import { Badge } from '@/components/ui/badge'; // Import Badge for cart count
+import { useEffect, useState } from 'react';
+
 
 export function Header() {
+  const { cartCount, toggleCart } = useCart();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-primary/80 backdrop-blur-lg">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
@@ -49,15 +63,20 @@ export function Header() {
                 variant="ghost"
                 size="icon"
                 aria-label="View shopping cart"
-                className="text-primary-foreground hover:bg-primary-foreground/10"
-                // onClick={() => { /* TODO: Implement cart functionality */ }}
+                className="relative text-primary-foreground hover:bg-primary-foreground/10"
+                onClick={toggleCart} 
               >
                 <ShoppingCart className="h-5 w-5" />
+                {mounted && cartCount > 0 && (
+                  <Badge variant="destructive" className="absolute -top-1 -right-1 h-5 w-5 p-0 flex items-center justify-center text-xs rounded-full">
+                    {cartCount}
+                  </Badge>
+                )}
                 <span className="sr-only">View Shopping Cart</span>
               </Button>
             </TooltipTrigger>
             <TooltipContent>
-              <p>View Cart</p>
+              <p>View Cart ({mounted ? cartCount : 0} items)</p>
             </TooltipContent>
           </Tooltip>
           <div className="md:hidden">
@@ -68,4 +87,3 @@ export function Header() {
     </header>
   );
 }
-

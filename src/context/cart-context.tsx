@@ -1,0 +1,231 @@
+
+'use client';
+
+import type { ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import type { CartItem, HoodieCartItem, BraceletCartItem, MatchingSetCartItem, Hoodie, ProductColor, ProductSize, Bracelet, Charm, MatchingBraceletSet, EditingItemState, BraceletCustomization } from '@/types';
+import { toast } from '@/hooks/use-toast';
+import { mockBracelets } from '@/data/mock-bracelets';
+import { mockMatchingBracelets } from '@/data/mock-matching-bracelets';
+import { mockHoodies } from '@/data/mock-hoodies';
+
+
+const INCLUDED_CHARMS_COUNT = 4; // Same as in BraceletDetailModal
+const INCLUDED_CHARMS_PER_BRACELET_IN_SET = 4; // Same as in MatchingBraceletSetDetailModal
+
+interface CartContextType {
+  items: CartItem[];
+  addItemToCart: (itemData: Omit<CartItem, 'cartItemId' | 'unitPrice' | 'quantity'> & { quantity?: number }) => void;
+  removeItemFromCart: (cartItemId: string) => void;
+  updateItemQuantity: (cartItemId: string, quantity: number) => void;
+  clearCart: () => void;
+  cartTotal: number;
+  cartCount: number;
+  isCartOpen: boolean;
+  toggleCart: () => void;
+  openCart: () => void;
+  closeCart: () => void;
+  editingItem: EditingItemState;
+  setEditingItem: (item: EditingItemState) => void;
+  getOriginalProductForEditing: (cartItem: CartItem) => Hoodie | Bracelet | MatchingBraceletSet | undefined;
+}
+
+const CartContext = createContext<CartContextType | undefined>(undefined);
+
+export const CartProvider = ({ children }: { children: ReactNode }) => {
+  const [items, setItems] = useState<CartItem[]>([]);
+  const [isCartOpen, setIsCartOpen] = useState(false);
+  const [editingItem, setEditingItem] = useState<EditingItemState>(null);
+
+  useEffect(() => {
+    const storedCartItems = localStorage.getItem('cartItems');
+    if (storedCartItems) {
+      setItems(JSON.parse(storedCartItems));
+    }
+  }, []);
+
+  useEffect(() => {
+    if (items.length > 0 || localStorage.getItem('cartItems')) { // only save if items exist or existed
+        localStorage.setItem('cartItems', JSON.stringify(items));
+    } else if (items.length === 0 && localStorage.getItem('cartItems')) { // if cart becomes empty, clear local storage
+        localStorage.removeItem('cartItems');
+    }
+  }, [items]);
+
+  const generateCartItemId = (productId: string, options: any): string => {
+    const optionsString = JSON.stringify(
+      Object.entries(options)
+        .sort(([keyA], [keyB]) => keyA.localeCompare(keyB))
+        .reduce((obj, [key, value]) => {
+          (obj as any)[key] = value;
+          return obj;
+        }, {})
+    );
+    return `${productId}-${Buffer.from(optionsString).toString('base64')}`;
+  };
+  
+  const calculateUnitPrice = (itemData: Omit<CartItem, 'cartItemId' | 'unitPrice' | 'quantity'>): number => {
+    switch (itemData.productType) {
+      case 'hoodie':
+        return (itemData as Omit<HoodieCartItem, 'cartItemId' | 'unitPrice' | 'quantity'>).productId // This is actually the full price from hoodie object
+            ? mockHoodies.find(h => h.id === itemData.productId)?.price || 0
+            : 0;
+      case 'bracelet': {
+        const braceletData = itemData as Omit<BraceletCartItem, 'cartItemId' | 'unitPrice' | 'quantity'>;
+        let charmsPrice = 0;
+        if (braceletData.selectedCharms.length > INCLUDED_CHARMS_COUNT) {
+          const extraCharms = braceletData.selectedCharms.slice(INCLUDED_CHARMS_COUNT);
+          charmsPrice = extraCharms.reduce((sum, charm) => sum + charm.price, 0);
+        }
+        return braceletData.baseBraceletPrice + charmsPrice;
+      }
+      case 'matchingSet': {
+        const setData = itemData as Omit<MatchingSetCartItem, 'cartItemId' | 'unitPrice' | 'quantity'>;
+        let totalExtraCharmsPrice = 0;
+        setData.braceletsCustomization.forEach(customization => {
+          if (customization.selectedCharms.length > INCLUDED_CHARMS_PER_BRACELET_IN_SET) {
+            const extraCharms = customization.selectedCharms.slice(INCLUDED_CHARMS_PER_BRACELET_IN_SET);
+            totalExtraCharmsPrice += extraCharms.reduce((sum, charm) => sum + charm.price, 0);
+          }
+        });
+        return setData.setBasePrice + totalExtraCharmsPrice;
+      }
+      default:
+        return 0;
+    }
+  };
+
+  const addItemToCart = useCallback((itemData: Omit<CartItem, 'cartItemId' | 'unitPrice' | 'quantity'> & { quantity?: number }) => {
+    setItems(prevItems => {
+      let optionsForId = {};
+      if (itemData.productType === 'hoodie') {
+        const hoodieData = itemData as Omit<HoodieCartItem, 'cartItemId'| 'unitPrice' | 'quantity'>;
+        optionsForId = { color: hoodieData.selectedColor.value, size: hoodieData.selectedSize.value };
+      } else if (itemData.productType === 'bracelet') {
+        const braceletData = itemData as Omit<BraceletCartItem, 'cartItemId'| 'unitPrice' | 'quantity'>;
+        optionsForId = { charms: braceletData.selectedCharms.map(c => c.id).sort() };
+      } else if (itemData.productType === 'matchingSet') {
+        const setData = itemData as Omit<MatchingSetCartItem, 'cartItemId'| 'unitPrice' | 'quantity'>;
+        optionsForId = { 
+          customizations: setData.braceletsCustomization.map(bc => ({
+            braceletId: bc.braceletId,
+            charms: bc.selectedCharms.map(c => c.id).sort()
+          })).sort((a,b) => a.braceletId.localeCompare(b.braceletId))
+        };
+      }
+      
+      const cartItemId = generateCartItemId(itemData.productId, optionsForId);
+      const unitPrice = calculateUnitPrice(itemData);
+      const quantity = itemData.quantity || 1;
+
+      const existingItemIndex = prevItems.findIndex(item => item.cartItemId === cartItemId);
+
+      if (editingItem && editingItem.productType === itemData.productType && editingItem.productId === itemData.productId) {
+        // If editing, replace the item
+        const updatedItems = prevItems.map(item =>
+          item.cartItemId === editingItem.cartItemId
+            ? { ...itemData, cartItemId, unitPrice, quantity } as CartItem
+            : item
+        );
+        setEditingItem(null); // Clear editing state
+        toast({ title: "Item Updated", description: `${itemData.name} has been updated in your cart.` });
+        return updatedItems;
+      }
+
+
+      if (existingItemIndex > -1) {
+        const updatedItems = prevItems.map((item, index) =>
+          index === existingItemIndex
+            ? { ...item, quantity: item.quantity + quantity }
+            : item
+        );
+        toast({ title: "Quantity Updated", description: `Quantity of ${itemData.name} increased in your cart.` });
+        return updatedItems;
+      } else {
+        const newItem: CartItem = {
+          ...itemData,
+          cartItemId,
+          unitPrice,
+          quantity,
+        } as CartItem; // Type assertion
+        toast({ title: "Item Added", description: `${itemData.name} has been added to your cart.` });
+        return [...prevItems, newItem];
+      }
+    });
+    if (!isCartOpen) {
+        setIsCartOpen(true); // Open cart when item is added
+    }
+  }, [isCartOpen, editingItem]);
+
+  const removeItemFromCart = useCallback((cartItemId: string) => {
+    setItems(prevItems => {
+      const itemToRemove = prevItems.find(item => item.cartItemId === cartItemId);
+      if (itemToRemove) {
+        toast({ title: "Item Removed", description: `${itemToRemove.name} has been removed from your cart.`, variant: 'destructive' });
+      }
+      return prevItems.filter(item => item.cartItemId !== cartItemId);
+    });
+  }, []);
+
+  const updateItemQuantity = useCallback((cartItemId: string, quantity: number) => {
+    setItems(prevItems => {
+      if (quantity <= 0) {
+        const itemToRemove = prevItems.find(item => item.cartItemId === cartItemId);
+        if (itemToRemove) {
+          toast({ title: "Item Removed", description: `${itemToRemove.name} has been removed from your cart.`, variant: 'destructive' });
+        }
+        return prevItems.filter(item => item.cartItemId !== cartItemId);
+      }
+      const itemToUpdate = prevItems.find(item => item.cartItemId === cartItemId);
+      if (itemToUpdate) {
+         toast({ title: "Quantity Updated", description: `Quantity of ${itemToUpdate.name} changed to ${quantity}.`});
+      }
+      return prevItems.map(item =>
+        item.cartItemId === cartItemId ? { ...item, quantity } : item
+      );
+    });
+  }, []);
+
+  const clearCart = useCallback(() => {
+    setItems([]);
+    toast({ title: "Cart Cleared", description: "All items have been removed from your cart.", variant: 'destructive' });
+  }, []);
+
+  const cartTotal = items.reduce((total, item) => total + item.unitPrice * item.quantity, 0);
+  const cartCount = items.reduce((count, item) => count + item.quantity, 0);
+
+  const toggleCart = useCallback(() => setIsCartOpen(prev => !prev), []);
+  const openCart = useCallback(() => setIsCartOpen(true), []);
+  const closeCart = useCallback(() => {
+    setIsCartOpen(false);
+    setEditingItem(null); // Clear editing state when cart is closed
+  }, []);
+
+  const getOriginalProductForEditing = useCallback((cartItem: CartItem): Hoodie | Bracelet | MatchingBraceletSet | undefined => {
+    switch (cartItem.productType) {
+        case 'hoodie':
+            return mockHoodies.find(h => h.id === cartItem.productId);
+        case 'bracelet':
+            return mockBracelets.find(b => b.id === cartItem.productId);
+        case 'matchingSet':
+            return mockMatchingBracelets.find(ms => ms.id === cartItem.productId);
+        default:
+            return undefined;
+    }
+  }, []);
+
+
+  return (
+    <CartContext.Provider value={{ items, addItemToCart, removeItemFromCart, updateItemQuantity, clearCart, cartTotal, cartCount, isCartOpen, toggleCart, openCart, closeCart, editingItem, setEditingItem, getOriginalProductForEditing }}>
+      {children}
+    </CartContext.Provider>
+  );
+};
+
+export const useCart = () => {
+  const context = useContext(CartContext);
+  if (context === undefined) {
+    throw new Error('useCart must be used within a CartProvider');
+  }
+  return context;
+};

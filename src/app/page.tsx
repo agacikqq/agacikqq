@@ -7,13 +7,15 @@ import { ProductCard } from '@/components/product-card';
 import { FilterSidebar } from '@/components/filter-sidebar';
 import { ProductDetailModal } from '@/components/product-detail-modal';
 import { mockHoodies } from '@/data/mock-hoodies';
-import type { Hoodie, Filters, ProductColor, ProductSize, ProductDesign } from '@/types';
+import type { Hoodie, Filters, ProductColor, ProductSize, ProductDesign, HoodieCartItem } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Search, X } from 'lucide-react';
 import { SidebarInset } from '@/components/ui/sidebar';
+import { useCart } from '@/context/cart-context'; // Import useCart
 
 export default function HomePage() {
+  const { editingItem } = useCart(); // Get editingItem from cart context
   const [hoodies, setHoodies] = useState<Hoodie[]>(mockHoodies);
   const [selectedHoodie, setSelectedHoodie] = useState<Hoodie | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -24,11 +26,28 @@ export default function HomePage() {
     designs: [],
   });
 
-  // Prevent hydration errors by delaying rendering of client-specific components
   const [hasMounted, setHasMounted] = useState(false);
   useEffect(() => {
     setHasMounted(true);
   }, []);
+
+  // Effect to open modal if editingItem changes and is a hoodie from this page
+  useEffect(() => {
+    if (editingItem?.productType === 'hoodie') {
+      const hoodieToEdit = mockHoodies.find(h => h.id === editingItem.productId);
+      if (hoodieToEdit) {
+        setSelectedHoodie(hoodieToEdit);
+        setIsModalOpen(true);
+      }
+    } else if (!editingItem && isModalOpen && selectedHoodie){
+      // If editingItem is cleared (e.g. cart closed) and modal was for editing, close it.
+      // Check if the modal was for the specific selectedHoodie to avoid closing unrelated modals
+      const currentlyEditingThisHoodie = mockHoodies.find(h => h.id === selectedHoodie.id);
+      if(currentlyEditingThisHoodie){
+         // This logic might need refinement if editingItem can be null for other reasons
+      }
+    }
+  }, [editingItem, isModalOpen, selectedHoodie]);
 
 
   const allColors = useMemo(() => {
@@ -40,7 +59,6 @@ export default function HomePage() {
   const allSizes = useMemo(() => {
     const sizes = new Map<string, ProductSize>();
     mockHoodies.forEach(hoodie => hoodie.availableSizes.forEach(size => sizes.set(size.value, size)));
-    // Define a sort order for sizes
     const sortOrder: { [key: string]: number } = { 'XS': 1, 'S': 2, 'M': 3, 'L': 4, 'XL': 5 };
     return Array.from(sizes.values()).sort((a, b) => (sortOrder[a.value] || 99) - (sortOrder[b.value] || 99));
   }, []);
@@ -93,10 +111,10 @@ export default function HomePage() {
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setSelectedHoodie(null);
+    // If modal was closed while editing, editingItem is handled by modal itself
   };
 
   if (!hasMounted) {
-    // Render a loading state or null during server-side rendering and initial client-side mount
     return (
       <div className="flex flex-col min-h-screen">
         <Header />
@@ -120,7 +138,7 @@ export default function HomePage() {
           onClearFilters={handleClearFilters}
         />
         <SidebarInset>
-          <main className="flex-1 p-4 md:p-8 bg-transparent"> {/* Changed bg-background to bg-transparent to allow body gradient to show */}
+          <main className="flex-1 p-4 md:p-8 bg-transparent">
             <div className="container mx-auto">
               <div className="mb-8 flex flex-col sm:flex-row gap-4 items-center">
                 <div className="relative flex-grow w-full sm:w-auto">
@@ -130,7 +148,7 @@ export default function HomePage() {
                     placeholder="Search hoodies by name or description..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10 pr-10 py-3 rounded-full focus:ring-2 focus:ring-accent border-muted bg-card/80" // Input component itself handles text size
+                    className="pl-10 pr-10 py-3 rounded-full focus:ring-2 focus:ring-accent border-muted bg-card/80"
                   />
                   {searchTerm && (
                      <Button 
@@ -144,7 +162,7 @@ export default function HomePage() {
                      </Button>
                   )}
                 </div>
-                <p className="text-lg text-muted-foreground whitespace-nowrap"> {/* Increased text size from text-base to text-lg */}
+                <p className="text-lg text-muted-foreground whitespace-nowrap">
                   Showing {filteredHoodies.length} of {hoodies.length} hoodies
                 </p>
               </div>
@@ -158,7 +176,7 @@ export default function HomePage() {
               ) : (
                 <div className="text-center py-10">
                   <h2 className="text-3xl font-semibold mb-2">No Hoodies Found</h2>
-                  <p className="text-lg text-muted-foreground mb-4"> {/* Increased text size from text-base to text-lg */}
+                  <p className="text-lg text-muted-foreground mb-4">
                     Try adjusting your search or filters.
                   </p>
                   <Button onClick={handleClearFilters} variant="default" className="bg-accent text-accent-foreground hover:bg-accent/90">
@@ -178,4 +196,3 @@ export default function HomePage() {
     </>
   );
 }
-

@@ -7,9 +7,11 @@ import { MatchingBraceletSetCard } from '@/components/matching-bracelet-set-card
 import { MatchingBraceletSetDetailModal } from '@/components/matching-bracelet-set-detail-modal';
 import { mockMatchingBracelets } from '@/data/mock-matching-bracelets';
 import type { MatchingBraceletSet } from '@/types';
-import { HeartHandshake } from 'lucide-react'; // Using a relevant icon
+import { HeartHandshake } from 'lucide-react';
+import { useCart } from '@/context/cart-context'; // Import useCart
 
 export default function MatchingBraceletsPage() {
+  const { editingItem } = useCart(); // Get editingItem from cart context
   const [matchingSets, setMatchingSets] = useState<MatchingBraceletSet[]>([]);
   const [selectedSet, setSelectedSet] = useState<MatchingBraceletSet | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -20,6 +22,24 @@ export default function MatchingBraceletsPage() {
     setMatchingSets(mockMatchingBracelets);
   }, []);
 
+  // Effect to open modal if editingItem changes and is a matching set from this page
+  useEffect(() => {
+    if (editingItem?.productType === 'matchingSet') {
+      const setToEdit = mockMatchingBracelets.find(ms => ms.id === editingItem.productId);
+      // Ensure it's the correct type and specific item being edited
+      if (setToEdit && editingItem.type === 'matchingSet' && (editingItem.originalSet && editingItem.originalSet.id === setToEdit.id)) {
+        setSelectedSet(setToEdit);
+        setIsModalOpen(true);
+      }
+    } else if (!editingItem && isModalOpen && selectedSet) {
+        // If editingItem is cleared and modal was for editing, close it.
+        const currentlyEditingThisSet = mockMatchingBracelets.find(ms => ms.id === selectedSet.id);
+        if(currentlyEditingThisSet){
+           // Specific check for this item
+        }
+    }
+  }, [editingItem, isModalOpen, selectedSet]);
+
   const handleViewDetails = (set: MatchingBraceletSet) => {
     setSelectedSet(set);
     setIsModalOpen(true);
@@ -28,6 +48,7 @@ export default function MatchingBraceletsPage() {
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setSelectedSet(null);
+    // editingItem state is handled by the modal itself
   };
 
   if (!hasMounted) {

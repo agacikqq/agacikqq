@@ -10,8 +10,10 @@ import type { Hoodie } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Search, X, Percent } from 'lucide-react';
+import { useCart } from '@/context/cart-context'; // Import useCart
 
 export default function SalePage() {
+  const { editingItem } = useCart(); // Get editingItem from cart context
   const [allSaleHoodies, setAllSaleHoodies] = useState<Hoodie[]>([]);
   const [filteredSaleHoodies, setFilteredSaleHoodies] = useState<Hoodie[]>([]);
   const [selectedHoodie, setSelectedHoodie] = useState<Hoodie | null>(null);
@@ -29,6 +31,23 @@ export default function SalePage() {
     );
     setAllSaleHoodies(saleItems);
   }, []);
+
+  // Effect to open modal if editingItem changes and is a hoodie from this page
+  useEffect(() => {
+    if (editingItem?.productType === 'hoodie') {
+      const hoodieToEdit = allSaleHoodies.find(h => h.id === editingItem.productId);
+      if (hoodieToEdit) {
+        setSelectedHoodie(hoodieToEdit);
+        setIsModalOpen(true);
+      }
+    } else if (!editingItem && isModalOpen && selectedHoodie) {
+      const currentlyEditingThisHoodie = allSaleHoodies.find(h => h.id === selectedHoodie.id);
+      if (currentlyEditingThisHoodie) {
+        // This logic might need refinement
+      }
+    }
+  }, [editingItem, allSaleHoodies, isModalOpen, selectedHoodie]);
+
 
   useEffect(() => {
     let items = allSaleHoodies;
@@ -50,6 +69,7 @@ export default function SalePage() {
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setSelectedHoodie(null);
+    // editingItem state is handled by the modal itself
   };
 
   if (!hasMounted) {

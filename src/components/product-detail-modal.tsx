@@ -2,7 +2,7 @@
 'use client';
 
 import Image from 'next/image';
-import type { Hoodie, ProductColor, ProductSize } from '@/types';
+import type { Hoodie, ProductColor, ProductSize, HoodieCartItem } from '@/types';
 import {
   Dialog,
   DialogContent,
@@ -18,6 +18,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Package, ShieldCheck, Info, Percent } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
 import { toast } from "@/hooks/use-toast";
+import { useCart } from '@/context/cart-context'; // Import useCart
 
 interface ProductDetailModalProps {
   hoodie: Hoodie | null;
@@ -26,19 +27,44 @@ interface ProductDetailModalProps {
 }
 
 export function ProductDetailModal({ hoodie, isOpen, onClose }: ProductDetailModalProps) {
+  const { addItemToCart, editingItem, setEditingItem } = useCart();
   const [selectedColor, setSelectedColor] = useState<ProductColor | null>(null);
   const [selectedSize, setSelectedSize] = useState<ProductSize | null>(null);
+  const [currentImage, setCurrentImage] = useState<string>('');
+  
+  const isEditing = editingItem?.productType === 'hoodie' && editingItem?.productId === hoodie?.id;
 
   useEffect(() => {
-    if (hoodie) {
-      setSelectedColor(hoodie.colors[0] || null);
-      setSelectedSize(hoodie.availableSizes[0] || null);
+    if (isOpen && hoodie) {
+      if (isEditing && editingItem?.productType === 'hoodie') {
+        const editHoodie = editingItem.item as HoodieCartItem;
+        setSelectedColor(editHoodie.selectedColor);
+        setSelectedSize(editHoodie.selectedSize);
+        setCurrentImage(editHoodie.selectedColor?.image || editHoodie.image || hoodie.images[0]);
+      } else {
+        setSelectedColor(hoodie.colors[0] || null);
+        setSelectedSize(hoodie.availableSizes[0] || null);
+        setCurrentImage(hoodie.colors[0]?.image || hoodie.images[0]);
+      }
+    } else if (!isOpen) {
+        // Reset editingItem when modal closes if it was for this item
+        if (isEditing) {
+            setEditingItem(null);
+        }
     }
-  }, [hoodie]);
+  }, [hoodie, isOpen, isEditing, editingItem, setEditingItem]);
+  
+  useEffect(() => {
+    if (selectedColor && selectedColor.image) {
+      setCurrentImage(selectedColor.image);
+    } else if (hoodie && hoodie.images.length > 0) {
+      setCurrentImage(hoodie.images[0]);
+    }
+  }, [selectedColor, hoodie]);
+
 
   if (!hoodie) return null;
 
-  const currentImage = selectedColor?.image || hoodie.images[0];
   const isOnSale = hoodie.originalPrice && hoodie.originalPrice > hoodie.price;
   const discountPercent = isOnSale ? Math.round(((hoodie.originalPrice! - hoodie.price) / hoodie.originalPrice!) * 100) : 0;
 
@@ -52,16 +78,23 @@ export function ProductDetailModal({ hoodie, isOpen, onClose }: ProductDetailMod
         });
         return;
     }
-    toast({
-        title: "Added to Cart! (Simulated)",
-        description: `${hoodie.name} (${selectedColor?.name}, ${selectedSize?.name}) for AED ${hoodie.price.toFixed(2)}`,
-        variant: "default",
-    });
+    const cartItemData: Omit<HoodieCartItem, 'cartItemId' | 'unitPrice' | 'quantity'> = {
+      productId: hoodie.id,
+      name: hoodie.name,
+      image: selectedColor.image || hoodie.images[0], // Use color specific image if available
+      productType: 'hoodie',
+      selectedColor,
+      selectedSize,
+    };
+    addItemToCart(cartItemData);
     onClose();
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog open={isOpen} onOpenChange={(open) => {
+        if (!open && isEditing) setEditingItem(null); // Clear editing state if modal is closed
+        onClose();
+    }}>
       <DialogContent className="max-w-3xl p-0">
         <ScrollArea className="max-h-[90vh]">
         <div className="grid md:grid-cols-2 gap-0">
@@ -82,32 +115,27 @@ export function ProductDetailModal({ hoodie, isOpen, onClose }: ProductDetailMod
                 </Badge>
               )}
             </div>
-            {hoodie.images.length > 1 && (
+            {hoodie.images.length > 1 && hoodie.colors.length > 1 && (
               <div className="grid grid-cols-4 gap-2">
-                {hoodie.images.map((img, index) => {
-                  const colorForImage = hoodie.colors.find(c => c.image === img) || hoodie.colors[index % hoodie.colors.length];
-                  return (
-                    <button
-                      key={index}
-                      onClick={() => {
-                        if (colorForImage) setSelectedColor(colorForImage);
-                      }}
-                      className={`aspect-square rounded-md overflow-hidden border-2 ${
-                        (selectedColor?.image || hoodie.images[0]) === img ? 'border-accent' : 'border-transparent'
-                      } hover:border-accent/70 transition-colors`}
-                      aria-label={`View ${colorForImage?.name || `image ${index + 1}`}`}
-                    >
-                      <Image
-                        src={img}
-                        alt={`Thumbnail ${index + 1} ${colorForImage?.name || ''}`}
-                        width={100}
-                        height={133}
-                        className="h-full w-full object-cover"
-                        data-ai-hint="hoodie clothing thumbnail"
-                      />
-                    </button>
-                  );
-                })}
+                {hoodie.colors.filter(c => c.image).map((colorOption) => (
+                  <button
+                    key={colorOption.value}
+                    onClick={() => setSelectedColor(colorOption)}
+                    className={`aspect-square rounded-md overflow-hidden border-2 ${
+                      selectedColor?.value === colorOption.value ? 'border-accent ring-2 ring-accent' : 'border-transparent'
+                    } hover:border-accent/70 transition-colors`}
+                    aria-label={`View ${colorOption.name}`}
+                  >
+                    <Image
+                      src={colorOption.image!}
+                      alt={`Thumbnail ${colorOption.name}`}
+                      width={100}
+                      height={133}
+                      className="h-full w-full object-cover"
+                      data-ai-hint="hoodie clothing thumbnail"
+                    />
+                  </button>
+                ))}
               </div>
             )}
           </div>
@@ -212,7 +240,7 @@ export function ProductDetailModal({ hoodie, isOpen, onClose }: ProductDetailMod
                 onClick={handleAddToCart}
                 disabled={!selectedColor || !selectedSize}
               >
-                Add to Cart
+                {isEditing ? 'Update Item' : 'Add to Cart'}
               </Button>
             </DialogFooter>
           </div>

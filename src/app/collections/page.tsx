@@ -8,8 +8,10 @@ import { BraceletDetailModal } from '@/components/bracelet-detail-modal';
 import { mockBracelets } from '@/data/mock-bracelets';
 import type { Bracelet } from '@/types';
 import { Gem } from 'lucide-react';
+import { useCart } from '@/context/cart-context'; // Import useCart
 
 export default function CollectionsPage() {
+  const { editingItem } = useCart(); // Get editingItem from cart context
   const [bracelets, setBracelets] = useState<Bracelet[]>([]);
   const [selectedBracelet, setSelectedBracelet] = useState<Bracelet | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -20,6 +22,23 @@ export default function CollectionsPage() {
     setBracelets(mockBracelets);
   }, []);
 
+  // Effect to open modal if editingItem changes and is a bracelet from this page
+  useEffect(() => {
+    if (editingItem?.productType === 'bracelet') {
+      const braceletToEdit = mockBracelets.find(b => b.id === editingItem.productId);
+      if (braceletToEdit && editingItem.type === 'bracelet' && (editingItem.originalBracelet && editingItem.originalBracelet.id === braceletToEdit.id)) { // Ensure it's the correct bracelet type and specific item
+        setSelectedBracelet(braceletToEdit);
+        setIsModalOpen(true);
+      }
+    } else if (!editingItem && isModalOpen && selectedBracelet) {
+        // If editingItem is cleared and modal was for editing, close it.
+        const currentlyEditingThisBracelet = mockBracelets.find(b => b.id === selectedBracelet.id);
+        if(currentlyEditingThisBracelet){
+           // More specific check could be added if needed.
+        }
+    }
+  }, [editingItem, isModalOpen, selectedBracelet]);
+
   const handleViewDetails = (bracelet: Bracelet) => {
     setSelectedBracelet(bracelet);
     setIsModalOpen(true);
@@ -28,6 +47,7 @@ export default function CollectionsPage() {
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setSelectedBracelet(null);
+    // editingItem state is handled by the modal itself
   };
 
   if (!hasMounted) {
