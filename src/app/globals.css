@@ -4,94 +4,96 @@
 
 @layer base {
   :root {
-    --background: 210 25% 88%; /* Darker light cool gray */
-    --foreground: 215 35% 15%; /* Deeper, richer dark grayish blue for text */
+    /* Beige Light Theme */
+    --background: 45 50% 90%; /* Light Beige */
+    --foreground: 45 20% 20%; /* Dark Brownish Gray */
 
-    --card: 210 20% 96%; /* Slightly off-white cards */
-    --card-foreground: 215 35% 15%;
+    --card: 45 45% 95%; /* Very Light Beige */
+    --card-foreground: 45 20% 20%;
 
-    --popover: 210 20% 96%;
-    --popover-foreground: 215 35% 15%;
+    --popover: 45 45% 95%;
+    --popover-foreground: 45 20% 20%;
 
-    --primary: 200 55% 50%; /* Darker, more saturated Muted Blue */
-    --primary-foreground: 200 60% 95%; /* Lighter text for contrast */
+    --primary: 25 60% 50%; /* Terracotta/Muted Orange */
+    --primary-foreground: 25 30% 95%; /* Light text for contrast */
 
-    --secondary: 120 45% 60%; /* Darker Muted Green */
-    --secondary-foreground: 120 30% 90%;
+    --secondary: 90 30% 60%; /* Soft Sage Green */
+    --secondary-foreground: 90 20% 90%;
 
-    --muted: 210 20% 75%; /* Darker Cool Soft Gray */
-    --muted-foreground: 210 20% 30%; /* Darker Gray text for muted */
+    --muted: 45 30% 80%; /* Muted Beige */
+    --muted-foreground: 45 20% 40%; /* Darker Gray text for muted */
 
-    --accent: 35 75% 45%; /* Richer, slightly darker Amber/Orange */
-    --accent-foreground: 35 60% 96%; /* Very light text on accent */
+    --accent: 35 75% 55%; /* Amber/Orange */
+    --accent-foreground: 35 50% 96%; /* Very light text on accent */
 
-    --destructive: 0 70% 50%; /* Darker red */
+    --destructive: 0 70% 55%; /* Darker red */
     --destructive-foreground: 0 0% 98%;
 
-    --border: 210 15% 70%; /* Darker border */
-    --input: 210 15% 80%; /* Darker input background */
-    --ring: 35 75% 45%; /* Richer Amber/Orange for focus rings (matching accent) */
+    --border: 45 30% 70%; /* Beige-toned border */
+    --input: 45 40% 85%; /* Slightly darker beige for input background */
+    --ring: 35 75% 55%; /* Amber/Orange for focus rings (matching accent) */
     --radius: 0.7rem;
 
-    /* Sidebar variables */
+    /* Sidebar variables - Beige Light Theme */
     --sidebar-background: hsl(var(--card));
     --sidebar-foreground: hsl(var(--card-foreground));
     --sidebar-primary: hsl(var(--primary));
     --sidebar-primary-foreground: hsl(var(--primary-foreground));
-    --sidebar-accent: 200 55% 90%; /* Lighter version of primary hue for hover */
-    --sidebar-accent-foreground: 200 55% 20%; /* Darker text for light accent */
+    --sidebar-accent: 45 50% 85%; /* Lighter version of beige for hover */
+    --sidebar-accent-foreground: 45 20% 30%; /* Darker text for light accent */
     --sidebar-border: hsl(var(--border));
     --sidebar-ring: hsl(var(--ring));
 
     --chart-1: 12 70% 50%;
-    --chart-2: 173 55% 30%;
-    --chart-3: 197 40% 22%;
+    --chart-2: 100 45% 50%; /* Adjusted to complement beige theme */
+    --chart-3: 30 60% 60%;  /* Adjusted */
     --chart-4: 43 70% 55%;
     --chart-5: 27 80% 55%;
   }
 
   .dark {
-    --background: 222 45% 8%; /* Even darker, rich desaturated blue-black */
-    --foreground: 210 30% 90%; /* Slightly less stark white for text */
+    /* Midnight Blue Dark Theme */
+    --background: 220 40% 10%; /* Deep Midnight Blue */
+    --foreground: 220 20% 85%; /* Light Cool Gray/Blue */
 
-    --card: 222 45% 12%; /* Darker cards, distinct from bg */
-    --card-foreground: 210 30% 90%;
+    --card: 220 40% 15%; /* Slightly Lighter Midnight Blue for cards */
+    --card-foreground: 220 20% 85%;
 
-    --popover: 222 45% 12%;
-    --popover-foreground: 210 30% 90%;
+    --popover: 220 40% 15%;
+    --popover-foreground: 220 20% 85%;
 
-    --primary: 190 65% 30%; /* Deeper, richer Teal */
-    --primary-foreground: 190 30% 92%; 
+    --primary: 200 70% 60%; /* Bright Cyan/Blue */
+    --primary-foreground: 200 30% 10%; /* Dark text for contrast */
 
-    --secondary: 260 45% 35%; /* Deeper, richer Plum */
-    --secondary-foreground: 260 30% 92%;
+    --secondary: 210 15% 50%; /* Muted Steel Blue/Gray */
+    --secondary-foreground: 210 20% 90%;
 
-    --muted: 220 25% 18%; /* Darker Gray for muted elements */
-    --muted-foreground: 210 25% 65%; 
+    --muted: 220 30% 20%; /* Darker Muted Blue */
+    --muted-foreground: 220 20% 65%; 
 
-    --accent: 35 85% 50%; /* More vibrant, slightly darker Amber/Orange */
-    --accent-foreground: 35 30% 96%;
+    --accent: 45 90% 55%; /* Vibrant Gold/Yellow */
+    --accent-foreground: 45 50% 10%; /* Dark text on accent */
 
-    --destructive: 0 65% 45%; /* Darker red */
+    --destructive: 0 65% 50%; /* Darker red */
     --destructive-foreground: 0 0% 98%;
 
-    --border: 220 25% 20%; /* Darker border */
-    --input: 220 25% 15%; /* Darker input background */
-    --ring: 35 85% 50%; /* Richer Amber/Dark Orange for focus rings */
+    --border: 220 30% 25%; /* Midnight Blue-toned border */
+    --input: 220 30% 18%; /* Slightly lighter than card for input */
+    --ring: 45 90% 55%; /* Vibrant Gold/Yellow for focus rings */
     
-    /* Sidebar variables */
+    /* Sidebar variables - Midnight Blue Dark Theme */
     --sidebar-background: hsl(var(--card));
     --sidebar-foreground: hsl(var(--card-foreground));
     --sidebar-primary: hsl(var(--primary));
     --sidebar-primary-foreground: hsl(var(--primary-foreground));
-    --sidebar-accent: 190 65% 15%;  /* Darker hover, derived from primary hue */
+    --sidebar-accent: 220 40% 20%;  /* Darker hover, derived from card hue */
     --sidebar-accent-foreground: hsl(var(--foreground));
     --sidebar-border: hsl(var(--border));
     --sidebar-ring: hsl(var(--ring));
 
     --chart-1: 220 75% 60%;
-    --chart-2: 160 65% 50%;
-    --chart-3: 30 85% 65%;
+    --chart-2: 180 65% 50%; /* Adjusted to complement midnight blue */
+    --chart-3: 50 85% 65%;  /* Adjusted */
     --chart-4: 280 70% 70%;
     --chart-5: 340 80% 65%;
   }
