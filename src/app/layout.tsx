@@ -1,6 +1,6 @@
 
 import type { Metadata } from 'next';
-import { Dancing_Script } from 'next/font/google';
+import { Great_Vibes } from 'next/font/google'; // Changed from Dancing_Script to Great_Vibes
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 import { SidebarProvider } from '@/components/ui/sidebar';
@@ -8,14 +8,14 @@ import { ThemeProvider } from '@/components/theme-provider';
 import { CartProvider } from '@/context/cart-context';
 import { CartSidebar } from '@/components/cart-sidebar';
 
-const dancingScript = Dancing_Script({
+const greatVibes = Great_Vibes({ // Changed from dancingScript to greatVibes
   subsets: ['latin'],
-  weight: ['400', '500', '600', '700'], // Dancing Script has limited weights, but specifying helps if available
-  variable: '--font-dancing-script',
+  weight: ['400'], // Great Vibes typically has only 400 weight
+  variable: '--font-great-vibes', // Changed variable name
 });
 
 export const metadata: Metadata = {
-  title: 'cœzii - Awesome Hoodies for Teens', // Updated title
+  title: 'cœzii - Awesome Hoodies for Teens',
   description: 'Discover the coolest and most comfortable hoodies. Filter by color, size, and design.',
 };
 
@@ -26,12 +26,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="h-full">
-      <body className={`${dancingScript.variable} font-sans antialiased flex flex-col min-h-screen bg-background text-2xl`}> {/* Apply new font variable and base text size */}
+      <body className={`${greatVibes.variable} font-sans antialiased flex flex-col min-h-screen bg-background text-2xl`}> {/* Apply new font variable */}
         <ThemeProvider
           attribute="class"
           defaultTheme="light"
           enableSystem={false}
-          storageKey="coezii-theme" // Updated storageKey
+          storageKey="coezii-theme"
         >
           <CartProvider>
             <SidebarProvider>
