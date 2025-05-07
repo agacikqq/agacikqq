@@ -4,41 +4,41 @@
 
 @layer base {
   :root {
-    --background: 210 60% 98%; /* Very light cool gray, almost white */
-    --foreground: 215 25% 27%; /* Dark grayish blue for text */
+    --background: 210 30% 92%; /* Light cool gray */
+    --foreground: 215 30% 20%; /* Deeper dark grayish blue for text */
 
     --card: 0 0% 100%; /* White cards */
-    --card-foreground: 215 25% 27%;
+    --card-foreground: 215 30% 20%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 215 25% 27%;
+    --popover-foreground: 215 30% 20%;
 
-    --primary: 200 53% 80%; /* Light Blue (ADD8E6) - Main theme color */
-    --primary-foreground: 200 30% 20%; /* Darker blue text on light blue */
+    --primary: 200 50% 65%; /* Muted Blue */
+    --primary-foreground: 200 80% 15%; /* Darker blue text for contrast */
 
-    --secondary: 120 60% 88%; /* Lighter Pastel Green (#90EE90) - supporting elements */
-    --secondary-foreground: 120 30% 25%; /* Darker Green for text */
+    --secondary: 120 40% 75%; /* Muted Green */
+    --secondary-foreground: 120 50% 20%; /* Darker Green for text */
 
-    --muted: 0 0% 90%; /* Soft Gray (D3D3D3) for muted elements */
-    --muted-foreground: 0 0% 45%; /* Gray text for muted */
+    --muted: 210 30% 85%; /* Cool Soft Gray for muted elements */
+    --muted-foreground: 210 25% 40%; /* Gray text for muted */
 
-    --accent: 330 100% 71%; /* Bright Pink (#FF69B4) for CTAs and highlights */
-    --accent-foreground: 0 0% 100%; /* White text on pink accent */
+    --accent: 35 70% 50%; /* Muted Amber/Orange for CTAs and highlights */
+    --accent-foreground: 35 100% 95%; /* Very light text on accent */
 
-    --destructive: 0 84.2% 60.2%;
+    --destructive: 0 75% 55%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 0 0% 88%;
-    --input: 0 0% 94%;
-    --ring: 330 100% 71%; /* Pink for focus rings (matching accent) */
-    --radius: 0.8rem; /* More rounded for youthful feel */
+    --border: 210 20% 80%;
+    --input: 210 20% 88%;
+    --ring: 35 70% 50%; /* Amber/Orange for focus rings (matching accent) */
+    --radius: 0.7rem; /* Slightly less rounded for a more mature feel */
 
-    /* Sidebar variables - aliased to main theme for consistency */
+    /* Sidebar variables */
     --sidebar-background: hsl(var(--card));
     --sidebar-foreground: hsl(var(--card-foreground));
     --sidebar-primary: hsl(var(--primary)); /* Active item in sidebar */
     --sidebar-primary-foreground: hsl(var(--primary-foreground));
-    --sidebar-accent: 200 53% 92%; /* Lighter blue for hover in sidebar on card-like bg */
+    --sidebar-accent: 200 50% 90%; /* Lighter blue for hover in sidebar on card-like bg */
     --sidebar-accent-foreground: hsl(var(--primary-foreground));
     --sidebar-border: hsl(var(--border));
     --sidebar-ring: hsl(var(--ring));
@@ -51,41 +51,41 @@
   }
 
   .dark {
-    --background: 220 18% 12%;
-    --foreground: 210 20% 90%;
+    --background: 222 40% 12%; /* Very dark, rich desaturated blue */
+    --foreground: 210 40% 95%; /* Light gray/off-white for text */
 
-    --card: 220 18% 10%;
-    --card-foreground: 210 20% 90%;
+    --card: 222 40% 15%; /* Slightly lighter than background, still dark */
+    --card-foreground: 210 40% 95%;
 
-    --popover: 220 18% 10%;
-    --popover-foreground: 210 20% 90%;
+    --popover: 222 40% 15%;
+    --popover-foreground: 210 40% 95%;
 
-    --primary: 200 40% 40%; /* Darker Light Blue */
-    --primary-foreground: 200 50% 90%;
+    --primary: 190 60% 35%; /* Deep Teal */
+    --primary-foreground: 190 20% 90%; /* Light text on primary */
 
-    --secondary: 120 30% 25%; /* Darker Pastel Green */
-    --secondary-foreground: 120 50% 80%;
+    --secondary: 260 40% 40%; /* Deep Plum */
+    --secondary-foreground: 260 20% 90%; /* Light text on secondary */
 
-    --muted: 220 15% 22%;
-    --muted-foreground: 210 15% 65%;
+    --muted: 220 20% 20%; /* Dark Gray for muted elements */
+    --muted-foreground: 210 30% 70%; /* Lighter Gray text for muted */
 
-    --accent: 330 90% 65%; /* Adjusted Bright Pink for dark mode */
-    --accent-foreground: 330 100% 98%;
+    --accent: 35 80% 55%; /* Rich Amber/Dark Orange */
+    --accent-foreground: 35 20% 95%; /* Light cream/off-white text on accent */
 
-    --destructive: 0 70% 45%;
+    --destructive: 0 70% 50%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 220 15% 25%;
-    --input: 220 15% 20%;
-    --ring: 330 90% 65%;
+    --border: 220 20% 25%;
+    --input: 220 20% 18%;
+    --ring: 35 80% 55%; /* Amber/Dark Orange for focus rings */
     
-    /* Sidebar variables - aliased to main theme for consistency */
+    /* Sidebar variables */
     --sidebar-background: hsl(var(--card));
     --sidebar-foreground: hsl(var(--card-foreground));
     --sidebar-primary: hsl(var(--primary));
     --sidebar-primary-foreground: hsl(var(--primary-foreground));
-    --sidebar-accent: 200 40% 25%; 
-    --sidebar-accent-foreground: hsl(var(--primary-foreground));
+    --sidebar-accent: 222 40% 20%;  /* Slightly lighter card color for hover */
+    --sidebar-accent-foreground: hsl(var(--foreground));
     --sidebar-border: hsl(var(--border));
     --sidebar-ring: hsl(var(--ring));
 
@@ -103,5 +103,10 @@
   }
   body {
     @apply bg-background text-foreground;
+    /* Subtle background gradient for depth */
+    background-image: linear-gradient(135deg, hsl(var(--background)) 0%, color-mix(in srgb, hsl(var(--background)) 85%, hsl(var(--foreground)) 15%) 100%);
+  }
+  .dark body {
+     background-image: linear-gradient(135deg, hsl(var(--background)) 0%, color-mix(in srgb, hsl(var(--background)) 85%, hsl(var(--foreground)) 5%) 100%);
   }
 }

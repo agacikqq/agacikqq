@@ -10,8 +10,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: 'TeenHood - Awesome Hoodies for Teens',
-  description: 'Discover the coolest hoodies for teens. Filter by color, size, and design.',
+  title: 'cœzii - Awesome Hoodies for Teens',
+  description: 'Discover the coolest and most comfortable hoodies. Filter by color, size, and design.',
 };
 
 export default function RootLayout({

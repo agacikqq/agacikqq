@@ -100,7 +100,7 @@ export default function HomePage() {
       <div className="flex flex-col min-h-screen">
         <Header />
         <div className="flex-grow container mx-auto p-4 text-center">
-          <p className="text-2xl font-semibold text-primary animate-pulse">Loading TeenHood...</p>
+          <p className="text-2xl font-semibold text-primary animate-pulse">Loading cœzii...</p>
         </div>
       </div>
     );
@@ -119,7 +119,7 @@ export default function HomePage() {
           onClearFilters={handleClearFilters}
         />
         <SidebarInset>
-          <main className="flex-1 p-4 md:p-8 bg-background">
+          <main className="flex-1 p-4 md:p-8 bg-transparent"> {/* Changed bg-background to bg-transparent to allow body gradient to show */}
             <div className="container mx-auto">
               <div className="mb-8 flex flex-col sm:flex-row gap-4 items-center">
                 <div className="relative flex-grow w-full sm:w-auto">
@@ -129,7 +129,7 @@ export default function HomePage() {
                     placeholder="Search hoodies by name or description..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10 pr-10 py-3 text-base rounded-full focus:ring-2 focus:ring-accent border-muted"
+                    className="pl-10 pr-10 py-3 text-base rounded-full focus:ring-2 focus:ring-accent border-muted bg-card/80" /* Added bg-card/80 for better visibility on gradient */
                   />
                   {searchTerm && (
                      <Button 

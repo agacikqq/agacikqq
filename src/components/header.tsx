@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Shirt } from 'lucide-react';
+import { Shirt } from 'lucide-react'; // Icon can be reviewed later if "Shirt" doesn't fit "cœzii"
 import { SidebarTrigger } from '@/components/ui/sidebar';
 
 export function Header() {
@@ -10,7 +10,7 @@ export function Header() {
           <Link href="/" className="flex items-center space-x-2">
             <Shirt className="h-7 w-7 text-primary-foreground" />
             <span className="inline-block text-2xl font-bold text-primary-foreground tracking-tight">
-              TeenHood
+              cœzii
             </span>
           </Link>
         </div>
