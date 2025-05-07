@@ -38,7 +38,7 @@ export interface Filters {
   designs: string[];
 }
 
-// New types for Bracelets and Charms
+// Charm type
 export interface Charm {
   id: string;
   name: string;
@@ -47,6 +47,7 @@ export interface Charm {
   description?: string;
 }
 
+// Individual Bracelet type (customizable with charms)
 export interface Bracelet {
   id: string;
   name: string;
@@ -56,5 +57,25 @@ export interface Bracelet {
   images: string[]; // URLs to images, first image is primary
   materials: string; // e.g., "Sterling Silver, Leather"
   availableCharms: Charm[]; // Array of available charms for this bracelet
-  // Optional: Add other relevant properties like clasp type, length options, etc.
+}
+
+// Simplified Bracelet Info for use within a Matching Set
+export interface SimpleBraceletInfo {
+  id: string;
+  name: string; // e.g., "Her Moon Bracelet"
+  image: string;
+  materials: string;
+  description?: string; // Short description for this specific part of the set
+}
+
+// Matching Bracelet Set type
+export interface MatchingBraceletSet {
+  id: string;
+  name: string; // e.g., "Sun & Moon Lovers Set"
+  slug: string;
+  description: string; // Description of the entire set
+  setPrice: number; // Price for the whole set
+  originalSetPrice?: number; // For sales
+  images: string[]; // Images showcasing the set (e.g., both bracelets worn together)
+  bracelets: SimpleBraceletInfo[]; // Details of each bracelet in the set
 }

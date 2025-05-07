@@ -24,7 +24,10 @@ export function Header() {
             Shop All
           </Link>
           <Link href="/collections" className="text-base font-medium text-primary-foreground hover:text-primary-foreground/80 transition-colors">
-            Collections
+            Bracelets
+          </Link>
+          <Link href="/matching-bracelets" className="text-base font-medium text-primary-foreground hover:text-primary-foreground/80 transition-colors">
+            Matching Sets
           </Link>
           <Link href="/sale" className="text-base font-medium text-primary-foreground hover:text-primary-foreground/80 transition-colors">
             Sale
