@@ -1,4 +1,3 @@
-
 'use client';
 
 import type { ReactNode } from 'react';
@@ -32,6 +31,50 @@ interface CartContextType {
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
+const generateCartItemId = (productId: string, options: any): string => {
+  const optionsString = JSON.stringify(
+    Object.entries(options)
+      .sort(([keyA], [keyB]) => keyA.localeCompare(keyB))
+      .reduce((obj, [key, value]) => {
+        (obj as any)[key] = value;
+        return obj;
+      }, {})
+  );
+  return `${productId}-${Buffer.from(optionsString).toString('base64')}`;
+};
+
+const calculateUnitPrice = (itemData: Omit<CartItem, 'cartItemId' | 'unitPrice' | 'quantity'>): number => {
+  switch (itemData.productType) {
+    case 'hoodie':
+      return (itemData as Omit<HoodieCartItem, 'cartItemId' | 'unitPrice' | 'quantity'>).productId
+          ? mockHoodies.find(h => h.id === itemData.productId)?.price || 0
+          : 0;
+    case 'bracelet': {
+      const braceletData = itemData as Omit<BraceletCartItem, 'cartItemId' | 'unitPrice' | 'quantity'>;
+      let charmsPrice = 0;
+      if (braceletData.selectedCharms.length > INCLUDED_CHARMS_COUNT) {
+        const extraCharms = braceletData.selectedCharms.slice(INCLUDED_CHARMS_COUNT);
+        charmsPrice = extraCharms.reduce((sum, charm) => sum + charm.price, 0);
+      }
+      return braceletData.baseBraceletPrice + charmsPrice;
+    }
+    case 'matchingSet': {
+      const setData = itemData as Omit<MatchingSetCartItem, 'cartItemId' | 'unitPrice' | 'quantity'>;
+      let totalExtraCharmsPrice = 0;
+      setData.braceletsCustomization.forEach(customization => {
+        if (customization.selectedCharms.length > INCLUDED_CHARMS_PER_BRACELET_IN_SET) {
+          const extraCharms = customization.selectedCharms.slice(INCLUDED_CHARMS_PER_BRACELET_IN_SET);
+          totalExtraCharmsPrice += extraCharms.reduce((sum, charm) => sum + charm.price, 0);
+        }
+      });
+      return setData.setBasePrice + totalExtraCharmsPrice;
+    }
+    default:
+      return 0;
+  }
+};
+
+
 export const CartProvider = ({ children }: { children: ReactNode }) => {
   const [items, setItems] = useState<CartItem[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
@@ -45,117 +88,100 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   useEffect(() => {
-    if (items.length > 0 || localStorage.getItem('cartItems')) { // only save if items exist or existed
+    if (items.length > 0 || localStorage.getItem('cartItems')) {
         localStorage.setItem('cartItems', JSON.stringify(items));
-    } else if (items.length === 0 && localStorage.getItem('cartItems')) { // if cart becomes empty, clear local storage
+    } else if (items.length === 0 && localStorage.getItem('cartItems')) {
         localStorage.removeItem('cartItems');
     }
   }, [items]);
 
-  const generateCartItemId = (productId: string, options: any): string => {
-    const optionsString = JSON.stringify(
-      Object.entries(options)
-        .sort(([keyA], [keyB]) => keyA.localeCompare(keyB))
-        .reduce((obj, [key, value]) => {
-          (obj as any)[key] = value;
-          return obj;
-        }, {})
-    );
-    return `${productId}-${Buffer.from(optionsString).toString('base64')}`;
-  };
-  
-  const calculateUnitPrice = (itemData: Omit<CartItem, 'cartItemId' | 'unitPrice' | 'quantity'>): number => {
-    switch (itemData.productType) {
-      case 'hoodie':
-        return (itemData as Omit<HoodieCartItem, 'cartItemId' | 'unitPrice' | 'quantity'>).productId // This is actually the full price from hoodie object
-            ? mockHoodies.find(h => h.id === itemData.productId)?.price || 0
-            : 0;
-      case 'bracelet': {
-        const braceletData = itemData as Omit<BraceletCartItem, 'cartItemId' | 'unitPrice' | 'quantity'>;
-        let charmsPrice = 0;
-        if (braceletData.selectedCharms.length > INCLUDED_CHARMS_COUNT) {
-          const extraCharms = braceletData.selectedCharms.slice(INCLUDED_CHARMS_COUNT);
-          charmsPrice = extraCharms.reduce((sum, charm) => sum + charm.price, 0);
-        }
-        return braceletData.baseBraceletPrice + charmsPrice;
-      }
-      case 'matchingSet': {
-        const setData = itemData as Omit<MatchingSetCartItem, 'cartItemId' | 'unitPrice' | 'quantity'>;
-        let totalExtraCharmsPrice = 0;
-        setData.braceletsCustomization.forEach(customization => {
-          if (customization.selectedCharms.length > INCLUDED_CHARMS_PER_BRACELET_IN_SET) {
-            const extraCharms = customization.selectedCharms.slice(INCLUDED_CHARMS_PER_BRACELET_IN_SET);
-            totalExtraCharmsPrice += extraCharms.reduce((sum, charm) => sum + charm.price, 0);
-          }
-        });
-        return setData.setBasePrice + totalExtraCharmsPrice;
-      }
-      default:
-        return 0;
-    }
-  };
-
-  const addItemToCart = useCallback((itemData: Omit<CartItem, 'cartItemId' | 'unitPrice' | 'quantity'> & { quantity?: number }) => {
-    setItems(prevItems => {
-      let optionsForId = {};
-      if (itemData.productType === 'hoodie') {
+  const addItemToCartLogic = (
+    itemData: Omit<CartItem, 'cartItemId' | 'unitPrice' | 'quantity'> & { quantity?: number },
+    currentItems: CartItem[],
+    currentEditingItem: EditingItemState
+  ): { nextItems: CartItem[], toastMsg: { title: string; description: string } | null, editingItemToClear: boolean } => {
+    
+    let optionsForId: any = {};
+    if (itemData.productType === 'hoodie') {
         const hoodieData = itemData as Omit<HoodieCartItem, 'cartItemId'| 'unitPrice' | 'quantity'>;
         optionsForId = { color: hoodieData.selectedColor.value, size: hoodieData.selectedSize.value };
-      } else if (itemData.productType === 'bracelet') {
+    } else if (itemData.productType === 'bracelet') {
         const braceletData = itemData as Omit<BraceletCartItem, 'cartItemId'| 'unitPrice' | 'quantity'>;
         optionsForId = { charms: braceletData.selectedCharms.map(c => c.id).sort() };
-      } else if (itemData.productType === 'matchingSet') {
+    } else if (itemData.productType === 'matchingSet') {
         const setData = itemData as Omit<MatchingSetCartItem, 'cartItemId'| 'unitPrice' | 'quantity'>;
         optionsForId = { 
-          customizations: setData.braceletsCustomization.map(bc => ({
+        customizations: setData.braceletsCustomization.map(bc => ({
             braceletId: bc.braceletId,
             charms: bc.selectedCharms.map(c => c.id).sort()
-          })).sort((a,b) => a.braceletId.localeCompare(b.braceletId))
+        })).sort((a,b) => a.braceletId.localeCompare(b.braceletId))
         };
+    }
+
+    const cartItemId = generateCartItemId(itemData.productId, optionsForId);
+    const unitPrice = calculateUnitPrice(itemData);
+    const quantityToAdd = itemData.quantity || 1;
+
+    let nextItems = [...currentItems];
+    let toastMsg: { title: string; description: string } | null = null;
+    let editingItemToClear = false;
+
+    if (currentEditingItem && currentEditingItem.productType === itemData.productType && currentEditingItem.productId === itemData.productId) {
+      let itemReplaced = false;
+      nextItems = currentItems.map(item => {
+        if (item.cartItemId === currentEditingItem.cartItemId) {
+          itemReplaced = true;
+          return { ...itemData, cartItemId, unitPrice, quantity: quantityToAdd } as CartItem;
+        }
+        return item;
+      });
+      // If the item being edited was somehow not in the cart (e.g., removed by another action), add the new config as a new item.
+      if (!itemReplaced) {
+        nextItems.push({ ...itemData, cartItemId, unitPrice, quantity: quantityToAdd } as CartItem)
       }
-      
-      const cartItemId = generateCartItemId(itemData.productId, optionsForId);
-      const unitPrice = calculateUnitPrice(itemData);
-      const quantity = itemData.quantity || 1;
-
-      const existingItemIndex = prevItems.findIndex(item => item.cartItemId === cartItemId);
-
-      if (editingItem && editingItem.productType === itemData.productType && editingItem.productId === itemData.productId) {
-        // If editing, replace the item
-        const updatedItems = prevItems.map(item =>
-          item.cartItemId === editingItem.cartItemId
-            ? { ...itemData, cartItemId, unitPrice, quantity } as CartItem
-            : item
-        );
-        setEditingItem(null); // Clear editing state
-        toast({ title: "Item Updated", description: `${itemData.name} has been updated in your cart.` });
-        return updatedItems;
-      }
-
-
+      toastMsg = { title: "Item Updated", description: `${itemData.name} has been updated in your cart.` };
+      editingItemToClear = true;
+    } else {
+      const existingItemIndex = currentItems.findIndex(item => item.cartItemId === cartItemId);
       if (existingItemIndex > -1) {
-        const updatedItems = prevItems.map((item, index) =>
+        nextItems = currentItems.map((item, index) =>
           index === existingItemIndex
-            ? { ...item, quantity: item.quantity + quantity }
+            ? { ...item, quantity: item.quantity + quantityToAdd }
             : item
         );
-        toast({ title: "Quantity Updated", description: `Quantity of ${itemData.name} increased in your cart.` });
-        return updatedItems;
+        toastMsg = { title: "Quantity Updated", description: `Quantity of ${itemData.name} increased in your cart.` };
       } else {
         const newItem: CartItem = {
           ...itemData,
           cartItemId,
           unitPrice,
-          quantity,
-        } as CartItem; // Type assertion
-        toast({ title: "Item Added", description: `${itemData.name} has been added to your cart.` });
-        return [...prevItems, newItem];
+          quantity: quantityToAdd,
+        } as CartItem;
+        nextItems = [...currentItems, newItem];
+        toastMsg = { title: "Item Added", description: `${itemData.name} has been added to your cart.` };
       }
-    });
-    if (!isCartOpen) {
-        setIsCartOpen(true); // Open cart when item is added
     }
-  }, [isCartOpen, editingItem]);
+    return { nextItems, toastMsg, editingItemToClear };
+  };
+  
+  const addItemToCart = useCallback((itemData: Omit<CartItem, 'cartItemId' | 'unitPrice' | 'quantity'> & { quantity?: number }) => {
+    const result = addItemToCartLogic(itemData, items, editingItem);
+    
+    setItems(result.nextItems);
+
+    if (result.toastMsg) {
+      toast(result.toastMsg);
+    }
+
+    if (result.editingItemToClear) {
+      setEditingItem(null);
+    }
+
+    if (!isCartOpen) {
+        setIsCartOpen(true);
+    }
+  }, [items, editingItem, isCartOpen, /* setEditingItem and setIsCartOpen are stable setters */ ]);
+
 
   const removeItemFromCart = useCallback((cartItemId: string) => {
     setItems(prevItems => {
@@ -198,7 +224,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   const openCart = useCallback(() => setIsCartOpen(true), []);
   const closeCart = useCallback(() => {
     setIsCartOpen(false);
-    setEditingItem(null); // Clear editing state when cart is closed
+    setEditingItem(null); 
   }, []);
 
   const getOriginalProductForEditing = useCallback((cartItem: CartItem): Hoodie | Bracelet | MatchingBraceletSet | undefined => {
@@ -229,3 +255,4 @@ export const useCart = () => {
   }
   return context;
 };
+
