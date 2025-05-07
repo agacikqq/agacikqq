@@ -71,7 +71,7 @@ export function BraceletDetailModal({ bracelet, isOpen, onClose }: BraceletDetai
 
     toast({
         title: "Added to Cart! (Simulated)",
-        description: `${bracelet.name} with charms: ${charmNames}${includedMessage}. Total: $${totalPrice.toFixed(2)}`,
+        description: `${bracelet.name} with charms: ${charmNames}${includedMessage}. Total: AED ${totalPrice.toFixed(2)}`,
         variant: "default",
       });
     onClose();
@@ -128,11 +128,11 @@ export function BraceletDetailModal({ bracelet, isOpen, onClose }: BraceletDetai
             
             <div className="mb-4 flex items-baseline gap-x-3">
               <span className="text-4xl font-extrabold text-accent">
-                ${totalPrice.toFixed(2)}
+                AED {totalPrice.toFixed(2)}
               </span>
               {selectedCharms.length > 0 && totalPrice !== bracelet.basePrice && (
                  <span className="text-xl text-muted-foreground">
-                    (Base: ${bracelet.basePrice.toFixed(2)})
+                    (Base: AED {bracelet.basePrice.toFixed(2)})
                  </span>
               )}
             </div>
@@ -182,12 +182,12 @@ export function BraceletDetailModal({ bracelet, isOpen, onClose }: BraceletDetai
                           </div>
                         </div>
                         <div className="flex items-center space-x-3">
-                          <span className="text-base font-semibold text-accent">+${charm.price.toFixed(2)}</span>
+                          <span className="text-base font-semibold text-accent">+AED {charm.price.toFixed(2)}</span>
                           <Checkbox
                             id={`charm-${charm.id}`}
                             checked={selectedCharms.some(c => c.id === charm.id)}
                             onCheckedChange={() => handleCharmToggle(charm)}
-                            aria-label={`Select charm ${charm.name}, costs $${charm.price.toFixed(2)} extra`}
+                            aria-label={`Select charm ${charm.name}, costs AED ${charm.price.toFixed(2)} extra`}
                           />
                         </div>
                       </div>
@@ -210,7 +210,7 @@ export function BraceletDetailModal({ bracelet, isOpen, onClose }: BraceletDetai
                 className="w-full bg-accent text-accent-foreground hover:bg-accent/90 sm:w-auto"
                 onClick={handleAddToCart}
               >
-                Add to Cart - ${totalPrice.toFixed(2)}
+                Add to Cart - AED {totalPrice.toFixed(2)}
               </Button>
             </DialogFooter>
           </div>

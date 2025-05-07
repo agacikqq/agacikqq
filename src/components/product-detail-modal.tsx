@@ -17,6 +17,7 @@ import { Separator } from '@/components/ui/separator';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Package, ShieldCheck, Info, Percent } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
+import { toast } from "@/hooks/use-toast";
 
 interface ProductDetailModalProps {
   hoodie: Hoodie | null;
@@ -41,6 +42,23 @@ export function ProductDetailModal({ hoodie, isOpen, onClose }: ProductDetailMod
   const isOnSale = hoodie.originalPrice && hoodie.originalPrice > hoodie.price;
   const discountPercent = isOnSale ? Math.round(((hoodie.originalPrice! - hoodie.price) / hoodie.originalPrice!) * 100) : 0;
 
+
+  const handleAddToCart = () => {
+    if (!selectedColor || !selectedSize) {
+        toast({
+            title: "Selection Missing",
+            description: "Please select a color and size.",
+            variant: "destructive",
+        });
+        return;
+    }
+    toast({
+        title: "Added to Cart! (Simulated)",
+        description: `${hoodie.name} (${selectedColor?.name}, ${selectedSize?.name}) for AED ${hoodie.price.toFixed(2)}`,
+        variant: "default",
+    });
+    onClose();
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -104,11 +122,11 @@ export function ProductDetailModal({ hoodie, isOpen, onClose }: ProductDetailMod
             
             <div className="mb-4 flex items-baseline gap-x-3">
               <span className="text-4xl font-extrabold text-accent">
-                ${hoodie.price.toFixed(2)}
+                AED {hoodie.price.toFixed(2)}
               </span>
               {isOnSale && hoodie.originalPrice && (
                 <span className="text-2xl text-muted-foreground line-through">
-                  ${hoodie.originalPrice.toFixed(2)}
+                  AED {hoodie.originalPrice.toFixed(2)}
                 </span>
               )}
             </div>
@@ -191,10 +209,7 @@ export function ProductDetailModal({ hoodie, isOpen, onClose }: ProductDetailMod
               <Button
                 variant="default"
                 className="w-full bg-accent text-accent-foreground hover:bg-accent/90 sm:w-auto"
-                onClick={() => {
-                  alert(`Added ${hoodie.name} (${selectedColor?.name}, ${selectedSize?.name}) to cart! (Not really)`);
-                  onClose();
-                }}
+                onClick={handleAddToCart}
                 disabled={!selectedColor || !selectedSize}
               >
                 Add to Cart

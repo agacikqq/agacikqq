@@ -45,11 +45,11 @@ export function ProductCard({ hoodie, onViewDetailsClick }: ProductCardProps) {
         
         <div className="mb-3 flex items-baseline gap-2">
           <span className="text-3xl font-bold text-accent">
-            ${hoodie.price.toFixed(2)}
+            AED {hoodie.price.toFixed(2)}
           </span>
           {isOnSale && hoodie.originalPrice && (
             <del className="text-xl text-muted-foreground/80">
-              ${hoodie.originalPrice.toFixed(2)}
+              AED {hoodie.originalPrice.toFixed(2)}
             </del>
           )}
         </div>
