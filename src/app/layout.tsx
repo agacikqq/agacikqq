@@ -1,8 +1,10 @@
+
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google'; // Using Inter for modern, readable font
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 import { SidebarProvider } from '@/components/ui/sidebar';
+import { ThemeProvider } from '@/components/theme-provider'; // Import ThemeProvider
 
 const inter = Inter({
   subsets: ['latin'],
@@ -22,9 +24,16 @@ export default function RootLayout({
   return (
     <html lang="en" className="h-full">
       <body className={`${inter.variable} font-sans antialiased flex flex-col min-h-screen bg-background`}>
-        <SidebarProvider>
-          {children}
-        </SidebarProvider>
+        <ThemeProvider
+          attribute="class" // This attribute is not directly used by the custom ThemeProvider but common in libraries like next-themes
+          defaultTheme="light"
+          enableSystem={false} // System theme detection not implemented in this custom provider
+          storageKey="coezii-theme"
+        >
+          <SidebarProvider>
+            {children}
+          </SidebarProvider>
+        </ThemeProvider>
         <Toaster />
       </body>
     </html>

@@ -1,6 +1,8 @@
+
 import Link from 'next/link';
 import { Shirt } from 'lucide-react'; // Icon can be reviewed later if "Shirt" doesn't fit "cœzii"
 import { SidebarTrigger } from '@/components/ui/sidebar';
+import { ThemeToggleButton } from '@/components/theme-toggle-button'; // Import ThemeToggleButton
 
 export function Header() {
   return (
@@ -14,7 +16,8 @@ export function Header() {
             </span>
           </Link>
         </div>
-        <div className="flex flex-1 items-center justify-end space-x-4">
+        <div className="flex flex-1 items-center justify-end space-x-2">
+          <ThemeToggleButton />
           <div className="md:hidden">
              <SidebarTrigger className="text-primary-foreground hover:bg-primary-foreground/10" />
           </div>
