@@ -1,8 +1,14 @@
 
 import Link from 'next/link';
-import { Shirt } from 'lucide-react'; // Icon can be reviewed later if "Shirt" doesn't fit "cœzii"
+import { Shirt, ShoppingCart } from 'lucide-react'; // Added ShoppingCart
 import { SidebarTrigger } from '@/components/ui/sidebar';
-import { ThemeToggleButton } from '@/components/theme-toggle-button'; // Import ThemeToggleButton
+import { ThemeToggleButton } from '@/components/theme-toggle-button';
+import { Button } from '@/components/ui/button'; // Added Button import
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"; // Added Tooltip imports
 
 export function Header() {
   return (
@@ -34,9 +40,26 @@ export function Header() {
           </Link>
         </nav>
 
-        {/* Right side items: Theme Toggle & Mobile Sidebar Trigger */}
+        {/* Right side items: Theme Toggle, Cart & Mobile Sidebar Trigger */}
         <div className="flex items-center space-x-2">
           <ThemeToggleButton />
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                aria-label="View shopping cart"
+                className="text-primary-foreground hover:bg-primary-foreground/10"
+                // onClick={() => { /* TODO: Implement cart functionality */ }}
+              >
+                <ShoppingCart className="h-5 w-5" />
+                <span className="sr-only">View Shopping Cart</span>
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>View Cart</p>
+            </TooltipContent>
+          </Tooltip>
           <div className="md:hidden">
              <SidebarTrigger className="text-primary-foreground hover:bg-primary-foreground/10" />
           </div>
@@ -45,3 +68,4 @@ export function Header() {
     </header>
   );
 }
+
