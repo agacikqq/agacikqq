@@ -1,3 +1,4 @@
+
 'use client';
 
 import Image from 'next/image';
@@ -35,11 +36,11 @@ export function ProductCard({ hoodie, onViewDetailsClick }: ProductCardProps) {
         <p className="mb-3 text-3xl font-bold text-accent">
           ${hoodie.price.toFixed(2)}
         </p>
-        <p className="mb-3 text-base text-muted-foreground line-clamp-2">
+        <p className="mb-3 text-lg text-muted-foreground line-clamp-2"> {/* Increased text size from text-base to text-lg */}
           {hoodie.description}
         </p>
         <div className="mb-3">
-          <h4 className="mb-1 text-sm font-medium text-foreground/80">Colors:</h4>
+          <h4 className="mb-1 text-lg font-medium text-foreground/80">Colors:</h4> {/* Increased text size from text-sm to text-lg */}
           <div className="flex flex-wrap gap-2">
             {hoodie.colors.map((color: ProductColor) => (
               <Badge
@@ -59,7 +60,7 @@ export function ProductCard({ hoodie, onViewDetailsClick }: ProductCardProps) {
           </div>
         </div>
         <div>
-          <h4 className="mb-1 text-sm font-medium text-foreground/80">Sizes:</h4>
+          <h4 className="mb-1 text-lg font-medium text-foreground/80">Sizes:</h4> {/* Increased text size from text-sm to text-lg */}
           <div className="flex flex-wrap gap-1.5">
             {hoodie.availableSizes.map((size) => (
               <Badge key={size.value} variant="secondary" className="px-2.5 py-1"> {/* text-sm is now in Badge component */}

@@ -1,3 +1,4 @@
+
 'use client';
 
 import Image from 'next/image';
@@ -142,28 +143,28 @@ export function ProductDetailModal({ hoodie, isOpen, onClose }: ProductDetailMod
             
             <Separator className="my-6" />
 
-            <div className="space-y-4 text-base text-foreground/90">
+            <div className="space-y-4 text-lg text-foreground/90"> {/* Increased base text size from text-base to text-lg */}
               <p>{hoodie.description}</p>
               
               <div className="flex items-start gap-3">
                 <Package className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
                 <div>
-                  <h5 className="font-semibold text-base">Materials</h5>
-                  <p className="text-base text-muted-foreground">{hoodie.materials}</p>
+                  <h5 className="font-semibold text-xl">Materials</h5> {/* Increased text size from text-base to text-xl */}
+                  <p className="text-lg text-muted-foreground">{hoodie.materials}</p> {/* Will inherit text-lg or apply explicitly */}
                 </div>
               </div>
               <div className="flex items-start gap-3">
                 <ShieldCheck className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
                 <div>
-                  <h5 className="font-semibold text-base">Care Instructions</h5>
-                  <p className="text-base text-muted-foreground">{hoodie.careInstructions}</p>
+                  <h5 className="font-semibold text-xl">Care Instructions</h5> {/* Increased text size from text-base to text-xl */}
+                  <p className="text-lg text-muted-foreground">{hoodie.careInstructions}</p> {/* Will inherit text-lg or apply explicitly */}
                 </div>
               </div>
               <div className="flex items-start gap-3">
                 <Info className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
                 <div>
-                  <h5 className="font-semibold text-base">Origin</h5>
-                  <p className="text-base text-muted-foreground">{hoodie.origin}</p>
+                  <h5 className="font-semibold text-xl">Origin</h5> {/* Increased text size from text-base to text-xl */}
+                  <p className="text-lg text-muted-foreground">{hoodie.origin}</p> {/* Will inherit text-lg or apply explicitly */}
                 </div>
               </div>
             </div>

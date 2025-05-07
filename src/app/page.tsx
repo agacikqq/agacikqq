@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
@@ -143,7 +144,7 @@ export default function HomePage() {
                      </Button>
                   )}
                 </div>
-                <p className="text-base text-muted-foreground whitespace-nowrap">
+                <p className="text-lg text-muted-foreground whitespace-nowrap"> {/* Increased text size from text-base to text-lg */}
                   Showing {filteredHoodies.length} of {hoodies.length} hoodies
                 </p>
               </div>
@@ -157,7 +158,7 @@ export default function HomePage() {
               ) : (
                 <div className="text-center py-10">
                   <h2 className="text-3xl font-semibold mb-2">No Hoodies Found</h2>
-                  <p className="text-base text-muted-foreground mb-4">
+                  <p className="text-lg text-muted-foreground mb-4"> {/* Increased text size from text-base to text-lg */}
                     Try adjusting your search or filters.
                   </p>
                   <Button onClick={handleClearFilters} variant="default" className="bg-accent text-accent-foreground hover:bg-accent/90">
