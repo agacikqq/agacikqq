@@ -11,7 +11,7 @@ export function Header() {
         <div className="flex gap-6 md:gap-10">
           <Link href="/" className="flex items-center space-x-2">
             <Shirt className="h-7 w-7 text-primary-foreground" />
-            <span className="inline-block text-2xl font-bold text-primary-foreground tracking-tight">
+            <span className="inline-block text-3xl font-bold text-primary-foreground tracking-tight">
               cœzii
             </span>
           </Link>
@@ -26,3 +26,4 @@ export function Header() {
     </header>
   );
 }
+

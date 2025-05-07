@@ -89,26 +89,26 @@ export function ProductDetailModal({ hoodie, isOpen, onClose }: ProductDetailMod
 
           <div className="p-6 flex flex-col">
             <DialogHeader className="mb-4">
-              <DialogTitle className="text-3xl font-bold tracking-tight text-foreground">{hoodie.name}</DialogTitle>
-              <DialogDescription className="text-sm text-muted-foreground pt-1">
+              <DialogTitle className="text-4xl font-bold tracking-tight text-foreground">{hoodie.name}</DialogTitle>
+              <DialogDescription className="text-base text-muted-foreground pt-1">
                 {hoodie.designs.map(d => d.name).join(', ')}
               </DialogDescription>
             </DialogHeader>
             
-            <p className="mb-4 text-3xl font-extrabold text-accent">
+            <p className="mb-4 text-4xl font-extrabold text-accent">
               ${hoodie.price.toFixed(2)}
             </p>
 
             <div className="mb-6">
-              <h4 className="mb-2 text-md font-semibold text-foreground">Color:</h4>
+              <h4 className="mb-2 text-lg font-semibold text-foreground">Color:</h4>
               <div className="flex flex-wrap gap-2">
                 {hoodie.colors.map((color) => (
                   <Button
                     key={color.value}
                     variant={selectedColor?.value === color.value ? 'default' : 'outline'}
-                    size="sm"
+                    size="sm" // Button size sm text will be text-sm from button.tsx
                     onClick={() => setSelectedColor(color)}
-                    className={`flex items-center gap-2 rounded-full px-4 py-2 text-sm transition-all ${selectedColor?.value === color.value ? 'bg-primary text-primary-foreground ring-2 ring-primary ring-offset-2' : 'hover:bg-muted/50'}`}
+                    className={`flex items-center gap-2 rounded-full px-4 py-2 transition-all ${selectedColor?.value === color.value ? 'bg-primary text-primary-foreground ring-2 ring-primary ring-offset-2' : 'hover:bg-muted/50'}`}
                     aria-pressed={selectedColor?.value === color.value}
                   >
                     <span
@@ -123,15 +123,15 @@ export function ProductDetailModal({ hoodie, isOpen, onClose }: ProductDetailMod
             </div>
 
             <div className="mb-6">
-              <h4 className="mb-2 text-md font-semibold text-foreground">Size:</h4>
+              <h4 className="mb-2 text-lg font-semibold text-foreground">Size:</h4>
               <div className="flex flex-wrap gap-2">
                 {hoodie.availableSizes.map((size) => (
                   <Button
                     key={size.value}
                     variant={selectedSize?.value === size.value ? 'default' : 'outline'}
-                    size="sm"
+                    size="sm" // Button size sm text will be text-sm from button.tsx
                     onClick={() => setSelectedSize(size)}
-                    className={`rounded-md px-4 py-2 text-sm transition-all ${selectedSize?.value === size.value ? 'bg-primary text-primary-foreground ring-2 ring-primary ring-offset-2' : 'hover:bg-muted/50'}`}
+                    className={`rounded-md px-4 py-2 transition-all ${selectedSize?.value === size.value ? 'bg-primary text-primary-foreground ring-2 ring-primary ring-offset-2' : 'hover:bg-muted/50'}`}
                     aria-pressed={selectedSize?.value === size.value}
                   >
                     {size.name} ({size.value})
@@ -142,28 +142,28 @@ export function ProductDetailModal({ hoodie, isOpen, onClose }: ProductDetailMod
             
             <Separator className="my-6" />
 
-            <div className="space-y-4 text-sm text-foreground/90">
+            <div className="space-y-4 text-base text-foreground/90">
               <p>{hoodie.description}</p>
               
               <div className="flex items-start gap-3">
                 <Package className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
                 <div>
-                  <h5 className="font-semibold">Materials</h5>
-                  <p className="text-muted-foreground">{hoodie.materials}</p>
+                  <h5 className="font-semibold text-base">Materials</h5>
+                  <p className="text-base text-muted-foreground">{hoodie.materials}</p>
                 </div>
               </div>
               <div className="flex items-start gap-3">
                 <ShieldCheck className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
                 <div>
-                  <h5 className="font-semibold">Care Instructions</h5>
-                  <p className="text-muted-foreground">{hoodie.careInstructions}</p>
+                  <h5 className="font-semibold text-base">Care Instructions</h5>
+                  <p className="text-base text-muted-foreground">{hoodie.careInstructions}</p>
                 </div>
               </div>
               <div className="flex items-start gap-3">
                 <Info className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
                 <div>
-                  <h5 className="font-semibold">Origin</h5>
-                  <p className="text-muted-foreground">{hoodie.origin}</p>
+                  <h5 className="font-semibold text-base">Origin</h5>
+                  <p className="text-base text-muted-foreground">{hoodie.origin}</p>
                 </div>
               </div>
             </div>
@@ -191,3 +191,4 @@ export function ProductDetailModal({ hoodie, isOpen, onClose }: ProductDetailMod
     </Dialog>
   );
 }
+

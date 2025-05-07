@@ -41,7 +41,7 @@ export function FilterSidebar({
     activeFilterValues: string[]
   ) => (
     <SidebarGroup>
-      <SidebarGroupLabel className="text-sm font-semibold text-foreground">{title}</SidebarGroupLabel>
+      <SidebarGroupLabel className="text-base font-semibold text-foreground">{title}</SidebarGroupLabel>
       <div className="space-y-2">
         {items.map((item) => (
           <div key={item.value} className="flex items-center space-x-2">
@@ -58,7 +58,7 @@ export function FilterSidebar({
                   aria-hidden="true"
                 />
               )}
-            <Label htmlFor={`${filterType}-${item.value}`} id={`label-${filterType}-${item.value}`} className="cursor-pointer text-sm font-normal text-foreground/90 hover:text-foreground">
+            <Label htmlFor={`${filterType}-${item.value}`} id={`label-${filterType}-${item.value}`} className="cursor-pointer font-normal text-foreground/90 hover:text-foreground"> {/* Label text size increased in label.tsx */}
               {item.name}
             </Label>
           </div>
@@ -72,7 +72,7 @@ export function FilterSidebar({
       <SidebarHeader className="flex items-center justify-between border-b p-4">
         <div className="flex items-center gap-2">
           <SlidersHorizontal className="h-5 w-5 text-primary" />
-          <h2 className="text-lg font-semibold text-foreground">Filters</h2>
+          <h2 className="text-xl font-semibold text-foreground">Filters</h2>
         </div>
       </SidebarHeader>
       <ScrollArea className="h-[calc(100vh-140px)]"> {/* Adjust height based on header/footer */}
@@ -87,7 +87,7 @@ export function FilterSidebar({
        <div className="mt-auto border-t p-4">
         <Button
           variant="outline"
-          className="w-full"
+          className="w-full" // Text size will be base due to button.tsx change
           onClick={onClearFilters}
           disabled={
             activeFilters.colors.length === 0 &&
@@ -102,3 +102,4 @@ export function FilterSidebar({
     </Sidebar>
   );
 }
+

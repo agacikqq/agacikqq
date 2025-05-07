@@ -100,7 +100,7 @@ export default function HomePage() {
       <div className="flex flex-col min-h-screen">
         <Header />
         <div className="flex-grow container mx-auto p-4 text-center">
-          <p className="text-2xl font-semibold text-primary animate-pulse">Loading cœzii...</p>
+          <p className="text-3xl font-semibold text-primary animate-pulse">Loading cœzii...</p>
         </div>
       </div>
     );
@@ -129,7 +129,7 @@ export default function HomePage() {
                     placeholder="Search hoodies by name or description..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10 pr-10 py-3 text-base rounded-full focus:ring-2 focus:ring-accent border-muted bg-card/80" /* Added bg-card/80 for better visibility on gradient */
+                    className="pl-10 pr-10 py-3 rounded-full focus:ring-2 focus:ring-accent border-muted bg-card/80" // Input component itself handles text size
                   />
                   {searchTerm && (
                      <Button 
@@ -143,7 +143,7 @@ export default function HomePage() {
                      </Button>
                   )}
                 </div>
-                <p className="text-sm text-muted-foreground whitespace-nowrap">
+                <p className="text-base text-muted-foreground whitespace-nowrap">
                   Showing {filteredHoodies.length} of {hoodies.length} hoodies
                 </p>
               </div>
@@ -156,8 +156,8 @@ export default function HomePage() {
                 </div>
               ) : (
                 <div className="text-center py-10">
-                  <h2 className="text-2xl font-semibold mb-2">No Hoodies Found</h2>
-                  <p className="text-muted-foreground mb-4">
+                  <h2 className="text-3xl font-semibold mb-2">No Hoodies Found</h2>
+                  <p className="text-base text-muted-foreground mb-4">
                     Try adjusting your search or filters.
                   </p>
                   <Button onClick={handleClearFilters} variant="default" className="bg-accent text-accent-foreground hover:bg-accent/90">
@@ -177,3 +177,4 @@ export default function HomePage() {
     </>
   );
 }
+

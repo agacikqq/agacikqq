@@ -29,23 +29,23 @@ export function ProductCard({ hoodie, onViewDetailsClick }: ProductCardProps) {
         </div>
       </CardHeader>
       <CardContent className="flex-grow p-4">
-        <CardTitle className="mb-2 text-xl font-semibold leading-tight tracking-tight">
+        <CardTitle className="mb-2 text-2xl font-semibold leading-tight tracking-tight">
           {hoodie.name}
         </CardTitle>
-        <p className="mb-3 text-2xl font-bold text-accent">
+        <p className="mb-3 text-3xl font-bold text-accent">
           ${hoodie.price.toFixed(2)}
         </p>
-        <p className="mb-3 text-sm text-muted-foreground line-clamp-2">
+        <p className="mb-3 text-base text-muted-foreground line-clamp-2">
           {hoodie.description}
         </p>
         <div className="mb-3">
-          <h4 className="mb-1 text-xs font-medium text-foreground/80">Colors:</h4>
+          <h4 className="mb-1 text-sm font-medium text-foreground/80">Colors:</h4>
           <div className="flex flex-wrap gap-2">
             {hoodie.colors.map((color: ProductColor) => (
               <Badge
                 key={color.value}
                 variant="outline"
-                className="flex items-center gap-1.5 border-border px-2 py-1 text-xs"
+                className="flex items-center gap-1.5 border-border px-2 py-1" // text-sm is now in Badge component
                 aria-label={`Color: ${color.name}`}
               >
                 <span
@@ -59,10 +59,10 @@ export function ProductCard({ hoodie, onViewDetailsClick }: ProductCardProps) {
           </div>
         </div>
         <div>
-          <h4 className="mb-1 text-xs font-medium text-foreground/80">Sizes:</h4>
+          <h4 className="mb-1 text-sm font-medium text-foreground/80">Sizes:</h4>
           <div className="flex flex-wrap gap-1.5">
             {hoodie.availableSizes.map((size) => (
-              <Badge key={size.value} variant="secondary" className="px-2.5 py-1 text-xs">
+              <Badge key={size.value} variant="secondary" className="px-2.5 py-1"> {/* text-sm is now in Badge component */}
                 {size.name}
               </Badge>
             ))}
@@ -72,7 +72,7 @@ export function ProductCard({ hoodie, onViewDetailsClick }: ProductCardProps) {
       <CardFooter className="p-4 pt-0">
         <Button
           variant="default"
-          size="lg"
+          size="lg" // Button size lg text will be base or lg depending on button.tsx
           className="w-full bg-accent text-accent-foreground hover:bg-accent/90"
           onClick={() => onViewDetailsClick(hoodie)}
         >
@@ -83,3 +83,4 @@ export function ProductCard({ hoodie, onViewDetailsClick }: ProductCardProps) {
     </Card>
   );
 }
+
