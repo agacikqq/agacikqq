@@ -1,206 +1,129 @@
 
 'use client';
 
-import { useState, useMemo, useEffect } from 'react';
+import Link from 'next/link';
+import Image from 'next/image';
+import React from 'react'; // Added import for React
 import { Header } from '@/components/header';
-import { ProductCard } from '@/components/product-card';
-import { FilterSidebar } from '@/components/filter-sidebar';
-import { ProductDetailModal } from '@/components/product-detail-modal';
-import { mockHoodies } from '@/data/mock-hoodies';
-import type { Hoodie, Filters, ProductColor, ProductSize, ProductDesign, HoodieCartItem } from '@/types';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Search, X, Shirt } from 'lucide-react'; // Added Shirt icon
-import { SidebarInset } from '@/components/ui/sidebar';
-import { useCart } from '@/context/cart-context';
+import { Shirt, Gem, HeartHandshake, Percent } from 'lucide-react';
 
 export default function HomePage() {
-  const { editingItem } = useCart();
-  const [hoodies, setHoodies] = useState<Hoodie[]>(mockHoodies);
-  const [selectedHoodie, setSelectedHoodie] = useState<Hoodie | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [activeFilters, setActiveFilters] = useState<Filters>({
-    colors: [],
-    sizes: [],
-    designs: [],
-  });
-
-  const [hasMounted, setHasMounted] = useState(false);
-  useEffect(() => {
-    setHasMounted(true);
-  }, []);
-
-  useEffect(() => {
-    if (editingItem?.productType === 'hoodie') {
-      const hoodieToEdit = mockHoodies.find(h => h.id === editingItem.productId);
-      if (hoodieToEdit && editingItem.type === 'hoodie' && editingItem.item.cartItemId === (editingItem as { type: 'hoodie'; item: HoodieCartItem }).item.cartItemId) {
-        setSelectedHoodie(hoodieToEdit);
-        setIsModalOpen(true);
-      }
-    } else if (!editingItem && isModalOpen && selectedHoodie){
-      const currentlyEditingThisHoodie = mockHoodies.find(h => h.id === selectedHoodie.id);
-      if(currentlyEditingThisHoodie){
-         // This logic might need refinement if editingItem can be null for other reasons
-      }
-    }
-  }, [editingItem, isModalOpen, selectedHoodie]);
-
-
-  const allColors = useMemo(() => {
-    const colors = new Map<string, ProductColor>();
-    mockHoodies.forEach(hoodie => hoodie.colors.forEach(color => colors.set(color.value, color)));
-    return Array.from(colors.values()).sort((a,b) => a.name.localeCompare(b.name));
-  }, []);
-
-  const allSizes = useMemo(() => {
-    const sizes = new Map<string, ProductSize>();
-    mockHoodies.forEach(hoodie => hoodie.availableSizes.forEach(size => sizes.set(size.value, size)));
-    const sortOrder: { [key: string]: number } = { 'XS': 1, 'S': 2, 'M': 3, 'L': 4, 'XL': 5 };
-    return Array.from(sizes.values()).sort((a, b) => (sortOrder[a.value] || 99) - (sortOrder[b.value] || 99));
-  }, []);
-
-  const allDesigns = useMemo(() => {
-    const designs = new Map<string, ProductDesign>();
-    mockHoodies.forEach(hoodie => hoodie.designs.forEach(design => designs.set(design.value, design)));
-    return Array.from(designs.values()).sort((a,b) => a.name.localeCompare(b.name));
-  }, []);
-
-  const handleFilterChange = (filterType: keyof Filters, value: string) => {
-    setActiveFilters(prev => {
-      const currentValues = prev[filterType];
-      const newValues = currentValues.includes(value)
-        ? currentValues.filter(v => v !== value)
-        : [...currentValues, value];
-      return { ...prev, [filterType]: newValues };
-    });
-  };
-
-  const handleClearFilters = () => {
-    setActiveFilters({ colors: [], sizes: [], designs: [] });
-    setSearchTerm('');
-  };
-
-  const filteredHoodies = useMemo(() => {
-    return hoodies.filter(hoodie => {
-      const matchesSearch = searchTerm === '' || 
-        hoodie.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        hoodie.description.toLowerCase().includes(searchTerm.toLowerCase());
-
-      const matchesColor = activeFilters.colors.length === 0 ||
-        activeFilters.colors.some(fc => hoodie.colors.some(hc => hc.value === fc));
-      
-      const matchesSize = activeFilters.sizes.length === 0 ||
-        activeFilters.sizes.some(fs => hoodie.availableSizes.some(hs => hs.value === fs));
-
-      const matchesDesign = activeFilters.designs.length === 0 ||
-        activeFilters.designs.some(fd => hoodie.designs.some(hd => hd.value === fd));
-
-      return matchesSearch && matchesColor && matchesSize && matchesDesign;
-    });
-  }, [hoodies, activeFilters, searchTerm]);
-
-  const handleViewDetails = (hoodie: Hoodie) => {
-    setSelectedHoodie(hoodie);
-    setIsModalOpen(true);
-  };
-
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-    setSelectedHoodie(null);
-  };
-
-  if (!hasMounted) {
-    return (
-      <div className="flex flex-col min-h-screen">
-        <Header />
-        <div className="flex-grow container mx-auto p-4 text-center">
-          <p className="text-3xl font-semibold text-primary animate-pulse">Loading cœzii...</p>
-        </div>
-      </div>
-    );
-  }
+  const categories = [
+    {
+      name: 'Awesome Hoodies',
+      href: '/hoodies',
+      icon: <Shirt className="h-16 w-16 text-accent" />,
+      description: 'Explore our wide range of stylish and comfortable hoodies.',
+      imageSrc: 'https://picsum.photos/seed/hoodieCat/600/400',
+      imageHint: 'teenager wearing hoodie',
+    },
+    {
+      name: 'Individual Bracelets',
+      href: '/collections',
+      icon: <Gem className="h-16 w-16 text-accent" />,
+      description: 'Customize your look with unique bracelets and charms.',
+      imageSrc: 'https://picsum.photos/seed/braceletCat/600/400',
+      imageHint: 'silver charm bracelet',
+    },
+    {
+      name: 'Matching Sets',
+      href: '/matching-bracelets',
+      icon: <HeartHandshake className="h-16 w-16 text-accent" />,
+      description: 'Find perfect pairs to share or complete your style.',
+      imageSrc: 'https://picsum.photos/seed/matchingCat/600/400',
+      imageHint: 'friends matching bracelets',
+    },
+    {
+      name: 'Hot Deals',
+      href: '/sale',
+      icon: <Percent className="h-16 w-16 text-accent" />,
+      description: 'Grab amazing discounts on your favorite items.',
+      imageSrc: 'https://picsum.photos/seed/saleCat/600/400',
+      imageHint: 'sale shopping discount',
+    },
+  ];
 
   return (
     <>
       <Header />
-      <div className="flex flex-1">
-        <FilterSidebar
-          allColors={allColors}
-          allSizes={allSizes}
-          allDesigns={allDesigns}
-          activeFilters={activeFilters}
-          onFilterChange={handleFilterChange}
-          onClearFilters={handleClearFilters}
-        />
-        <SidebarInset>
-          <main className="flex-1 p-4 md:p-8 bg-transparent">
-            <div className="container mx-auto">
-              <div className="mb-12 text-center">
-                <h1 className="text-5xl font-extrabold text-primary mb-3 flex items-center justify-center gap-3">
-                  <Shirt className="h-12 w-12 text-accent animate-pulse" />
-                  Our Hoodie Collection
-                </h1>
-                <p className="text-xl text-muted-foreground">
-                  Discover your next favorite cœzii hoodie. Filter by color, size, and style to find the perfect fit.
-                </p>
-              </div>
+      <main className="flex-1 bg-transparent">
+        {/* Hero Section */}
+        <section className="py-16 md:py-24 text-center bg-gradient-to-br from-primary/30 via-background to-background">
+          <div className="container mx-auto px-4">
+            <h1 className="text-5xl md:text-7xl font-extrabold text-primary mb-6">
+              Welcome to TeenHood!
+            </h1>
+            <p className="text-xl md:text-2xl text-muted-foreground mb-10 max-w-3xl mx-auto">
+              Your one-stop shop for the coolest hoodies, customizable bracelets, and matching sets. Express yourself with TeenHood!
+            </p>
+            <Button asChild size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90 text-xl px-10 py-7 rounded-full">
+              <Link href="/hoodies">Shop All Products</Link>
+            </Button>
+          </div>
+        </section>
 
-              <div className="mb-8 flex flex-col sm:flex-row gap-4 items-center">
-                <div className="relative flex-grow w-full sm:w-auto">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                  <Input
-                    type="search"
-                    placeholder="Search hoodies by name or description..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10 pr-10 py-3 rounded-full focus:ring-2 focus:ring-accent border-muted bg-card/80"
-                  />
-                  {searchTerm && (
-                     <Button 
-                        variant="ghost" 
-                        size="icon" 
-                        className="absolute right-2 top-1/2 -translate-y-1/2 h-7 w-7 text-muted-foreground hover:text-foreground"
-                        onClick={() => setSearchTerm('')}
-                      >
-                       <X className="h-4 w-4" />
-                       <span className="sr-only">Clear search</span>
-                     </Button>
-                  )}
-                </div>
-                <p className="text-lg text-muted-foreground whitespace-nowrap">
-                  Showing {filteredHoodies.length} of {hoodies.length} hoodies
-                </p>
-              </div>
-
-              {filteredHoodies.length > 0 ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                  {filteredHoodies.map(hoodie => (
-                    <ProductCard key={hoodie.id} hoodie={hoodie} onViewDetailsClick={handleViewDetails} />
-                  ))}
-                </div>
-              ) : (
-                <div className="text-center py-10">
-                   <Shirt className="h-24 w-24 text-muted-foreground/50 mx-auto mb-6" />
-                  <h2 className="text-3xl font-semibold mb-2 text-foreground">No Hoodies Found</h2>
-                  <p className="text-lg text-muted-foreground mb-4">
-                    Try adjusting your search or filters.
-                  </p>
-                  <Button onClick={handleClearFilters} variant="default" className="bg-accent text-accent-foreground hover:bg-accent/90">
-                    Clear All Filters
-                  </Button>
-                </div>
-              )}
+        {/* Categories Section */}
+        <section className="py-16 md:py-20">
+          <div className="container mx-auto px-4">
+            <h2 className="text-4xl font-bold text-center text-primary mb-12">
+              Explore Our Collections
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+              {categories.map((category) => (
+                <Link href={category.href} key={category.name} legacyBehavior>
+                  <a className="block group bg-card p-6 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 ease-in-out transform hover:-translate-y-1">
+                    <div className="relative aspect-video w-full overflow-hidden rounded-lg mb-6">
+                       <Image
+                        src={category.imageSrc}
+                        alt={`Image for ${category.name}`}
+                        layout="fill"
+                        objectFit="cover"
+                        className="transition-transform duration-500 group-hover:scale-110"
+                        data-ai-hint={category.imageHint}
+                      />
+                    </div>
+                    <div className="flex items-center justify-center mb-4 text-accent">
+                         {React.cloneElement(category.icon, { className: "h-12 w-12 text-accent group-hover:animate-pulse" })}
+                    </div>
+                    <h3 className="text-2xl font-semibold text-center text-card-foreground mb-2 group-hover:text-accent">
+                      {category.name}
+                    </h3>
+                    <p className="text-center text-muted-foreground text-md">
+                      {category.description}
+                    </p>
+                  </a>
+                </Link>
+              ))}
             </div>
-          </main>
-        </SidebarInset>
-      </div>
-      <ProductDetailModal
-        hoodie={selectedHoodie}
-        isOpen={isModalOpen}
-        onClose={handleCloseModal}
-      />
+          </div>
+        </section>
+        
+        {/* Featured Product Placeholder */}
+        <section className="py-16 md:py-20 bg-muted/30">
+            <div className="container mx-auto px-4 text-center">
+                <h2 className="text-4xl font-bold text-primary mb-6">Today's Feature</h2>
+                <div className="max-w-md mx-auto bg-card p-8 rounded-xl shadow-xl">
+                    <Image 
+                        src="https://picsum.photos/seed/featuredProduct/600/400" 
+                        alt="Featured Product" 
+                        width={600} 
+                        height={400} 
+                        className="rounded-lg mb-6"
+                        data-ai-hint="cool trendy clothing"
+                    />
+                    <h3 className="text-3xl font-semibold text-card-foreground mb-3">The "Trendsetter" Hoodie</h3>
+                    <p className="text-lg text-muted-foreground mb-6">Limited edition design. Get yours before it's gone!</p>
+                    <Button asChild size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90">
+                        <Link href="/hoodies/cosmic-dreamer-hoodie">Check it Out</Link>
+                    </Button>
+                </div>
+            </div>
+        </section>
+      </main>
+      <footer className="py-8 text-center border-t bg-primary/10">
+          <p className="text-muted-foreground">&copy; {new Date().getFullYear()} TeenHood. All rights reserved.</p>
+      </footer>
     </>
   );
 }
-

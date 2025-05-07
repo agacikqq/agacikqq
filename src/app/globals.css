@@ -4,55 +4,55 @@
 
 @layer base {
   :root {
-    /* Beige Light Theme */
-    --background: 45 50% 90%; /* Light Beige */
-    --foreground: 45 20% 20%; /* Dark Brownish Gray */
+    /* TeenHood Theme - Light Blue based */
+    --background: 200 52% 90%; /* Lighter version of #ADD8E6 for main background */
+    --foreground: 210 30% 20%; /* Dark Blue-Gray for text */
 
-    --card: 45 45% 95%; /* Very Light Beige */
-    --card-foreground: 45 20% 20%;
+    --card: 200 50% 95%; /* Very Light Blue for cards */
+    --card-foreground: 210 30% 20%;
 
-    --popover: 45 45% 95%;
-    --popover-foreground: 45 20% 20%;
+    --popover: 200 50% 95%;
+    --popover-foreground: 210 30% 20%;
 
-    --primary: 25 60% 50%; /* Terracotta/Muted Orange */
-    --primary-foreground: 25 30% 95%; /* Light text for contrast */
+    --primary: 200 60% 70%; /* Light Blue from #ADD8E6, made slightly more vibrant */
+    --primary-foreground: 210 50% 15%; /* Dark text for contrast on primary */
 
-    --secondary: 90 30% 60%; /* Soft Sage Green */
-    --secondary-foreground: 90 20% 90%;
+    --secondary: 0 0% 83%; /* Soft Gray #D3D3D3 */
+    --secondary-foreground: 0 0% 25%; /* Dark gray text on Soft Gray */
 
-    --muted: 45 30% 80%; /* Muted Beige */
-    --muted-foreground: 45 20% 40%; /* Darker Gray text for muted */
+    --muted: 120 73% 85%; /* Lighter Pastel Green (derived from #90EE90) */
+    --muted-foreground: 120 40% 30%; /* Darker Green for text on muted green */
 
-    --accent: 35 75% 55%; /* Amber/Orange */
-    --accent-foreground: 35 50% 96%; /* Very light text on accent */
+    --accent: 328 100% 71%; /* Bright Pink #FF69B4 */
+    --accent-foreground: 328 100% 98%; /* White/Very Light Pink for text on accent */
 
-    --destructive: 0 70% 55%; /* Darker red */
+    --destructive: 0 70% 55%; /* Standard red */
     --destructive-foreground: 0 0% 98%;
 
-    --border: 45 30% 70%; /* Beige-toned border */
-    --input: 45 40% 85%; /* Slightly darker beige for input background */
-    --ring: 35 75% 55%; /* Amber/Orange for focus rings (matching accent) */
+    --border: 200 50% 75%; /* Slightly darker Light Blue for borders */
+    --input: 200 50% 92%; /* Lighter Blue for input backgrounds, distinct from card */
+    --ring: 328 100% 71%; /* Bright Pink for focus rings (matching accent) */
     --radius: 0.7rem;
 
-    /* Sidebar variables - Beige Light Theme */
+    /* Sidebar variables - ensure they match or derive from the main theme */
     --sidebar-background: hsl(var(--card));
     --sidebar-foreground: hsl(var(--card-foreground));
     --sidebar-primary: hsl(var(--primary));
     --sidebar-primary-foreground: hsl(var(--primary-foreground));
-    --sidebar-accent: 45 50% 85%; /* Lighter version of beige for hover */
-    --sidebar-accent-foreground: 45 20% 30%; /* Darker text for light accent */
+    --sidebar-accent: 200 55% 88%; /* Lighter version of blue for hover, distinct from card */
+    --sidebar-accent-foreground: 210 40% 25%; /* Darker text for light accent */
     --sidebar-border: hsl(var(--border));
     --sidebar-ring: hsl(var(--ring));
 
-    --chart-1: 12 70% 50%;
-    --chart-2: 100 45% 50%; /* Adjusted to complement beige theme */
-    --chart-3: 30 60% 60%;  /* Adjusted */
-    --chart-4: 43 70% 55%;
-    --chart-5: 27 80% 55%;
+    --chart-1: hsl(var(--accent)); /* Pink */
+    --chart-2: 120 60% 65%; /* Darker Pastel Green */
+    --chart-3: 200 70% 60%;  /* Stronger Blue */
+    --chart-4: 43 70% 55%; /* Orange - kept from previous for variety */
+    --chart-5: 0 0% 60%; /* Medium Gray */
   }
 
   .dark {
-    /* Midnight Blue Dark Theme */
+    /* Midnight Blue Dark Theme - Kept as is from previous state, can be adjusted later if needed */
     --background: 220 40% 10%; /* Deep Midnight Blue */
     --foreground: 220 20% 85%; /* Light Cool Gray/Blue */
 
@@ -92,8 +92,8 @@
     --sidebar-ring: hsl(var(--ring));
 
     --chart-1: 220 75% 60%;
-    --chart-2: 180 65% 50%; /* Adjusted to complement midnight blue */
-    --chart-3: 50 85% 65%;  /* Adjusted */
+    --chart-2: 180 65% 50%;
+    --chart-3: 50 85% 65%;
     --chart-4: 280 70% 70%;
     --chart-5: 340 80% 65%;
   }

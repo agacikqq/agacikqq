@@ -11,7 +11,7 @@ export default {
   theme: {
   	extend: {
       fontFamily: {
-        sans: ['var(--font-dancing-script)', 'cursive'], // Changed from Outfit to Dancing Script variable
+        sans: ['var(--font-outfit)', 'sans-serif'], // Changed from Dancing Script variable to Outfit
       },
   		colors: {
   			background: 'hsl(var(--background))',
@@ -96,4 +96,3 @@ export default {
   },
   plugins: [require("tailwindcss-animate")],
 } satisfies Config;
-
