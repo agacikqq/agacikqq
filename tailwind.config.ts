@@ -11,7 +11,7 @@ export default {
   theme: {
   	extend: {
       fontFamily: {
-        sans: ['var(--font-outfit)', 'sans-serif'], // Changed from Poppins to Outfit variable
+        sans: ['var(--font-dancing-script)', 'cursive'], // Changed from Outfit to Dancing Script variable
       },
   		colors: {
   			background: 'hsl(var(--background))',

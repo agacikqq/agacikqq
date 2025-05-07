@@ -1,15 +1,15 @@
 
 import type { Metadata } from 'next';
-import { Outfit } from 'next/font/google'; // Changed from Poppins to Outfit
+import { Dancing_Script } from 'next/font/google'; // Changed from Outfit to Dancing_Script
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { ThemeProvider } from '@/components/theme-provider';
 
-const outfit = Outfit({ // Changed from poppins to outfit
+const dancingScript = Dancing_Script({ // Changed from outfit to dancingScript
   subsets: ['latin'],
-  weight: ['300', '400', '500', '600', '700'], // Kept similar weights
-  variable: '--font-outfit', // Changed CSS variable name
+  weight: ['400', '500', '600', '700'], // Adjusted weights for Dancing Script
+  variable: '--font-dancing-script', // Changed CSS variable name
 });
 
 export const metadata: Metadata = {
@@ -24,7 +24,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="h-full">
-      <body className={`${outfit.variable} font-sans antialiased flex flex-col min-h-screen bg-background`}> {/* Apply new font variable */}
+      <body className={`${dancingScript.variable} font-sans antialiased flex flex-col min-h-screen bg-background`}> {/* Apply new font variable */}
         <ThemeProvider
           attribute="class"
           defaultTheme="light"
