@@ -27,7 +27,7 @@ const ThemeContext = createContext<ThemeProviderState>(initialState);
 export const ThemeProvider: FC<ThemeProviderProps> = ({
   children,
   defaultTheme = 'light',
-  storageKey = 'teenhood-theme', // Updated storageKey
+  storageKey = 'coezii-theme', // Updated storageKey
 }) => {
   const [theme, setThemeState] = useState<Theme>(() => {
     if (typeof window !== 'undefined') {
@@ -69,3 +69,4 @@ export const useTheme = () => {
   }
   return context;
 };
+

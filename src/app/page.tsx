@@ -3,7 +3,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import React from 'react'; // Added import for React
+import React from 'react';
 import { Header } from '@/components/header';
 import { Button } from '@/components/ui/button';
 import { Shirt, Gem, HeartHandshake, Percent } from 'lucide-react';
@@ -52,10 +52,10 @@ export default function HomePage() {
         <section className="py-16 md:py-24 text-center bg-gradient-to-br from-primary/30 via-background to-background">
           <div className="container mx-auto px-4">
             <h1 className="text-5xl md:text-7xl font-extrabold text-primary mb-6">
-              Welcome to TeenHood!
+              Welcome to cœzii!
             </h1>
             <p className="text-xl md:text-2xl text-muted-foreground mb-10 max-w-3xl mx-auto">
-              Your one-stop shop for the coolest hoodies, customizable bracelets, and matching sets. Express yourself with TeenHood!
+              Your one-stop shop for the coolest hoodies, customizable bracelets, and matching sets. Express yourself with cœzii!
             </p>
             <Button asChild size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90 text-xl px-10 py-7 rounded-full">
               <Link href="/hoodies">Shop All Products</Link>
@@ -122,8 +122,9 @@ export default function HomePage() {
         </section>
       </main>
       <footer className="py-8 text-center border-t bg-primary/10">
-          <p className="text-muted-foreground">&copy; {new Date().getFullYear()} TeenHood. All rights reserved.</p>
+          <p className="text-muted-foreground">&copy; {new Date().getFullYear()} cœzii. All rights reserved.</p>
       </footer>
     </>
   );
 }
+

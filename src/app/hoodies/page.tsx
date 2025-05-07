@@ -144,7 +144,7 @@ export default function HoodiesPage() {
                   Our Hoodie Collection
                 </h1>
                 <p className="text-xl text-muted-foreground">
-                  Discover your next favorite TeenHood hoodie. Filter by color, size, and style to find the perfect fit.
+                  Discover your next favorite cœzii hoodie. Filter by color, size, and style to find the perfect fit.
                 </p>
               </div>
 
@@ -205,3 +205,4 @@ export default function HoodiesPage() {
     </>
   );
 }
+

@@ -41,7 +41,7 @@ export function Header() {
           <Link href="/" className="flex items-center space-x-2 group">
             <Shirt className="h-8 w-8 text-primary-foreground group-hover:animate-pulse" />
             <span className="inline-block text-4xl font-bold text-primary-foreground tracking-tight">
-              TeenHood
+              cœzii
             </span>
           </Link>
         </div>
@@ -119,3 +119,4 @@ export function Header() {
     </header>
   );
 }
+

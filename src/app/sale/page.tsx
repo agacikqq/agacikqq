@@ -6,14 +6,14 @@ import { Header } from '@/components/header';
 import { ProductCard } from '@/components/product-card';
 import { ProductDetailModal } from '@/components/product-detail-modal';
 import { mockHoodies } from '@/data/mock-hoodies';
-import type { Hoodie } from '@/types';
+import type { Hoodie, HoodieCartItem } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Search, X, Percent } from 'lucide-react';
-import { useCart } from '@/context/cart-context'; // Import useCart
+import { useCart } from '@/context/cart-context'; 
 
 export default function SalePage() {
-  const { editingItem } = useCart(); // Get editingItem from cart context
+  const { editingItem } = useCart(); 
   const [allSaleHoodies, setAllSaleHoodies] = useState<Hoodie[]>([]);
   const [filteredSaleHoodies, setFilteredSaleHoodies] = useState<Hoodie[]>([]);
   const [selectedHoodie, setSelectedHoodie] = useState<Hoodie | null>(null);
@@ -36,7 +36,8 @@ export default function SalePage() {
   useEffect(() => {
     if (editingItem?.productType === 'hoodie') {
       const hoodieToEdit = allSaleHoodies.find(h => h.id === editingItem.productId);
-      if (hoodieToEdit) {
+      // Ensure it's the correct type and specific item being edited by checking cartItemId
+      if (hoodieToEdit && editingItem.type === 'hoodie' && editingItem.item.cartItemId === (editingItem as { type: 'hoodie'; item: HoodieCartItem }).item.cartItemId) {
         setSelectedHoodie(hoodieToEdit);
         setIsModalOpen(true);
       }
@@ -156,3 +157,4 @@ export default function SalePage() {
     </>
   );
 }
+
