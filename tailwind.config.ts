@@ -11,7 +11,7 @@ export default {
   theme: {
   	extend: {
       fontFamily: {
-        sans: ['var(--font-poppins)', 'sans-serif'], // Changed from Inter to Poppins
+        sans: ['var(--font-outfit)', 'sans-serif'], // Changed from Poppins to Outfit variable
       },
   		colors: {
   			background: 'hsl(var(--background))',
@@ -96,3 +96,4 @@ export default {
   },
   plugins: [require("tailwindcss-animate")],
 } satisfies Config;
+

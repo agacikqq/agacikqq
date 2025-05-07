@@ -1,15 +1,15 @@
 
 import type { Metadata } from 'next';
-import { Poppins } from 'next/font/google'; // Using Poppins for a more distinct and interesting font
+import { Outfit } from 'next/font/google'; // Changed from Poppins to Outfit
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 import { SidebarProvider } from '@/components/ui/sidebar';
-import { ThemeProvider } from '@/components/theme-provider'; // Import ThemeProvider
+import { ThemeProvider } from '@/components/theme-provider';
 
-const poppins = Poppins({
+const outfit = Outfit({ // Changed from poppins to outfit
   subsets: ['latin'],
-  weight: ['300', '400', '500', '600', '700'], // Include various weights
-  variable: '--font-poppins', // Using CSS variable for font
+  weight: ['300', '400', '500', '600', '700'], // Kept similar weights
+  variable: '--font-outfit', // Changed CSS variable name
 });
 
 export const metadata: Metadata = {
@@ -24,11 +24,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="h-full">
-      <body className={`${poppins.variable} font-sans antialiased flex flex-col min-h-screen bg-background`}>
+      <body className={`${outfit.variable} font-sans antialiased flex flex-col min-h-screen bg-background`}> {/* Apply new font variable */}
         <ThemeProvider
-          attribute="class" // This attribute is not directly used by the custom ThemeProvider but common in libraries like next-themes
+          attribute="class"
           defaultTheme="light"
-          enableSystem={false} // System theme detection not implemented in this custom provider
+          enableSystem={false}
           storageKey="coezii-theme"
         >
           <SidebarProvider>
@@ -40,3 +40,4 @@ export default function RootLayout({
     </html>
   );
 }
+
