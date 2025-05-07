@@ -21,6 +21,7 @@ export interface Hoodie {
   name: string;
   description: string;
   price: number;
+  originalPrice?: number; // Added for sale price functionality
   images: string[]; // URLs to images, first image is primary
   colors: ProductColor[];
   availableSizes: ProductSize[];

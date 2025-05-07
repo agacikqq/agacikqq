@@ -26,7 +26,7 @@ export function Header() {
           <Link href="/" className="text-base font-medium text-primary-foreground hover:text-primary-foreground/80 transition-colors">
             Collections
           </Link>
-          <Link href="/" className="text-base font-medium text-primary-foreground hover:text-primary-foreground/80 transition-colors">
+          <Link href="/sale" className="text-base font-medium text-primary-foreground hover:text-primary-foreground/80 transition-colors">
             Sale
           </Link>
         </nav>
@@ -42,4 +42,3 @@ export function Header() {
     </header>
   );
 }
-

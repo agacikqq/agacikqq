@@ -6,7 +6,7 @@ import type { Hoodie, ProductColor } from '@/types';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Sparkles } from 'lucide-react';
+import { Sparkles, Percent } from 'lucide-react';
 
 interface ProductCardProps {
   hoodie: Hoodie;
@@ -14,8 +14,17 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ hoodie, onViewDetailsClick }: ProductCardProps) {
+  const isOnSale = hoodie.originalPrice && hoodie.originalPrice > hoodie.price;
+  const discountPercent = isOnSale ? Math.round(((hoodie.originalPrice! - hoodie.price) / hoodie.originalPrice!) * 100) : 0;
+
   return (
-    <Card className="flex h-full flex-col overflow-hidden rounded-lg shadow-lg transition-all hover:shadow-xl">
+    <Card className="relative flex h-full flex-col overflow-hidden rounded-lg shadow-lg transition-all hover:shadow-xl">
+      {isOnSale && (
+        <Badge variant="destructive" className="absolute top-3 right-3 z-10 text-base px-3 py-1 shadow-md">
+          <Percent className="mr-1 h-4 w-4" />
+          {discountPercent}% OFF
+        </Badge>
+      )}
       <CardHeader className="p-0">
         <div className="aspect-[3/4] w-full overflow-hidden">
           <Image
@@ -33,20 +42,29 @@ export function ProductCard({ hoodie, onViewDetailsClick }: ProductCardProps) {
         <CardTitle className="mb-2 text-2xl font-semibold leading-tight tracking-tight">
           {hoodie.name}
         </CardTitle>
-        <p className="mb-3 text-3xl font-bold text-accent">
-          ${hoodie.price.toFixed(2)}
-        </p>
-        <p className="mb-3 text-lg text-muted-foreground line-clamp-2"> {/* Increased text size from text-base to text-lg */}
+        
+        <div className="mb-3 flex items-baseline gap-2">
+          <span className="text-3xl font-bold text-accent">
+            ${hoodie.price.toFixed(2)}
+          </span>
+          {isOnSale && hoodie.originalPrice && (
+            <del className="text-xl text-muted-foreground/80">
+              ${hoodie.originalPrice.toFixed(2)}
+            </del>
+          )}
+        </div>
+
+        <p className="mb-3 text-lg text-muted-foreground line-clamp-2">
           {hoodie.description}
         </p>
         <div className="mb-3">
-          <h4 className="mb-1 text-lg font-medium text-foreground/80">Colors:</h4> {/* Increased text size from text-sm to text-lg */}
+          <h4 className="mb-1 text-lg font-medium text-foreground/80">Colors:</h4>
           <div className="flex flex-wrap gap-2">
             {hoodie.colors.map((color: ProductColor) => (
               <Badge
                 key={color.value}
                 variant="outline"
-                className="flex items-center gap-1.5 border-border px-2 py-1" // text-sm is now in Badge component
+                className="flex items-center gap-1.5 border-border px-2 py-1"
                 aria-label={`Color: ${color.name}`}
               >
                 <span
@@ -60,10 +78,10 @@ export function ProductCard({ hoodie, onViewDetailsClick }: ProductCardProps) {
           </div>
         </div>
         <div>
-          <h4 className="mb-1 text-lg font-medium text-foreground/80">Sizes:</h4> {/* Increased text size from text-sm to text-lg */}
+          <h4 className="mb-1 text-lg font-medium text-foreground/80">Sizes:</h4>
           <div className="flex flex-wrap gap-1.5">
             {hoodie.availableSizes.map((size) => (
-              <Badge key={size.value} variant="secondary" className="px-2.5 py-1"> {/* text-sm is now in Badge component */}
+              <Badge key={size.value} variant="secondary" className="px-2.5 py-1">
                 {size.name}
               </Badge>
             ))}
@@ -73,7 +91,7 @@ export function ProductCard({ hoodie, onViewDetailsClick }: ProductCardProps) {
       <CardFooter className="p-4 pt-0">
         <Button
           variant="default"
-          size="lg" // Button size lg text will be base or lg depending on button.tsx
+          size="lg"
           className="w-full bg-accent text-accent-foreground hover:bg-accent/90"
           onClick={() => onViewDetailsClick(hoodie)}
         >
@@ -84,4 +102,3 @@ export function ProductCard({ hoodie, onViewDetailsClick }: ProductCardProps) {
     </Card>
   );
 }
-
