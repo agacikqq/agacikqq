@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -10,7 +11,7 @@ export default {
   theme: {
   	extend: {
       fontFamily: {
-        sans: ['var(--font-inter)', 'sans-serif'],
+        sans: ['var(--font-poppins)', 'sans-serif'], // Changed from Inter to Poppins
       },
   		colors: {
   			background: 'hsl(var(--background))',

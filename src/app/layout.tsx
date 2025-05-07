@@ -1,14 +1,15 @@
 
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google'; // Using Inter for modern, readable font
+import { Poppins } from 'next/font/google'; // Using Poppins for a more distinct and interesting font
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { ThemeProvider } from '@/components/theme-provider'; // Import ThemeProvider
 
-const inter = Inter({
+const poppins = Poppins({
   subsets: ['latin'],
-  variable: '--font-inter', // Using CSS variable for font
+  weight: ['300', '400', '500', '600', '700'], // Include various weights
+  variable: '--font-poppins', // Using CSS variable for font
 });
 
 export const metadata: Metadata = {
@@ -23,7 +24,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="h-full">
-      <body className={`${inter.variable} font-sans antialiased flex flex-col min-h-screen bg-background`}>
+      <body className={`${poppins.variable} font-sans antialiased flex flex-col min-h-screen bg-background`}>
         <ThemeProvider
           attribute="class" // This attribute is not directly used by the custom ThemeProvider but common in libraries like next-themes
           defaultTheme="light"
