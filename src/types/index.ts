@@ -37,3 +37,24 @@ export interface Filters {
   sizes: string[];
   designs: string[];
 }
+
+// New types for Bracelets and Charms
+export interface Charm {
+  id: string;
+  name: string;
+  price: number;
+  image: string;
+  description?: string;
+}
+
+export interface Bracelet {
+  id: string;
+  name: string;
+  slug: string;
+  description: string;
+  basePrice: number;
+  images: string[]; // URLs to images, first image is primary
+  materials: string; // e.g., "Sterling Silver, Leather"
+  availableCharms: Charm[]; // Array of available charms for this bracelet
+  // Optional: Add other relevant properties like clasp type, length options, etc.
+}
