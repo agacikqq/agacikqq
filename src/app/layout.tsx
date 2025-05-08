@@ -1,6 +1,6 @@
 
 import type { Metadata } from 'next';
-import { Great_Vibes } from 'next/font/google'; // Changed from Dancing_Script to Great_Vibes
+import { Great_Vibes } from 'next/font/google'; 
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 import { SidebarProvider } from '@/components/ui/sidebar';
@@ -8,10 +8,10 @@ import { ThemeProvider } from '@/components/theme-provider';
 import { CartProvider } from '@/context/cart-context';
 import { CartSidebar } from '@/components/cart-sidebar';
 
-const greatVibes = Great_Vibes({ // Changed from dancingScript to greatVibes
+const greatVibes = Great_Vibes({ 
   subsets: ['latin'],
-  weight: ['400'], // Great Vibes typically only has a 400 weight
-  variable: '--font-great-vibes', // Changed variable name
+  weight: ['400'], 
+  variable: '--font-great-vibes', 
 });
 
 export const metadata: Metadata = {
@@ -26,7 +26,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="h-full">
-      <body className={`${greatVibes.variable} font-sans antialiased flex flex-col min-h-screen bg-background text-2xl`}> {/* Apply new font variable */}
+      <body className={`${greatVibes.variable} font-sans antialiased flex flex-col min-h-screen bg-background text-2xl`}>
         <ThemeProvider
           attribute="class"
           defaultTheme="light"
@@ -35,7 +35,9 @@ export default function RootLayout({
         >
           <CartProvider>
             <SidebarProvider>
-              {children}
+              <div className="flex flex-col flex-1"> {/* Wrapper for flex layout */}
+                {children}
+              </div>
               <CartSidebar />
             </SidebarProvider>
           </CartProvider>
@@ -45,4 +47,3 @@ export default function RootLayout({
     </html>
   );
 }
-

@@ -4,14 +4,12 @@
 import { useState, useMemo, useEffect } from 'react';
 import { Header } from '@/components/header';
 import { ProductCard } from '@/components/product-card';
-// import { FilterSidebar } from '@/components/filter-sidebar'; // Removed
 import { ProductDetailModal } from '@/components/product-detail-modal';
 import { mockHoodies } from '@/data/mock-hoodies';
 import type { Hoodie, Filters, ProductColor, ProductSize, ProductDesign, HoodieCartItem } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Search, X, Shirt, SlidersHorizontal } from 'lucide-react'; // Added SlidersHorizontal for a potential future filter button
-// import { SidebarInset } from '@/components/ui/sidebar'; // Removed
+import { Search, X, Shirt, SlidersHorizontal } from 'lucide-react'; 
 import { useCart } from '@/context/cart-context';
 import {
   DropdownMenu,
@@ -22,7 +20,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
-
+import { Footer } from '@/components/footer'; // Import Footer
 
 export default function HoodiesPage() {
   const { editingItem } = useCart();
@@ -44,14 +42,11 @@ export default function HoodiesPage() {
   useEffect(() => {
     if (editingItem?.productType === 'hoodie') {
       const hoodieToEdit = mockHoodies.find(h => h.id === editingItem.productId);
-      // Ensure it's the correct type and specific item being edited by checking cartItemId
       if (hoodieToEdit && editingItem.type === 'hoodie' && editingItem.item.cartItemId === (editingItem as { type: 'hoodie'; item: HoodieCartItem }).item.cartItemId) {
         setSelectedHoodie(hoodieToEdit);
         setIsModalOpen(true);
       }
     } else if (!editingItem && isModalOpen && selectedHoodie){
-      // If editingItem is cleared (e.g., modal closed or item updated) and a hoodie was selected for modal
-      // This logic ensures modal closes if editing is finished from elsewhere
     }
   }, [editingItem, isModalOpen, selectedHoodie]);
 
@@ -87,7 +82,6 @@ export default function HoodiesPage() {
 
   const handleClearFilters = () => {
     setActiveFilters({ colors: [], sizes: [], designs: [] });
-    // setSearchTerm(''); // Optionally clear search term as well
   };
 
   const filteredHoodies = useMemo(() => {
@@ -117,7 +111,6 @@ export default function HoodiesPage() {
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setSelectedHoodie(null);
-    // Editing item state is handled by the modal and cart context
   };
 
   const renderFilterDropdownGroup = <T extends { name: string; value: string }>(
@@ -154,12 +147,13 @@ export default function HoodiesPage() {
         <div className="flex-grow container mx-auto p-4 text-center">
           <p className="text-3xl font-semibold text-primary animate-pulse">Loading Hoodiez...</p>
         </div>
+        <Footer />
       </div>
     );
   }
 
   return (
-    <>
+    <div className="flex flex-col min-h-screen">
       <Header />
       <main className="flex-1 p-4 md:p-8 bg-transparent">
         <div className="container mx-auto">
@@ -250,7 +244,7 @@ export default function HoodiesPage() {
         isOpen={isModalOpen}
         onClose={handleCloseModal}
       />
-    </>
+      <Footer />
+    </div>
   );
 }
-

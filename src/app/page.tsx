@@ -6,54 +6,14 @@ import Image from 'next/image';
 import React from 'react';
 import { Header } from '@/components/header';
 import { Button } from '@/components/ui/button';
-import { Shirt, Gem, HeartHandshake, Percent, Slack } from 'lucide-react'; // Added Slack for sweatpants
+import { Footer } from '@/components/footer'; // Import Footer
+import { categories } from '@/data/categories'; // Import categories
 
 export default function HomePage() {
-  const categories = [
-    {
-      name: 'Awesome Hoodiez',
-      href: '/hoodies',
-      icon: <Shirt className="h-16 w-16 text-accent" />,
-      description: 'Explore our wide range of stylish and comfortable hoodiez.',
-      imageSrc: 'https://picsum.photos/seed/hoodieCat/600/400',
-      imageHint: 'teenager wearing hoodiez',
-    },
-    {
-      name: 'Comfy Sweatpantz',
-      href: '/sweatpants',
-      icon: <Slack className="h-16 w-16 text-accent" />, // Using Slack icon as placeholder for sweatpants
-      description: 'Relax in style with our collection of cozy sweatpantz.',
-      imageSrc: 'https://picsum.photos/seed/sweatpantsCat/600/400',
-      imageHint: 'person wearing sweatpantz',
-    },
-    {
-      name: 'Individual Braceletz',
-      href: '/collections',
-      icon: <Gem className="h-16 w-16 text-accent" />,
-      description: 'Customize your look with unique braceletz and charms.',
-      imageSrc: 'https://picsum.photos/seed/braceletCat/600/400',
-      imageHint: 'silver charm braceletz',
-    },
-    {
-      name: 'Matching Setz',
-      href: '/matching-bracelets',
-      icon: <HeartHandshake className="h-16 w-16 text-accent" />,
-      description: 'Find perfect pairs to share or complete your style.',
-      imageSrc: 'https://picsum.photos/seed/matchingCat/600/400',
-      imageHint: 'friends matching braceletz',
-    },
-    {
-      name: 'Hot Dealz',
-      href: '/salez',
-      icon: <Percent className="h-16 w-16 text-accent" />,
-      description: 'Grab amazing discounts on your favorite items.',
-      imageSrc: 'https://picsum.photos/seed/saleCat/600/400',
-      imageHint: 'sale shopping discount',
-    },
-  ];
+  // Categories are now imported from @/data/categories
 
   return (
-    <>
+    <div className="flex flex-col min-h-screen">
       <Header />
       <main className="flex-1 bg-transparent">
         {/* Hero Section */}
@@ -65,9 +25,14 @@ export default function HomePage() {
             <p className="text-xl md:text-2xl text-muted-foreground mb-10 max-w-3xl mx-auto">
               Your one-stop shop for the coolest hoodiez, comfiest sweatpantz, customizable braceletz, and matching setz. Express yourself with cœzii!
             </p>
-            <Button asChild size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90 text-xl px-10 py-7 rounded-full">
-              <Link href="/hoodies">Shop All Hoodiez</Link>
-            </Button>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Button asChild size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90 text-xl px-10 py-7 rounded-full">
+                  <Link href="/hoodies">Shop All Hoodiez</Link>
+                </Button>
+                <Button asChild size="lg" variant="outline" className="text-xl px-10 py-7 rounded-full border-accent text-accent hover:bg-accent/10">
+                  <Link href="/all-products">Explore All Productz</Link>
+                </Button>
+            </div>
           </div>
         </section>
 
@@ -129,10 +94,7 @@ export default function HomePage() {
             </div>
         </section>
       </main>
-      <footer className="py-8 text-center border-t bg-primary/10">
-          <p className="text-muted-foreground">&copy; {new Date().getFullYear()} cœzii. All rights reserved.</p>
-      </footer>
-    </>
+      <Footer />
+    </div>
   );
 }
-

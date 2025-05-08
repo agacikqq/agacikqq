@@ -20,6 +20,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
+import { Footer } from '@/components/footer'; // Import Footer
 
 export default function SweatpantsPage() {
   const { editingItem } = useCart();
@@ -46,7 +47,6 @@ export default function SweatpantsPage() {
         setIsModalOpen(true);
       }
     } else if (!editingItem && isModalOpen && selectedSweatpants){
-      // Modal close logic if editing finished elsewhere
     }
   }, [editingItem, isModalOpen, selectedSweatpants]);
 
@@ -147,12 +147,13 @@ export default function SweatpantsPage() {
         <div className="flex-grow container mx-auto p-4 text-center">
           <p className="text-3xl font-semibold text-primary animate-pulse">Loading Sweatpantz...</p>
         </div>
+        <Footer />
       </div>
     );
   }
 
   return (
-    <>
+    <div className="flex flex-col min-h-screen">
       <Header />
       <main className="flex-1 p-4 md:p-8 bg-transparent">
         <div className="container mx-auto">
@@ -243,6 +244,7 @@ export default function SweatpantsPage() {
         isOpen={isModalOpen}
         onClose={handleCloseModal}
       />
-    </>
+      <Footer />
+    </div>
   );
 }

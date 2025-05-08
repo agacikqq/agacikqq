@@ -2,7 +2,7 @@
 'use client';
 
 import Link from 'next/link';
-import { ShoppingCart, Menu, Slack } from 'lucide-react'; // Removed Shirt icon
+import { ShoppingCart, Menu, Package } from 'lucide-react'; // Added Package for All Productz
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import { ThemeToggleButton } from '@/components/theme-toggle-button';
 import { Button } from '@/components/ui/button';
@@ -20,8 +20,9 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
-import { CoeziiLogo } from '@/components/coezii-logo'; // Import the new logo component
+import { CoeziiLogo } from '@/components/coezii-logo'; 
 
 
 export function Header() {
@@ -49,6 +50,9 @@ export function Header() {
 
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center gap-x-6 lg:gap-x-8">
+          <Link href="/all-products" className="text-lg font-medium text-primary-foreground hover:text-primary-foreground/80 transition-colors flex items-center gap-1">
+             <Package className="h-5 w-5" /> All Productz
+          </Link>
           <Link href="/hoodies" className="text-lg font-medium text-primary-foreground hover:text-primary-foreground/80 transition-colors">
             Hoodiez
           </Link>
@@ -103,6 +107,10 @@ export function Header() {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
                 <DropdownMenuItem asChild>
+                  <Link href="/all-products" className="text-base flex items-center gap-2"><Package className="h-4 w-4" /> All Productz</Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
                   <Link href="/hoodies" className="text-base">Hoodiez</Link>
                 </DropdownMenuItem>
                  <DropdownMenuItem asChild>
@@ -126,4 +134,3 @@ export function Header() {
     </header>
   );
 }
-

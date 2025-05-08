@@ -8,10 +8,11 @@ import { BraceletDetailModal } from '@/components/bracelet-detail-modal';
 import { mockBracelets } from '@/data/mock-bracelets';
 import type { Bracelet } from '@/types';
 import { Gem } from 'lucide-react';
-import { useCart } from '@/context/cart-context'; // Import useCart
+import { useCart } from '@/context/cart-context'; 
+import { Footer } from '@/components/footer'; // Import Footer
 
 export default function CollectionsPage() {
-  const { editingItem } = useCart(); // Get editingItem from cart context
+  const { editingItem } = useCart(); 
   const [bracelets, setBracelets] = useState<Bracelet[]>([]);
   const [selectedBracelet, setSelectedBracelet] = useState<Bracelet | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -22,19 +23,16 @@ export default function CollectionsPage() {
     setBracelets(mockBracelets);
   }, []);
 
-  // Effect to open modal if editingItem changes and is a bracelet from this page
   useEffect(() => {
     if (editingItem?.productType === 'bracelet') {
       const braceletToEdit = mockBracelets.find(b => b.id === editingItem.productId);
-      if (braceletToEdit && editingItem.type === 'bracelet' && (editingItem.originalBracelet && editingItem.originalBracelet.id === braceletToEdit.id)) { // Ensure it's the correct bracelet type and specific item
+      if (braceletToEdit && editingItem.type === 'bracelet' && (editingItem.originalBracelet && editingItem.originalBracelet.id === braceletToEdit.id)) { 
         setSelectedBracelet(braceletToEdit);
         setIsModalOpen(true);
       }
     } else if (!editingItem && isModalOpen && selectedBracelet) {
-        // If editingItem is cleared and modal was for editing, close it.
         const currentlyEditingThisBracelet = mockBracelets.find(b => b.id === selectedBracelet.id);
         if(currentlyEditingThisBracelet){
-           // More specific check could be added if needed.
         }
     }
   }, [editingItem, isModalOpen, selectedBracelet]);
@@ -47,7 +45,6 @@ export default function CollectionsPage() {
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setSelectedBracelet(null);
-    // editingItem state is handled by the modal itself
   };
 
   if (!hasMounted) {
@@ -57,12 +54,13 @@ export default function CollectionsPage() {
         <div className="flex-grow container mx-auto p-4 text-center">
           <p className="text-3xl font-semibold text-primary animate-pulse">Loading Braceletz...</p>
         </div>
+        <Footer />
       </div>
     );
   }
 
   return (
-    <>
+    <div className="flex flex-col min-h-screen">
       <Header />
       <main className="flex-1 p-4 md:p-8 bg-transparent">
         <div className="container mx-auto">
@@ -98,6 +96,7 @@ export default function CollectionsPage() {
         isOpen={isModalOpen}
         onClose={handleCloseModal}
       />
-    </>
+      <Footer />
+    </div>
   );
 }

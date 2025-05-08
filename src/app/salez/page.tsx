@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Search, X, Percent } from 'lucide-react';
 import { useCart } from '@/context/cart-context'; 
+import { Footer } from '@/components/footer'; // Import Footer
 
 export default function SalezPage() {
   const { editingItem } = useCart(); 
@@ -32,11 +33,9 @@ export default function SalezPage() {
     setAllSaleHoodies(saleItems);
   }, []);
 
-  // Effect to open modal if editingItem changes and is a hoodie from this page
   useEffect(() => {
     if (editingItem?.productType === 'hoodie') {
       const hoodieToEdit = allSaleHoodies.find(h => h.id === editingItem.productId);
-      // Ensure it's the correct type and specific item being edited by checking cartItemId
       if (hoodieToEdit && editingItem.type === 'hoodie' && editingItem.item.cartItemId === (editingItem as { type: 'hoodie'; item: HoodieCartItem }).item.cartItemId) {
         setSelectedHoodie(hoodieToEdit);
         setIsModalOpen(true);
@@ -44,7 +43,6 @@ export default function SalezPage() {
     } else if (!editingItem && isModalOpen && selectedHoodie) {
       const currentlyEditingThisHoodie = allSaleHoodies.find(h => h.id === selectedHoodie.id);
       if (currentlyEditingThisHoodie) {
-        // This logic might need refinement
       }
     }
   }, [editingItem, allSaleHoodies, isModalOpen, selectedHoodie]);
@@ -70,7 +68,6 @@ export default function SalezPage() {
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setSelectedHoodie(null);
-    // editingItem state is handled by the modal itself
   };
 
   if (!hasMounted) {
@@ -80,12 +77,13 @@ export default function SalezPage() {
         <div className="flex-grow container mx-auto p-4 text-center">
           <p className="text-3xl font-semibold text-primary animate-pulse">Loading Salez...</p>
         </div>
+        <Footer />
       </div>
     );
   }
 
   return (
-    <>
+    <div className="flex flex-col min-h-screen">
       <Header />
       <main className="flex-1 p-4 md:p-8 bg-transparent">
         <div className="container mx-auto">
@@ -154,6 +152,7 @@ export default function SalezPage() {
         isOpen={isModalOpen}
         onClose={handleCloseModal}
       />
-    </>
+      <Footer />
+    </div>
   );
 }

@@ -8,10 +8,11 @@ import { MatchingBraceletSetDetailModal } from '@/components/matching-bracelet-s
 import { mockMatchingBracelets } from '@/data/mock-matching-bracelets';
 import type { MatchingBraceletSet } from '@/types';
 import { HeartHandshake } from 'lucide-react';
-import { useCart } from '@/context/cart-context'; // Import useCart
+import { useCart } from '@/context/cart-context'; 
+import { Footer } from '@/components/footer'; // Import Footer
 
 export default function MatchingBraceletsPage() {
-  const { editingItem } = useCart(); // Get editingItem from cart context
+  const { editingItem } = useCart(); 
   const [matchingSets, setMatchingSets] = useState<MatchingBraceletSet[]>([]);
   const [selectedSet, setSelectedSet] = useState<MatchingBraceletSet | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -22,20 +23,16 @@ export default function MatchingBraceletsPage() {
     setMatchingSets(mockMatchingBracelets);
   }, []);
 
-  // Effect to open modal if editingItem changes and is a matching set from this page
   useEffect(() => {
     if (editingItem?.productType === 'matchingSet') {
       const setToEdit = mockMatchingBracelets.find(ms => ms.id === editingItem.productId);
-      // Ensure it's the correct type and specific item being edited
       if (setToEdit && editingItem.type === 'matchingSet' && (editingItem.originalSet && editingItem.originalSet.id === setToEdit.id)) {
         setSelectedSet(setToEdit);
         setIsModalOpen(true);
       }
     } else if (!editingItem && isModalOpen && selectedSet) {
-        // If editingItem is cleared and modal was for editing, close it.
         const currentlyEditingThisSet = mockMatchingBracelets.find(ms => ms.id === selectedSet.id);
         if(currentlyEditingThisSet){
-           // Specific check for this item
         }
     }
   }, [editingItem, isModalOpen, selectedSet]);
@@ -48,7 +45,6 @@ export default function MatchingBraceletsPage() {
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setSelectedSet(null);
-    // editingItem state is handled by the modal itself
   };
 
   if (!hasMounted) {
@@ -58,12 +54,13 @@ export default function MatchingBraceletsPage() {
         <div className="flex-grow container mx-auto p-4 text-center">
           <p className="text-3xl font-semibold text-primary animate-pulse">Loading Matching Setz...</p>
         </div>
+        <Footer />
       </div>
     );
   }
 
   return (
-    <>
+    <div className="flex flex-col min-h-screen">
       <Header />
       <main className="flex-1 p-4 md:p-8 bg-transparent">
         <div className="container mx-auto">
@@ -99,7 +96,7 @@ export default function MatchingBraceletsPage() {
         isOpen={isModalOpen}
         onClose={handleCloseModal}
       />
-    </>
+      <Footer />
+    </div>
   );
 }
-
