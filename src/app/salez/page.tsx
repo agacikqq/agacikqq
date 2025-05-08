@@ -37,30 +37,26 @@ export default function SalezPage() {
   // Effect to open modal if editingItem changes and is a hoodie from this sale page
   useEffect(() => {
     if (editingItem?.type === 'hoodie') {
-      // Check if the editing item exists within the sale items list
-      const hoodieToEdit = allSaleHoodies.find(h => h.id === editingItem.productId);
+      const hoodieToEdit = allSaleHoodies.find(h => h.id === editingItem.item.productId);
       
       if (hoodieToEdit) {
-        // It's a sale hoodie, proceed to open modal
         setSelectedHoodie(hoodieToEdit);
         setIsModalOpen(true);
       } else {
-        // If the editingItem's productId doesn't match any hoodie *on sale*,
-        // we assume the edit was triggered from a different page (like /hoodies).
-        // We don't open the modal here, but we also don't clear editingItem,
-        // allowing the correct page component (/hoodies) to handle it.
-        // However, if for some reason the product ID itself is invalid, we should handle it.
-        // We'll rely on the other pages' useEffects to check `mockHoodies` if needed.
-        // If we specifically wanted to *prevent* editing non-sale items via this page's modal,
-        // we could clear editingItem here:
-        // setEditingItem(null); 
-        // But let's assume other pages handle their own items.
+        // If the product ID doesn't match a SALE hoodie, we clear the state
+        // assuming the edit button was clicked on a different page for a non-sale item.
+        // The user shouldn't be able to edit a non-sale item via the /salez page modal.
+        if(editingItem?.cartItemId) { // Only show toast if it seems like a valid item was clicked
+           toast({
+                title: "Edit Mismatch",
+                description: "Please edit this item from its original product page.",
+                variant: "destructive",
+            });
+        }
+        setEditingItem(null);
       }
-    } else if (!editingItem && isModalOpen) {
-        // If editingItem becomes null and modal is open, ensure modal is closed
-        // handleCloseModal(); // Call the close handler
     }
-  }, [editingItem, setEditingItem, isModalOpen, allSaleHoodies]); // Add allSaleHoodies dependency
+  }, [editingItem, setEditingItem, allSaleHoodies]); 
 
 
   useEffect(() => {
@@ -78,13 +74,11 @@ export default function SalezPage() {
   const handleViewDetails = (hoodie: Hoodie) => {
     setSelectedHoodie(hoodie);
     setIsModalOpen(true);
-     // Do NOT set editingItem here
   };
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setSelectedHoodie(null);
-    // Clear editing state if modal was closed while editing
     if (editingItem?.type === 'hoodie') {
         setEditingItem(null);
     }

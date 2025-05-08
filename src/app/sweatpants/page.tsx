@@ -42,7 +42,7 @@ export default function SweatpantsPage() {
   // Effect to open the modal when editingItem changes and matches sweatpants
   useEffect(() => {
     if (editingItem?.type === 'sweatpants') {
-      const itemToEdit = mockSweatpants.find(s => s.id === editingItem.productId);
+      const itemToEdit = mockSweatpants.find(s => s.id === editingItem.item.productId);
       if (itemToEdit) {
         setSelectedSweatpants(itemToEdit);
         setIsModalOpen(true);
@@ -54,11 +54,8 @@ export default function SweatpantsPage() {
         });
         setEditingItem(null); 
       }
-    } else if (!editingItem && isModalOpen) {
-       // If editingItem becomes null and modal is open, ensure modal is closed
-       // handleCloseModal(); // Call the close handler
     }
-  }, [editingItem, setEditingItem, isModalOpen]); // Depend on editingItem and setEditingItem
+  }, [editingItem, setEditingItem]); 
 
   const allColors = useMemo(() => {
     const colors = new Map<string, ProductColor>();
@@ -115,13 +112,11 @@ export default function SweatpantsPage() {
   const handleViewDetails = (item: Sweatpants) => {
     setSelectedSweatpants(item);
     setIsModalOpen(true);
-    // Do NOT set editingItem here
   };
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setSelectedSweatpants(null);
-    // Clear editing state if modal was closed while editing
     if (editingItem?.type === 'sweatpants') {
         setEditingItem(null);
     }

@@ -26,8 +26,7 @@ export default function CollectionsPage() {
   // Effect to open the modal when editingItem changes and matches a bracelet
   useEffect(() => {
     if (editingItem?.type === 'bracelet') {
-      // The originalBracelet data is now passed directly within editingItem
-      if (editingItem.originalBracelet) {
+      if (editingItem.originalBracelet) { // Use the bracelet data passed in editingItem
         setSelectedBracelet(editingItem.originalBracelet);
         setIsModalOpen(true);
       } else {
@@ -39,22 +38,17 @@ export default function CollectionsPage() {
         });
         setEditingItem(null);
       }
-    } else if (!editingItem && isModalOpen) {
-      // If editingItem becomes null (edit cancelled/completed) and modal is open, ensure it's closed
-      // handleCloseModal(); // Call the close handler
     }
-  }, [editingItem, setEditingItem, isModalOpen]); // Depend on editingItem and setEditingItem
+  }, [editingItem, setEditingItem]); 
 
   const handleViewDetails = (bracelet: Bracelet) => {
     setSelectedBracelet(bracelet);
     setIsModalOpen(true);
-    // Do NOT set editingItem here
   };
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setSelectedBracelet(null);
-    // Clear editing state if modal was closed while editing
     if (editingItem?.type === 'bracelet') {
         setEditingItem(null);
     }

@@ -26,8 +26,7 @@ export default function MatchingBraceletsPage() {
  // Effect to open the modal when editingItem changes and matches a matchingSet
   useEffect(() => {
     if (editingItem?.type === 'matchingSet') {
-      // The originalSet data is now passed directly within editingItem
-      if (editingItem.originalSet) {
+      if (editingItem.originalSet) { // Use the set data passed in editingItem
         setSelectedSet(editingItem.originalSet);
         setIsModalOpen(true);
       } else {
@@ -38,22 +37,17 @@ export default function MatchingBraceletsPage() {
         });
         setEditingItem(null);
       }
-    } else if (!editingItem && isModalOpen) {
-        // If editingItem becomes null and modal is open, ensure modal is closed
-        // handleCloseModal(); // Call the close handler
     }
-  }, [editingItem, setEditingItem, isModalOpen]); // Depend on editingItem and setEditingItem
+  }, [editingItem, setEditingItem]); 
 
   const handleViewDetails = (set: MatchingBraceletSet) => {
     setSelectedSet(set);
     setIsModalOpen(true);
-    // Do NOT set editingItem here
   };
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setSelectedSet(null);
-    // Clear editing state if modal was closed while editing
     if (editingItem?.type === 'matchingSet') {
         setEditingItem(null);
     }

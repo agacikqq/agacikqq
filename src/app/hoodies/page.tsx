@@ -42,27 +42,21 @@ export default function HoodiesPage() {
   // Effect to open the modal when editingItem changes and matches a hoodie
   useEffect(() => {
     if (editingItem?.type === 'hoodie') {
-      // Find the hoodie data from the mock data source
-      const hoodieToEdit = mockHoodies.find(h => h.id === editingItem.productId);
+      const hoodieToEdit = mockHoodies.find(h => h.id === editingItem.item.productId);
       
       if (hoodieToEdit) {
-        setSelectedHoodie(hoodieToEdit); // Set the hoodie for the modal
-        setIsModalOpen(true); // Open the modal
+        setSelectedHoodie(hoodieToEdit); 
+        setIsModalOpen(true); 
       } else {
-        // Handle case where hoodie data might not be found (e.g., data inconsistency)
         toast({
             title: "Error",
             description: "Could not find the hoodie details to edit.",
             variant: "destructive",
         });
-        setEditingItem(null); // Clear the invalid editing state
+        setEditingItem(null); 
       }
-    } else if (!editingItem && isModalOpen) {
-        // If editingItem becomes null (e.g., edit cancelled or completed) and modal is open, ensure modal is closed
-        // This might be redundant if handleCloseModal is always called, but good for safety
-        // handleCloseModal(); // Call the close handler which also clears selectedHoodie
     }
-  }, [editingItem, setEditingItem, isModalOpen]); // Depend on editingItem and setEditingItem
+  }, [editingItem, setEditingItem]);
 
 
   const allColors = useMemo(() => {
@@ -120,13 +114,11 @@ export default function HoodiesPage() {
   const handleViewDetails = (hoodie: Hoodie) => {
     setSelectedHoodie(hoodie);
     setIsModalOpen(true);
-    // Do NOT set editingItem here - editing is initiated from the cart
   };
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setSelectedHoodie(null);
-    // If the modal was closed while editing, ensure the editing state is cleared
     if (editingItem?.type === 'hoodie') {
         setEditingItem(null);
     }
