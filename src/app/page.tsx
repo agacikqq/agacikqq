@@ -43,8 +43,8 @@ export default function HomePage() {
       imageHint: 'friends matching braceletz',
     },
     {
-      name: 'Hot Deals',
-      href: '/sale',
+      name: 'Hot Dealz',
+      href: '/salez',
       icon: <Percent className="h-16 w-16 text-accent" />,
       description: 'Grab amazing discounts on your favorite items.',
       imageSrc: 'https://picsum.photos/seed/saleCat/600/400',
