@@ -18,15 +18,15 @@ export function CoeziiLogo(props: SVGProps<SVGSVGElement>) {
       </defs>
       <style>
         {`
-          @import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&display=swap');
+          @import url('https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap');
           .coezii-text {
-            font-family: 'Dancing Script', var(--font-dancing-script), cursive;
+            font-family: 'Great Vibes', var(--font-great-vibes), cursive;
             font-size: 48px;
             fill: url(#coeziiGradient);
             filter: drop-shadow(1px 1px 1px rgba(0,0,0,0.2));
           }
           .coezii-text-shadow {
-            font-family: 'Dancing Script', var(--font-dancing-script), cursive;
+            font-family: 'Great Vibes', var(--font-great-vibes), cursive;
             font-size: 48px;
             fill: hsl(var(--foreground) / 0.3);
             transform: translate(1px, 1px);

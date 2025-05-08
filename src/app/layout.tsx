@@ -1,6 +1,6 @@
 
 import type { Metadata } from 'next';
-import { Dancing_Script } from 'next/font/google'; // Changed from Great_Vibes to Dancing_Script
+import { Great_Vibes } from 'next/font/google'; // Changed from Dancing_Script to Great_Vibes
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 import { SidebarProvider } from '@/components/ui/sidebar';
@@ -8,10 +8,10 @@ import { ThemeProvider } from '@/components/theme-provider';
 import { CartProvider } from '@/context/cart-context';
 import { CartSidebar } from '@/components/cart-sidebar';
 
-const dancingScript = Dancing_Script({ // Changed from greatVibes to dancingScript
+const greatVibes = Great_Vibes({ // Changed from dancingScript to greatVibes
   subsets: ['latin'],
-  weight: ['400', '700'], // Dancing Script supports multiple weights
-  variable: '--font-dancing-script', // Changed variable name
+  weight: ['400'], // Great Vibes typically only has a 400 weight
+  variable: '--font-great-vibes', // Changed variable name
 });
 
 export const metadata: Metadata = {
@@ -26,7 +26,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="h-full">
-      <body className={`${dancingScript.variable} font-sans antialiased flex flex-col min-h-screen bg-background text-2xl`}> {/* Apply new font variable */}
+      <body className={`${greatVibes.variable} font-sans antialiased flex flex-col min-h-screen bg-background text-2xl`}> {/* Apply new font variable */}
         <ThemeProvider
           attribute="class"
           defaultTheme="light"

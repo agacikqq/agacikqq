@@ -11,7 +11,7 @@ export default {
   theme: {
   	extend: {
       fontFamily: {
-        sans: ['var(--font-dancing-script)', 'cursive'], // Changed to use Dancing Script variable
+        sans: ['var(--font-great-vibes)', 'cursive'], // Changed to use Great Vibes variable
       },
   		colors: {
   			background: 'hsl(var(--background))',
