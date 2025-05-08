@@ -2,7 +2,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Shirt, ShoppingCart, Menu, Slack } from 'lucide-react'; // Added Menu for mobile trigger, Slack for sweatpants
+import { ShoppingCart, Menu, Slack } from 'lucide-react'; // Removed Shirt icon
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import { ThemeToggleButton } from '@/components/theme-toggle-button';
 import { Button } from '@/components/ui/button';
@@ -21,6 +21,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { CoeziiLogo } from '@/components/coezii-logo'; // Import the new logo component
 
 
 export function Header() {
@@ -39,7 +40,7 @@ export function Header() {
         {/* Brand */}
         <div className="flex items-center">
           <Link href="/" className="flex items-center space-x-2 group">
-            <Shirt className="h-8 w-8 text-primary-foreground group-hover:animate-pulse" />
+            <CoeziiLogo className="h-10 w-auto text-primary-foreground group-hover:opacity-80 transition-opacity duration-300" />
             <span className="inline-block text-4xl font-bold text-primary-foreground tracking-tight">
               cœzii
             </span>
