@@ -6,7 +6,7 @@ import Image from 'next/image';
 import React from 'react';
 import { Header } from '@/components/header';
 import { Button } from '@/components/ui/button';
-import { Shirt, Gem, HeartHandshake, Percent } from 'lucide-react';
+import { Shirt, Gem, HeartHandshake, Percent, Slack } from 'lucide-react'; // Added Slack for sweatpants
 
 export default function HomePage() {
   const categories = [
@@ -17,6 +17,14 @@ export default function HomePage() {
       description: 'Explore our wide range of stylish and comfortable hoodies.',
       imageSrc: 'https://picsum.photos/seed/hoodieCat/600/400',
       imageHint: 'teenager wearing hoodie',
+    },
+    {
+      name: 'Comfy Sweatpants',
+      href: '/sweatpants',
+      icon: <Slack className="h-16 w-16 text-accent" />, // Using Slack icon as placeholder for sweatpants
+      description: 'Relax in style with our collection of cozy sweatpants.',
+      imageSrc: 'https://picsum.photos/seed/sweatpantsCat/600/400',
+      imageHint: 'person wearing sweatpants',
     },
     {
       name: 'Individual Bracelets',
@@ -55,7 +63,7 @@ export default function HomePage() {
               Welcome to cœzii!
             </h1>
             <p className="text-xl md:text-2xl text-muted-foreground mb-10 max-w-3xl mx-auto">
-              Your one-stop shop for the coolest hoodies, customizable bracelets, and matching sets. Express yourself with cœzii!
+              Your one-stop shop for the coolest hoodies, comfiest sweatpants, customizable bracelets, and matching sets. Express yourself with cœzii!
             </p>
             <Button asChild size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90 text-xl px-10 py-7 rounded-full">
               <Link href="/hoodies">Shop All Products</Link>
@@ -69,7 +77,7 @@ export default function HomePage() {
             <h2 className="text-4xl font-bold text-center text-primary mb-12">
               Explore Our Collections
             </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
               {categories.map((category) => (
                 <Link href={category.href} key={category.name} legacyBehavior>
                   <a className="block group bg-card p-6 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 ease-in-out transform hover:-translate-y-1">

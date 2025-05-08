@@ -32,6 +32,22 @@ export interface Hoodie {
   slug: string;
 }
 
+export interface Sweatpants {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  originalPrice?: number;
+  images: string[];
+  colors: ProductColor[];
+  availableSizes: ProductSize[];
+  designs: ProductDesign[]; // e.g., "Cuffed", "Straight Leg", "With Stripes"
+  materials: string;
+  careInstructions: string;
+  origin: string;
+  slug: string;
+}
+
 export interface Filters {
   colors: string[];
   sizes: string[];
@@ -88,6 +104,12 @@ export interface HoodieCartItem extends CartItemBase {
   selectedSize: ProductSize;
 }
 
+export interface SweatpantsCartItem extends CartItemBase {
+  productType: 'sweatpants';
+  selectedColor: ProductColor;
+  selectedSize: ProductSize;
+}
+
 export interface BraceletCustomization {
   braceletId: string;
   braceletName: string;
@@ -108,11 +130,13 @@ export interface MatchingSetCartItem extends CartItemBase {
   // unitPrice will be setBasePrice + total price of all extra charms for all bracelets in the set (beyond included per bracelet)
 }
 
-export type CartItem = HoodieCartItem | BraceletCartItem | MatchingSetCartItem;
+export type CartItem = HoodieCartItem | BraceletCartItem | MatchingSetCartItem | SweatpantsCartItem;
 
 // For re-opening modals for editing
 export type EditingItemState = 
   | { type: 'hoodie'; item: HoodieCartItem }
+  | { type: 'sweatpants'; item: SweatpantsCartItem }
   | { type: 'bracelet'; item: BraceletCartItem; originalBracelet: Bracelet }
   | { type: 'matchingSet'; item: MatchingSetCartItem; originalSet: MatchingBraceletSet }
   | null;
+

@@ -2,7 +2,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Shirt, ShoppingCart, Menu } from 'lucide-react'; // Added Menu for mobile trigger
+import { Shirt, ShoppingCart, Menu, Slack } from 'lucide-react'; // Added Menu for mobile trigger, Slack for sweatpants
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import { ThemeToggleButton } from '@/components/theme-toggle-button';
 import { Button } from '@/components/ui/button';
@@ -50,6 +50,9 @@ export function Header() {
         <nav className="hidden md:flex items-center gap-x-6 lg:gap-x-8">
           <Link href="/hoodies" className="text-lg font-medium text-primary-foreground hover:text-primary-foreground/80 transition-colors">
             Hoodies
+          </Link>
+           <Link href="/sweatpants" className="text-lg font-medium text-primary-foreground hover:text-primary-foreground/80 transition-colors">
+            Sweatpants
           </Link>
           <Link href="/collections" className="text-lg font-medium text-primary-foreground hover:text-primary-foreground/80 transition-colors">
             Bracelets
@@ -100,6 +103,9 @@ export function Header() {
               <DropdownMenuContent align="end" className="w-56">
                 <DropdownMenuItem asChild>
                   <Link href="/hoodies" className="text-base">Hoodies</Link>
+                </DropdownMenuItem>
+                 <DropdownMenuItem asChild>
+                  <Link href="/sweatpants" className="text-base">Sweatpants</Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link href="/collections" className="text-base">Bracelets</Link>

@@ -1,12 +1,14 @@
+
 'use client';
 
 import type { ReactNode } from 'react';
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import type { CartItem, HoodieCartItem, BraceletCartItem, MatchingSetCartItem, Hoodie, ProductColor, ProductSize, Bracelet, Charm, MatchingBraceletSet, EditingItemState, BraceletCustomization } from '@/types';
+import type { CartItem, HoodieCartItem, BraceletCartItem, MatchingSetCartItem, SweatpantsCartItem, Hoodie, ProductColor, ProductSize, Bracelet, Charm, MatchingBraceletSet, EditingItemState, BraceletCustomization, Sweatpants } from '@/types';
 import { toast } from '@/hooks/use-toast';
 import { mockBracelets } from '@/data/mock-bracelets';
 import { mockMatchingBracelets } from '@/data/mock-matching-bracelets';
 import { mockHoodies } from '@/data/mock-hoodies';
+import { mockSweatpants } from '@/data/mock-sweatpants';
 
 
 const INCLUDED_CHARMS_COUNT = 4; // Same as in BraceletDetailModal
@@ -26,7 +28,7 @@ interface CartContextType {
   closeCart: () => void;
   editingItem: EditingItemState;
   setEditingItem: (item: EditingItemState) => void;
-  getOriginalProductForEditing: (cartItem: CartItem) => Hoodie | Bracelet | MatchingBraceletSet | undefined;
+  getOriginalProductForEditing: (cartItem: CartItem) => Hoodie | Bracelet | MatchingBraceletSet | Sweatpants | undefined;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -48,6 +50,10 @@ const calculateUnitPrice = (itemData: Omit<CartItem, 'cartItemId' | 'unitPrice' 
     case 'hoodie':
       return (itemData as Omit<HoodieCartItem, 'cartItemId' | 'unitPrice' | 'quantity'>).productId
           ? mockHoodies.find(h => h.id === itemData.productId)?.price || 0
+          : 0;
+    case 'sweatpants':
+      return (itemData as Omit<SweatpantsCartItem, 'cartItemId' | 'unitPrice' | 'quantity'>).productId
+          ? mockSweatpants.find(s => s.id === itemData.productId)?.price || 0
           : 0;
     case 'bracelet': {
       const braceletData = itemData as Omit<BraceletCartItem, 'cartItemId' | 'unitPrice' | 'quantity'>;
@@ -79,6 +85,20 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   const [items, setItems] = useState<CartItem[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<EditingItemState>(null);
+  const [toastQueue, setToastQueue] = useState<Array<{ title: string; description: string, variant?: 'default' | 'destructive' }>>([]);
+
+  useEffect(() => {
+    if (toastQueue.length > 0) {
+      const toastToShow = toastQueue[0];
+      toast(toastToShow);
+      setToastQueue(currentQueue => currentQueue.slice(1));
+    }
+  }, [toastQueue]);
+
+  const addToastToQueue = (newToast: { title: string; description: string, variant?: 'default' | 'destructive' }) => {
+    setToastQueue(currentQueue => [...currentQueue, newToast]);
+  };
+
 
   useEffect(() => {
     const storedCartItems = localStorage.getItem('cartItems');
@@ -105,6 +125,9 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     if (itemData.productType === 'hoodie') {
         const hoodieData = itemData as Omit<HoodieCartItem, 'cartItemId'| 'unitPrice' | 'quantity'>;
         optionsForId = { color: hoodieData.selectedColor.value, size: hoodieData.selectedSize.value };
+    } else if (itemData.productType === 'sweatpants') {
+        const sweatpantsData = itemData as Omit<SweatpantsCartItem, 'cartItemId'| 'unitPrice' | 'quantity'>;
+        optionsForId = { color: sweatpantsData.selectedColor.value, size: sweatpantsData.selectedSize.value };
     } else if (itemData.productType === 'bracelet') {
         const braceletData = itemData as Omit<BraceletCartItem, 'cartItemId'| 'unitPrice' | 'quantity'>;
         optionsForId = { charms: braceletData.selectedCharms.map(c => c.id).sort() };
@@ -131,29 +154,21 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       nextItems = currentItems.map(item => {
         if (item.cartItemId === currentEditingItem.cartItemId) {
           itemReplaced = true;
-          // Create a new object for the updated item
           const updatedItem: CartItem = {
-            // Spread existing properties if they should be preserved (like quantity if not overridden by quantityToAdd)
-            // For now, assuming itemData and newly calculated properties are sufficient
             ...itemData,
-            cartItemId, // Use newly generated cartItemId if options changed, or old one if just quantity
+            cartItemId, 
             unitPrice,
-            quantity: quantityToAdd, // Ensure quantity is correctly set
-          } as CartItem; // Cast to CartItem
+            quantity: quantityToAdd, 
+          } as CartItem; 
           return updatedItem;
         }
         return item;
       });
       
       if (!itemReplaced) {
-        // This case means the item being "edited" wasn't found by its original cartItemId.
-        // This could happen if its configuration changed so much that its cartItemId also changed.
-        // Or if it was removed from the cart by another action.
-        // We should remove the old instance if its ID is different from the new one and it still exists.
         if(currentEditingItem.cartItemId !== cartItemId) {
             nextItems = nextItems.filter(i => i.cartItemId !== currentEditingItem.cartItemId);
         }
-        // Then, check if an item with the *new* cartItemId exists to update its quantity, or add as new.
         const existingNewConfigItemIndex = nextItems.findIndex(i => i.cartItemId === cartItemId);
         if (existingNewConfigItemIndex > -1) {
             nextItems[existingNewConfigItemIndex] = { ...nextItems[existingNewConfigItemIndex], quantity: nextItems[existingNewConfigItemIndex].quantity + quantityToAdd };
@@ -187,67 +202,64 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   };
   
   const addItemToCart = useCallback((itemData: Omit<CartItem, 'cartItemId' | 'unitPrice' | 'quantity'> & { quantity?: number }) => {
-    const result = addItemToCartLogic(itemData, items, editingItem);
-    
-    setItems(result.nextItems);
-
-    if (result.toastMsg) {
-      toast(result.toastMsg);
-    }
-
-    if (result.editingItemToClear) {
-      setEditingItem(null);
-    }
-
-    if (!isCartOpen) {
-        setIsCartOpen(true);
-    }
-  }, [items, editingItem, isCartOpen]);
+    setItems(currentItems => {
+        const result = addItemToCartLogic(itemData, currentItems, editingItem);
+        if (result.toastMsg) {
+            addToastToQueue(result.toastMsg);
+        }
+        if (result.editingItemToClear) {
+            setEditingItem(null);
+        }
+        if (!isCartOpen) {
+            setIsCartOpen(true);
+        }
+        return result.nextItems;
+    });
+  }, [editingItem, isCartOpen, addToastToQueue]);
 
 
   const removeItemFromCart = useCallback((cartItemId: string) => {
-    const itemToRemove = items.find(item => item.cartItemId === cartItemId);
-    
-    const nextItems = items.filter(item => item.cartItemId !== cartItemId);
-    setItems(nextItems);
-
-    if (itemToRemove) {
-      toast({ title: "Item Removed", description: `${itemToRemove.name} has been removed from your cart.`, variant: 'destructive' });
-    }
-  }, [items]);
+    setItems(currentItems => {
+        const itemToRemove = currentItems.find(item => item.cartItemId === cartItemId);
+        const nextItems = currentItems.filter(item => item.cartItemId !== cartItemId);
+        if (itemToRemove) {
+            addToastToQueue({ title: "Item Removed", description: `${itemToRemove.name} has been removed from your cart.`, variant: 'destructive' });
+        }
+        return nextItems;
+    });
+  }, [addToastToQueue]);
 
   const updateItemQuantity = useCallback((cartItemId: string, quantity: number) => {
-    const currentItem = items.find(item => item.cartItemId === cartItemId);
-    let toastInfo: { title: string; description: string; variant?: "default" | "destructive" } | null = null;
+     setItems(currentItems => {
+        const currentItem = currentItems.find(item => item.cartItemId === cartItemId);
+        let toastInfo: { title: string; description: string; variant?: "default" | "destructive" } | null = null;
+        let nextItems = [...currentItems];
 
-    let nextItems = [...items]; // Create a copy of the current items
-
-    if (quantity <= 0) {
-        if (currentItem) {
-            toastInfo = { title: "Item Removed", description: `${currentItem.name} has been removed from your cart.`, variant: 'destructive' };
+        if (quantity <= 0) {
+            if (currentItem) {
+                toastInfo = { title: "Item Removed", description: `${currentItem.name} has been removed from your cart.`, variant: 'destructive' };
+            }
+            nextItems = nextItems.filter(item => item.cartItemId !== cartItemId);
+        } else {
+            if (currentItem) {
+                toastInfo = { title: "Quantity Updated", description: `Quantity of ${currentItem.name} changed to ${quantity}.` };
+            }
+            nextItems = nextItems.map(item =>
+                item.cartItemId === cartItemId ? { ...item, quantity } : item
+            );
         }
-        nextItems = nextItems.filter(item => item.cartItemId !== cartItemId);
         
-    } else {
-        if (currentItem) {
-            toastInfo = { title: "Quantity Updated", description: `Quantity of ${currentItem.name} changed to ${quantity}.` };
+        if (toastInfo) {
+            addToastToQueue(toastInfo);
         }
-        nextItems = nextItems.map(item =>
-            item.cartItemId === cartItemId ? { ...item, quantity } : item
-        );
-    }
-    
-    setItems(nextItems);
-
-    if (toastInfo) {
-        toast(toastInfo);
-    }
-  }, [items]);
+        return nextItems;
+    });
+  }, [addToastToQueue]);
 
   const clearCart = useCallback(() => {
     setItems([]);
-    toast({ title: "Cart Cleared", description: "All items have been removed from your cart.", variant: 'destructive' });
-  }, []);
+    addToastToQueue({ title: "Cart Cleared", description: "All items have been removed from your cart.", variant: 'destructive' });
+  }, [addToastToQueue]);
 
   const cartTotal = items.reduce((total, item) => total + item.unitPrice * item.quantity, 0);
   const cartCount = items.reduce((count, item) => count + item.quantity, 0);
@@ -256,15 +268,17 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   const openCart = useCallback(() => setIsCartOpen(true), []);
   const closeCart = useCallback(() => {
     setIsCartOpen(false);
-    if (editingItem) { // Only clear editingItem if it was set
+    if (editingItem) { 
         setEditingItem(null); 
     }
-  }, [editingItem]); // Add editingItem to dependency if its presence affects logic
+  }, [editingItem]); 
 
-  const getOriginalProductForEditing = useCallback((cartItem: CartItem): Hoodie | Bracelet | MatchingBraceletSet | undefined => {
+  const getOriginalProductForEditing = useCallback((cartItem: CartItem): Hoodie | Bracelet | MatchingBraceletSet | Sweatpants | undefined => {
     switch (cartItem.productType) {
         case 'hoodie':
             return mockHoodies.find(h => h.id === cartItem.productId);
+        case 'sweatpants':
+            return mockSweatpants.find(s => s.id === cartItem.productId);
         case 'bracelet':
             return mockBracelets.find(b => b.id === cartItem.productId);
         case 'matchingSet':
@@ -290,12 +304,13 @@ export const useCart = () => {
   return context;
 };
 
-// Helper function to get cartItemId for an editing item, used in CartContext
 export const getCartItemIdFromEditingItem = (editingItem: EditingItemState): string | undefined => {
   if (!editingItem) return undefined;
   
   switch (editingItem.type) {
     case 'hoodie':
+      return editingItem.item.cartItemId;
+    case 'sweatpants':
       return editingItem.item.cartItemId;
     case 'bracelet':
       return editingItem.item.cartItemId;
@@ -305,3 +320,4 @@ export const getCartItemIdFromEditingItem = (editingItem: EditingItemState): str
       return undefined;
   }
 };
+

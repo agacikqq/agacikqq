@@ -3,7 +3,7 @@
 
 import Image from 'next/image';
 import { useCart } from '@/context/cart-context';
-import type { CartItem, HoodieCartItem, BraceletCartItem, MatchingSetCartItem, Hoodie, Bracelet, MatchingBraceletSet, Charm } from '@/types';
+import type { CartItem, HoodieCartItem, BraceletCartItem, MatchingSetCartItem, SweatpantsCartItem, Hoodie, Bracelet, MatchingBraceletSet, Sweatpants, Charm } from '@/types';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
@@ -40,6 +40,9 @@ export function CartSidebar() {
       case 'hoodie':
         setEditingItem({ type: 'hoodie', item: item as HoodieCartItem });
         break;
+      case 'sweatpants':
+        setEditingItem({ type: 'sweatpants', item: item as SweatpantsCartItem });
+        break;
       case 'bracelet':
         setEditingItem({ type: 'bracelet', item: item as BraceletCartItem, originalBracelet: originalProduct as Bracelet });
         break;
@@ -47,7 +50,7 @@ export function CartSidebar() {
         setEditingItem({ type: 'matchingSet', item: item as MatchingSetCartItem, originalSet: originalProduct as MatchingBraceletSet });
         break;
     }
-    closeCart(); // Close cart sidebar, modal will open from page
+    closeCart(); 
   };
   
   const renderCharmList = (charms: Charm[], includedCount: number, basePrice: number) => {
@@ -99,7 +102,7 @@ export function CartSidebar() {
                       src={item.image}
                       alt={item.name}
                       width={80}
-                      height={item.productType === 'hoodie' ? 107 : 80} // Adjust height for hoodie aspect ratio
+                      height={item.productType === 'hoodie' || item.productType === 'sweatpants' ? 107 : 80} 
                       className="rounded-md object-cover aspect-[3/4] sm:aspect-square"
                       data-ai-hint={`${item.name} cart image`}
                     />
@@ -116,6 +119,11 @@ export function CartSidebar() {
                       {item.productType === 'hoodie' && (
                         <p className="text-xs text-muted-foreground">
                           Color: {(item as HoodieCartItem).selectedColor.name}, Size: {(item as HoodieCartItem).selectedSize.name}
+                        </p>
+                      )}
+                      {item.productType === 'sweatpants' && (
+                        <p className="text-xs text-muted-foreground">
+                          Color: {(item as SweatpantsCartItem).selectedColor.name}, Size: {(item as SweatpantsCartItem).selectedSize.name}
                         </p>
                       )}
 
@@ -198,3 +206,4 @@ export function CartSidebar() {
     </Sheet>
   );
 }
+
