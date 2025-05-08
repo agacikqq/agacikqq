@@ -27,33 +27,39 @@ interface ProductDetailModalProps {
 }
 
 export function ProductDetailModal({ hoodie, isOpen, onClose }: ProductDetailModalProps) {
-  const { addItemToCart, editingItem } = useCart(); // Removed setEditingItem as it's handled by parent via onClose
+  const { addItemToCart, editingItem } = useCart(); 
   const [selectedColor, setSelectedColor] = useState<ProductColor | null>(null);
   const [selectedSize, setSelectedSize] = useState<ProductSize | null>(null);
   const [currentImage, setCurrentImage] = useState<string>('');
   
-  const isEditing = editingItem?.type === 'hoodie' && editingItem?.productId === hoodie?.id;
+  // Determine if we are currently editing *this specific hoodie* based on the global editingItem state
+  const amCurrentlyEditingThisItem = editingItem?.type === 'hoodie' && editingItem.item?.productId === hoodie?.id;
 
   useEffect(() => {
     if (isOpen && hoodie) {
-      if (isEditing && editingItem?.item) {
+      if (amCurrentlyEditingThisItem && editingItem?.item) { // Check if editingItem.item exists
         const editHoodieCartItem = editingItem.item as HoodieCartItem;
         setSelectedColor(editHoodieCartItem.selectedColor);
         setSelectedSize(editHoodieCartItem.selectedSize);
         setCurrentImage(editHoodieCartItem.selectedColor?.image || editHoodieCartItem.image || hoodie.images[0]);
       } else {
+        // Not editing this item, or no hoodie provided (though `if (isOpen && hoodie)` covers this)
+        // Initialize for a fresh view or if editingItem is for something else
         const initialColor = hoodie.colors[0] || null;
         setSelectedColor(initialColor);
         setSelectedSize(hoodie.availableSizes[0] || null);
         setCurrentImage(initialColor?.image || hoodie.images[0]);
       }
     }
-  }, [hoodie, isOpen, isEditing, editingItem]);
+  }, [hoodie, isOpen, editingItem, amCurrentlyEditingThisItem]); // Added amCurrentlyEditingThisItem to deps
   
   useEffect(() => {
+    // Update currentImage when selectedColor changes, if the color has a specific image
     if (selectedColor && selectedColor.image) {
       setCurrentImage(selectedColor.image);
     } else if (hoodie && hoodie.images.length > 0 && (!selectedColor || !selectedColor.image)) {
+      // Fallback to the first general image of the hoodie if selected color has no image
+      // or if no color is selected yet (though initial useEffect should handle this)
       setCurrentImage(hoodie.images[0]);
     }
   }, [selectedColor, hoodie]);
@@ -74,22 +80,25 @@ export function ProductDetailModal({ hoodie, isOpen, onClose }: ProductDetailMod
         });
         return;
     }
+    // itemDataFromModal does not include cartItemId, quantity or unitPrice here.
+    // The cart context (addItemToCart) will handle generating cartItemId, setting quantity, and calculating unitPrice.
+    // If it's an update, addItemToCart will use editingItem.cartItemId to find and update/replace.
     const cartItemData: Omit<HoodieCartItem, 'cartItemId' | 'unitPrice' | 'quantity'> = {
       productId: hoodie.id,
       name: hoodie.name,
-      image: selectedColor.image || hoodie.images[0], 
+      image: selectedColor.image || currentImage || hoodie.images[0], // Ensure image is robustly chosen
       productType: 'hoodie',
       selectedColor,
       selectedSize,
     };
     
     addItemToCart(cartItemData); 
-    onClose(); 
+    onClose(); // This will also clear the editingItem state via the parent page's handler
   };
 
   const handleInternalClose = (open: boolean) => {
       if (!open) {
-          onClose(); 
+          onClose(); // Call parent's onClose which should handle clearing editingItem
       }
   };
 
@@ -240,7 +249,7 @@ export function ProductDetailModal({ hoodie, isOpen, onClose }: ProductDetailMod
                 onClick={handleAddToCartOrUpdate}
                 disabled={!selectedColor || !selectedSize}
               >
-                {isEditing ? 'Update Item' : 'Add to Cart'} 
+                {amCurrentlyEditingThisItem ? 'Update Item' : 'Add to Cart'} 
               </Button>
             </DialogFooter>
           </div>
@@ -250,3 +259,4 @@ export function ProductDetailModal({ hoodie, isOpen, onClose }: ProductDetailMod
     </Dialog>
   );
 }
+

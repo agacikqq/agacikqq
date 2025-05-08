@@ -27,16 +27,16 @@ interface SweatpantsDetailModalProps {
 }
 
 export function SweatpantsDetailModal({ sweatpants, isOpen, onClose }: SweatpantsDetailModalProps) {
-  const { addItemToCart, editingItem } = useCart(); // Removed setEditingItem
+  const { addItemToCart, editingItem } = useCart();
   const [selectedColor, setSelectedColor] = useState<ProductColor | null>(null);
   const [selectedSize, setSelectedSize] = useState<ProductSize | null>(null);
   const [currentImage, setCurrentImage] = useState<string>('');
   
-  const isEditing = editingItem?.type === 'sweatpants' && editingItem?.productId === sweatpants?.id;
+  const amCurrentlyEditingThisItem = editingItem?.type === 'sweatpants' && editingItem.item?.productId === sweatpants?.id;
 
   useEffect(() => {
     if (isOpen && sweatpants) {
-      if (isEditing && editingItem?.item) { 
+      if (amCurrentlyEditingThisItem && editingItem?.item) { // Check editingItem.item exists
         const editSweatpantsCartItem = editingItem.item as SweatpantsCartItem;
         setSelectedColor(editSweatpantsCartItem.selectedColor);
         setSelectedSize(editSweatpantsCartItem.selectedSize);
@@ -48,7 +48,7 @@ export function SweatpantsDetailModal({ sweatpants, isOpen, onClose }: Sweatpant
         setCurrentImage(initialColor?.image || sweatpants.images[0]);
       }
     }
-  }, [sweatpants, isOpen, isEditing, editingItem]); 
+  }, [sweatpants, isOpen, editingItem, amCurrentlyEditingThisItem]);
   
   useEffect(() => {
     if (selectedColor && selectedColor.image) {
@@ -77,7 +77,7 @@ export function SweatpantsDetailModal({ sweatpants, isOpen, onClose }: Sweatpant
     const cartItemData: Omit<SweatpantsCartItem, 'cartItemId' | 'unitPrice' | 'quantity'> = {
       productId: sweatpants.id,
       name: sweatpants.name,
-      image: selectedColor.image || sweatpants.images[0], 
+      image: selectedColor.image || currentImage || sweatpants.images[0],
       productType: 'sweatpants',
       selectedColor,
       selectedSize,
@@ -240,7 +240,7 @@ export function SweatpantsDetailModal({ sweatpants, isOpen, onClose }: Sweatpant
                 onClick={handleAddToCartOrUpdate}
                 disabled={!selectedColor || !selectedSize}
               >
-                {isEditing ? 'Update Item' : 'Add to Cart'} 
+                {amCurrentlyEditingThisItem ? 'Update Item' : 'Add to Cart'} 
               </Button>
             </DialogFooter>
           </div>
@@ -250,3 +250,4 @@ export function SweatpantsDetailModal({ sweatpants, isOpen, onClose }: Sweatpant
     </Dialog>
   );
 }
+
