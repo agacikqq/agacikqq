@@ -58,7 +58,7 @@ export function Header() {
             Braceletz
           </Link>
           <Link href="/matching-bracelets" className="text-lg font-medium text-primary-foreground hover:text-primary-foreground/80 transition-colors">
-            Matching Sets
+            Matching Setz
           </Link>
           <Link href="/sale" className="text-lg font-medium text-primary-foreground hover:text-primary-foreground/80 transition-colors">
             Sale
@@ -111,7 +111,7 @@ export function Header() {
                   <Link href="/collections" className="text-base">Braceletz</Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link href="/matching-bracelets" className="text-base">Matching Sets</Link>
+                  <Link href="/matching-bracelets" className="text-base">Matching Setz</Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link href="/sale" className="text-base">Sale</Link>

@@ -35,7 +35,7 @@ export default function HomePage() {
       imageHint: 'silver charm braceletz',
     },
     {
-      name: 'Matching Sets',
+      name: 'Matching Setz',
       href: '/matching-bracelets',
       icon: <HeartHandshake className="h-16 w-16 text-accent" />,
       description: 'Find perfect pairs to share or complete your style.',
@@ -63,7 +63,7 @@ export default function HomePage() {
               Welcome to cœzii!
             </h1>
             <p className="text-xl md:text-2xl text-muted-foreground mb-10 max-w-3xl mx-auto">
-              Your one-stop shop for the coolest hoodiez, comfiest sweatpantz, customizable braceletz, and matching sets. Express yourself with cœzii!
+              Your one-stop shop for the coolest hoodiez, comfiest sweatpantz, customizable braceletz, and matching setz. Express yourself with cœzii!
             </p>
             <Button asChild size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90 text-xl px-10 py-7 rounded-full">
               <Link href="/hoodies">Shop All Hoodiez</Link>
