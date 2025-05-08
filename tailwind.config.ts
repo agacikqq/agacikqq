@@ -11,7 +11,7 @@ export default {
   theme: {
   	extend: {
       fontFamily: {
-        sans: ['var(--font-great-vibes)', 'cursive'], // Changed to use Great Vibes variable
+        sans: ['var(--font-poppins)', 'sans-serif'], // Changed to use Poppins variable and a generic sans-serif fallback
       },
   		colors: {
   			background: 'hsl(var(--background))',

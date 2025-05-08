@@ -1,6 +1,6 @@
 
 import type { Metadata } from 'next';
-import { Great_Vibes } from 'next/font/google'; 
+import { Poppins } from 'next/font/google'; // Changed from Great_Vibes
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 import { SidebarProvider } from '@/components/ui/sidebar';
@@ -8,10 +8,10 @@ import { ThemeProvider } from '@/components/theme-provider';
 import { CartProvider } from '@/context/cart-context';
 import { CartSidebar } from '@/components/cart-sidebar';
 
-const greatVibes = Great_Vibes({ 
+const poppins = Poppins({ // Changed from greatVibes
   subsets: ['latin'],
-  weight: ['400'], 
-  variable: '--font-great-vibes', 
+  weight: ['300', '400', '500', '600', '700', '800'], // Added more weights for flexibility
+  variable: '--font-poppins', // Changed variable name
 });
 
 export const metadata: Metadata = {
@@ -26,7 +26,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="h-full">
-      <body className={`${greatVibes.variable} font-sans antialiased flex flex-col min-h-screen bg-background text-2xl`}>
+      <body className={`${poppins.variable} font-sans antialiased flex flex-col min-h-screen bg-background text-2xl`}> {/* Updated font variable and font-sans */}
         <ThemeProvider
           attribute="class"
           defaultTheme="light"

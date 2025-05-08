@@ -18,23 +18,26 @@ export function CoeziiLogo(props: SVGProps<SVGSVGElement>) {
       </defs>
       <style>
         {`
-          @import url('https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap');
-          .coezii-text {
-            font-family: 'Great Vibes', var(--font-great-vibes), cursive;
-            font-size: 48px;
-            fill: url(#coeziiGradient);
-            filter: drop-shadow(1px 1px 1px rgba(0,0,0,0.2));
+          @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
+          .coezii-text-base {
+            font-family: 'Poppins', var(--font-poppins), sans-serif;
+            font-size: 40px; /* Adjusted size for Poppins */
+            font-weight: 700; /* Bolder weight */
+            letter-spacing: -0.5px; /* Slight adjustment for Poppins */
           }
           .coezii-text-shadow {
-            font-family: 'Great Vibes', var(--font-great-vibes), cursive;
-            font-size: 48px;
             fill: hsl(var(--foreground) / 0.3);
             transform: translate(1px, 1px);
           }
+          .coezii-text-main {
+            fill: url(#coeziiGradient);
+            filter: drop-shadow(1px 1px 1px rgba(0,0,0,0.15)); /* Softer shadow */
+          }
         `}
       </style>
-      <text x="5" y="40" className="coezii-text-shadow">cœzii</text>
-      <text x="5" y="40" className="coezii-text">cœzii</text>
+      {/* Apply base class and specific classes */}
+      <text x="5" y="40" className="coezii-text-base coezii-text-shadow">cœzii</text>
+      <text x="5" y="40" className="coezii-text-base coezii-text-main">cœzii</text>
     </svg>
   );
 }
