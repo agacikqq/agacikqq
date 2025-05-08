@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
@@ -20,10 +19,11 @@ import {
   DropdownMenuSeparator,
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
-import { Footer } from '@/components/footer'; // Import Footer
+import { Footer } from '@/components/footer'; 
+import { toast } from '@/hooks/use-toast';
 
 export default function HoodiesPage() {
-  const { editingItem } = useCart();
+  const { editingItem, setEditingItem } = useCart();
   const [hoodies, setHoodies] = useState<Hoodie[]>(mockHoodies);
   const [selectedHoodie, setSelectedHoodie] = useState<Hoodie | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -39,16 +39,30 @@ export default function HoodiesPage() {
     setHasMounted(true);
   }, []);
 
+  // Effect to open the modal when editingItem changes and matches a hoodie
   useEffect(() => {
-    if (editingItem?.productType === 'hoodie') {
+    if (editingItem?.type === 'hoodie') {
+      // Find the hoodie data from the mock data source
       const hoodieToEdit = mockHoodies.find(h => h.id === editingItem.productId);
-      if (hoodieToEdit && editingItem.type === 'hoodie' && editingItem.item.cartItemId === (editingItem as { type: 'hoodie'; item: HoodieCartItem }).item.cartItemId) {
-        setSelectedHoodie(hoodieToEdit);
-        setIsModalOpen(true);
+      
+      if (hoodieToEdit) {
+        setSelectedHoodie(hoodieToEdit); // Set the hoodie for the modal
+        setIsModalOpen(true); // Open the modal
+      } else {
+        // Handle case where hoodie data might not be found (e.g., data inconsistency)
+        toast({
+            title: "Error",
+            description: "Could not find the hoodie details to edit.",
+            variant: "destructive",
+        });
+        setEditingItem(null); // Clear the invalid editing state
       }
-    } else if (!editingItem && isModalOpen && selectedHoodie){
+    } else if (!editingItem && isModalOpen) {
+        // If editingItem becomes null (e.g., edit cancelled or completed) and modal is open, ensure modal is closed
+        // This might be redundant if handleCloseModal is always called, but good for safety
+        // handleCloseModal(); // Call the close handler which also clears selectedHoodie
     }
-  }, [editingItem, isModalOpen, selectedHoodie]);
+  }, [editingItem, setEditingItem, isModalOpen]); // Depend on editingItem and setEditingItem
 
 
   const allColors = useMemo(() => {
@@ -106,11 +120,16 @@ export default function HoodiesPage() {
   const handleViewDetails = (hoodie: Hoodie) => {
     setSelectedHoodie(hoodie);
     setIsModalOpen(true);
+    // Do NOT set editingItem here - editing is initiated from the cart
   };
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setSelectedHoodie(null);
+    // If the modal was closed while editing, ensure the editing state is cleared
+    if (editingItem?.type === 'hoodie') {
+        setEditingItem(null);
+    }
   };
 
   const renderFilterDropdownGroup = <T extends { name: string; value: string }>(

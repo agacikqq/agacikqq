@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -9,10 +8,11 @@ import { mockMatchingBracelets } from '@/data/mock-matching-bracelets';
 import type { MatchingBraceletSet } from '@/types';
 import { HeartHandshake } from 'lucide-react';
 import { useCart } from '@/context/cart-context'; 
-import { Footer } from '@/components/footer'; // Import Footer
+import { Footer } from '@/components/footer'; 
+import { toast } from '@/hooks/use-toast';
 
 export default function MatchingBraceletsPage() {
-  const { editingItem } = useCart(); 
+  const { editingItem, setEditingItem } = useCart(); 
   const [matchingSets, setMatchingSets] = useState<MatchingBraceletSet[]>([]);
   const [selectedSet, setSelectedSet] = useState<MatchingBraceletSet | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -23,28 +23,40 @@ export default function MatchingBraceletsPage() {
     setMatchingSets(mockMatchingBracelets);
   }, []);
 
+ // Effect to open the modal when editingItem changes and matches a matchingSet
   useEffect(() => {
-    if (editingItem?.productType === 'matchingSet') {
-      const setToEdit = mockMatchingBracelets.find(ms => ms.id === editingItem.productId);
-      if (setToEdit && editingItem.type === 'matchingSet' && (editingItem.originalSet && editingItem.originalSet.id === setToEdit.id)) {
-        setSelectedSet(setToEdit);
+    if (editingItem?.type === 'matchingSet') {
+      // The originalSet data is now passed directly within editingItem
+      if (editingItem.originalSet) {
+        setSelectedSet(editingItem.originalSet);
         setIsModalOpen(true);
+      } else {
+         toast({
+            title: "Error",
+            description: "Could not find the matching set details to edit.",
+            variant: "destructive",
+        });
+        setEditingItem(null);
       }
-    } else if (!editingItem && isModalOpen && selectedSet) {
-        const currentlyEditingThisSet = mockMatchingBracelets.find(ms => ms.id === selectedSet.id);
-        if(currentlyEditingThisSet){
-        }
+    } else if (!editingItem && isModalOpen) {
+        // If editingItem becomes null and modal is open, ensure modal is closed
+        // handleCloseModal(); // Call the close handler
     }
-  }, [editingItem, isModalOpen, selectedSet]);
+  }, [editingItem, setEditingItem, isModalOpen]); // Depend on editingItem and setEditingItem
 
   const handleViewDetails = (set: MatchingBraceletSet) => {
     setSelectedSet(set);
     setIsModalOpen(true);
+    // Do NOT set editingItem here
   };
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setSelectedSet(null);
+    // Clear editing state if modal was closed while editing
+    if (editingItem?.type === 'matchingSet') {
+        setEditingItem(null);
+    }
   };
 
   if (!hasMounted) {

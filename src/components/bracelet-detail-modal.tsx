@@ -1,4 +1,3 @@
-
 'use client';
 
 import Image from 'next/image';
@@ -23,7 +22,7 @@ import { useCart } from '@/context/cart-context'; // Import useCart
 interface BraceletDetailModalProps {
   bracelet: Bracelet | null;
   isOpen: boolean;
-  onClose: () => void;
+  onClose: () => void; // Parent component's close handler
 }
 
 const INCLUDED_CHARMS_COUNT = 4;
@@ -33,24 +32,25 @@ export function BraceletDetailModal({ bracelet, isOpen, onClose }: BraceletDetai
   const [selectedCharms, setSelectedCharms] = useState<Charm[]>([]);
   const [currentImage, setCurrentImage] = useState<string>('');
 
-  const isEditing = editingItem?.productType === 'bracelet' && editingItem?.productId === bracelet?.id;
+  const isEditing = editingItem?.type === 'bracelet' && editingItem?.productId === bracelet?.id;
 
+  // Effect to initialize modal state based on whether it's opened for viewing or editing
   useEffect(() => {
     if (isOpen && bracelet) {
-      if (isEditing && editingItem?.productType === 'bracelet') {
+      if (isEditing) { 
+        // Populate state from the item being edited (passed via editingItem.item)
         const editBracelet = editingItem.item as BraceletCartItem;
-        setSelectedCharms(editBracelet.selectedCharms);
-        setCurrentImage(editBracelet.image || bracelet.images[0] || '');
+        setSelectedCharms(editBracelet.selectedCharms || []); // Default to empty array if undefined
+        // Use image from editingItem first, then fallback to bracelet data
+        setCurrentImage(editBracelet.image || bracelet.images[0] || ''); 
       } else {
+        // Populate state for a fresh view (not editing)
         setSelectedCharms([]); 
         setCurrentImage(bracelet.images[0] || '');
       }
-    } else if (!isOpen) {
-        if (isEditing) {
-            setEditingItem(null);
-        }
-    }
-  }, [bracelet, isOpen, isEditing, editingItem, setEditingItem]);
+    } 
+    // No else if (!isOpen) needed, onClose handles cleanup.
+  }, [bracelet, isOpen, isEditing, editingItem]); // Add editingItem to dependencies
 
   const totalPrice = useMemo(() => {
     if (!bracelet) return 0;
@@ -74,24 +74,33 @@ export function BraceletDetailModal({ bracelet, isOpen, onClose }: BraceletDetai
   };
 
   const handleAddToCart = () => {
+    // Prepare item data
     const cartItemData: Omit<BraceletCartItem, 'cartItemId' | 'unitPrice' | 'quantity'> = {
       productId: bracelet.id,
       name: bracelet.name,
-      image: currentImage || bracelet.images[0],
+      image: currentImage || bracelet.images[0], // Use current image or fallback
       productType: 'bracelet',
       baseBraceletPrice: bracelet.basePrice,
       selectedCharms,
     };
-    addItemToCart(cartItemData);
-    onClose();
+    
+    // Add to cart (context handles add/update logic)
+    addItemToCart(cartItemData); 
+    
+    // Close modal using parent's handler (which should clear editingItem)
+    onClose(); 
   };
 
+  const handleInternalClose = (open: boolean) => {
+    if (!open) {
+        // Call the parent's onClose handler when the dialog requests closing
+        onClose(); 
+    }
+  };
 
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => {
-        if(!open && isEditing) setEditingItem(null);
-        onClose();
-    }}>
+    // Use the internal close handler for the Dialog's onOpenChange
+    <Dialog open={isOpen} onOpenChange={handleInternalClose}> 
       <DialogContent className="max-w-4xl p-0">
         <ScrollArea className="max-h-[90vh]">
         <div className="grid md:grid-cols-2 gap-0">
@@ -214,6 +223,7 @@ export function BraceletDetailModal({ bracelet, isOpen, onClose }: BraceletDetai
 
 
             <DialogFooter className="mt-auto pt-6">
+               {/* Use parent's onClose for the Close button */}
               <Button variant="outline" onClick={onClose} className="w-full sm:w-auto">
                 Close
               </Button>

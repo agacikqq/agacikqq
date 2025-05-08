@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -9,10 +8,11 @@ import { mockBracelets } from '@/data/mock-bracelets';
 import type { Bracelet } from '@/types';
 import { Gem } from 'lucide-react';
 import { useCart } from '@/context/cart-context'; 
-import { Footer } from '@/components/footer'; // Import Footer
+import { Footer } from '@/components/footer'; 
+import { toast } from '@/hooks/use-toast';
 
 export default function CollectionsPage() {
-  const { editingItem } = useCart(); 
+  const { editingItem, setEditingItem } = useCart(); 
   const [bracelets, setBracelets] = useState<Bracelet[]>([]);
   const [selectedBracelet, setSelectedBracelet] = useState<Bracelet | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -23,28 +23,41 @@ export default function CollectionsPage() {
     setBracelets(mockBracelets);
   }, []);
 
+  // Effect to open the modal when editingItem changes and matches a bracelet
   useEffect(() => {
-    if (editingItem?.productType === 'bracelet') {
-      const braceletToEdit = mockBracelets.find(b => b.id === editingItem.productId);
-      if (braceletToEdit && editingItem.type === 'bracelet' && (editingItem.originalBracelet && editingItem.originalBracelet.id === braceletToEdit.id)) { 
-        setSelectedBracelet(braceletToEdit);
+    if (editingItem?.type === 'bracelet') {
+      // The originalBracelet data is now passed directly within editingItem
+      if (editingItem.originalBracelet) {
+        setSelectedBracelet(editingItem.originalBracelet);
         setIsModalOpen(true);
+      } else {
+        // This case should ideally not happen if getOriginalProductForEditing works
+         toast({
+            title: "Error",
+            description: "Could not find the bracelet details to edit.",
+            variant: "destructive",
+        });
+        setEditingItem(null);
       }
-    } else if (!editingItem && isModalOpen && selectedBracelet) {
-        const currentlyEditingThisBracelet = mockBracelets.find(b => b.id === selectedBracelet.id);
-        if(currentlyEditingThisBracelet){
-        }
+    } else if (!editingItem && isModalOpen) {
+      // If editingItem becomes null (edit cancelled/completed) and modal is open, ensure it's closed
+      // handleCloseModal(); // Call the close handler
     }
-  }, [editingItem, isModalOpen, selectedBracelet]);
+  }, [editingItem, setEditingItem, isModalOpen]); // Depend on editingItem and setEditingItem
 
   const handleViewDetails = (bracelet: Bracelet) => {
     setSelectedBracelet(bracelet);
     setIsModalOpen(true);
+    // Do NOT set editingItem here
   };
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setSelectedBracelet(null);
+    // Clear editing state if modal was closed while editing
+    if (editingItem?.type === 'bracelet') {
+        setEditingItem(null);
+    }
   };
 
   if (!hasMounted) {

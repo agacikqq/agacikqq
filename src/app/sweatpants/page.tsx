@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
@@ -20,10 +19,11 @@ import {
   DropdownMenuSeparator,
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
-import { Footer } from '@/components/footer'; // Import Footer
+import { Footer } from '@/components/footer'; 
+import { toast } from '@/hooks/use-toast';
 
 export default function SweatpantsPage() {
-  const { editingItem } = useCart();
+  const { editingItem, setEditingItem } = useCart();
   const [sweatpantsList, setSweatpantsList] = useState<Sweatpants[]>(mockSweatpants);
   const [selectedSweatpants, setSelectedSweatpants] = useState<Sweatpants | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -39,17 +39,26 @@ export default function SweatpantsPage() {
     setHasMounted(true);
   }, []);
 
+  // Effect to open the modal when editingItem changes and matches sweatpants
   useEffect(() => {
-    if (editingItem?.productType === 'sweatpants') {
+    if (editingItem?.type === 'sweatpants') {
       const itemToEdit = mockSweatpants.find(s => s.id === editingItem.productId);
-      if (itemToEdit && editingItem.type === 'sweatpants' && editingItem.item.cartItemId === (editingItem as { type: 'sweatpants'; item: SweatpantsCartItem }).item.cartItemId) {
+      if (itemToEdit) {
         setSelectedSweatpants(itemToEdit);
         setIsModalOpen(true);
+      } else {
+         toast({
+            title: "Error",
+            description: "Could not find the sweatpants details to edit.",
+            variant: "destructive",
+        });
+        setEditingItem(null); 
       }
-    } else if (!editingItem && isModalOpen && selectedSweatpants){
+    } else if (!editingItem && isModalOpen) {
+       // If editingItem becomes null and modal is open, ensure modal is closed
+       // handleCloseModal(); // Call the close handler
     }
-  }, [editingItem, isModalOpen, selectedSweatpants]);
-
+  }, [editingItem, setEditingItem, isModalOpen]); // Depend on editingItem and setEditingItem
 
   const allColors = useMemo(() => {
     const colors = new Map<string, ProductColor>();
@@ -106,11 +115,16 @@ export default function SweatpantsPage() {
   const handleViewDetails = (item: Sweatpants) => {
     setSelectedSweatpants(item);
     setIsModalOpen(true);
+    // Do NOT set editingItem here
   };
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setSelectedSweatpants(null);
+    // Clear editing state if modal was closed while editing
+    if (editingItem?.type === 'sweatpants') {
+        setEditingItem(null);
+    }
   };
 
   const renderFilterDropdownGroup = <T extends { name: string; value: string }>(

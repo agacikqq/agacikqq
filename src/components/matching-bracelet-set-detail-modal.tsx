@@ -1,4 +1,3 @@
-
 'use client';
 
 import Image from 'next/image';
@@ -24,7 +23,7 @@ import { useCart } from '@/context/cart-context'; // Import useCart
 interface MatchingBraceletSetDetailModalProps {
   set: MatchingBraceletSet | null;
   isOpen: boolean;
-  onClose: () => void;
+  onClose: () => void; // Parent component's close handler
 }
 
 const INCLUDED_CHARMS_PER_BRACELET_IN_SET = 4;
@@ -35,19 +34,24 @@ export function MatchingBraceletSetDetailModal({ set, isOpen, onClose }: Matchin
   const [activeCustomizingBraceletId, setActiveCustomizingBraceletId] = useState<string | null>(null);
   const [braceletCustomizations, setBraceletCustomizations] = useState<Record<string, { selectedCharms: Charm[] }>>({});
 
-  const isEditing = editingItem?.productType === 'matchingSet' && editingItem?.productId === set?.id;
+  // Determine if we are editing this specific set
+  const isEditing = editingItem?.type === 'matchingSet' && editingItem?.productId === set?.id;
 
+  // Effect to initialize modal state based on view/edit mode
   useEffect(() => {
     if (isOpen && set) {
-      if (isEditing && editingItem?.productType === 'matchingSet') {
+      if (isEditing) { 
+        // Populate state from the item being edited
         const editSet = editingItem.item as MatchingSetCartItem;
         const initialCustomizations: Record<string, { selectedCharms: Charm[] }> = {};
         editSet.braceletsCustomization.forEach(bc => {
-          initialCustomizations[bc.braceletId] = { selectedCharms: bc.selectedCharms };
+          initialCustomizations[bc.braceletId] = { selectedCharms: bc.selectedCharms || [] }; // Ensure selectedCharms is an array
         });
         setBraceletCustomizations(initialCustomizations);
+        // Use image from editing item first, fallback to set data
         setCurrentMainImage(editSet.image || set.images[0] || '');
       } else {
+        // Populate state for a fresh view
         const initialCustomizations: Record<string, { selectedCharms: Charm[] }> = {};
         set.bracelets.forEach(b => {
           initialCustomizations[b.id] = { selectedCharms: [] };
@@ -55,21 +59,17 @@ export function MatchingBraceletSetDetailModal({ set, isOpen, onClose }: Matchin
         setBraceletCustomizations(initialCustomizations);
         setCurrentMainImage(set.images[0] || '');
       }
-      setActiveCustomizingBraceletId(null);
-    } else if (!isOpen) {
-      if (isEditing) {
-        setEditingItem(null);
-      }
-      // Reset customizations when modal is closed and not editing or if set changes
-      setBraceletCustomizations({});
+      // Reset which bracelet's customization is expanded
       setActiveCustomizingBraceletId(null);
     }
-  }, [set, isOpen, isEditing, editingItem, setEditingItem]);
+    // No else if (!isOpen) needed here, onClose handles cleanup.
+  }, [set, isOpen, isEditing, editingItem]); // Add editingItem dependency
 
   const totalSetPrice = useMemo(() => {
     if (!set) return 0;
     let currentTotal = set.setPrice;
 
+    // Calculate additional cost from extra charms for each bracelet
     set.bracelets.forEach(bracelet => {
       const customization = braceletCustomizations[bracelet.id];
       if (customization && customization.selectedCharms.length > INCLUDED_CHARMS_PER_BRACELET_IN_SET) {
@@ -100,29 +100,40 @@ export function MatchingBraceletSetDetailModal({ set, isOpen, onClose }: Matchin
   };
 
   const handleAddToCart = () => {
+    // Prepare customization data for the cart item
     const currentBraceletsCustomization: BraceletCustomization[] = set.bracelets.map(bracelet => ({
       braceletId: bracelet.id,
       braceletName: bracelet.name,
-      selectedCharms: braceletCustomizations[bracelet.id]?.selectedCharms || [],
+      selectedCharms: braceletCustomizations[bracelet.id]?.selectedCharms || [], // Ensure it's an array
     }));
 
+    // Prepare the base cart item data
     const cartItemData: Omit<MatchingSetCartItem, 'cartItemId' | 'unitPrice' | 'quantity'> = {
       productId: set.id,
       name: set.name,
-      image: currentMainImage || set.images[0],
+      image: currentMainImage || set.images[0], // Use current image or fallback
       productType: 'matchingSet',
       setBasePrice: set.setPrice,
       braceletsCustomization: currentBraceletsCustomization,
     };
-    addItemToCart(cartItemData);
-    onClose();
+    
+    // Add to cart (context handles add/update)
+    addItemToCart(cartItemData); 
+    
+    // Close modal using parent's handler (which should clear editingItem)
+    onClose(); 
+  };
+
+  const handleInternalClose = (open: boolean) => {
+      if (!open) {
+         // Call the parent's onClose handler when the dialog requests closing
+          onClose();
+      }
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => {
-        if (!open && isEditing) setEditingItem(null);
-        onClose();
-    }}>
+    // Use the internal close handler for the Dialog's onOpenChange
+    <Dialog open={isOpen} onOpenChange={handleInternalClose}> 
       <DialogContent className="max-w-4xl p-0">
         <ScrollArea className="max-h-[90vh]">
         <div className="grid md:grid-cols-2 gap-0">
@@ -225,24 +236,30 @@ export function MatchingBraceletSetDetailModal({ set, isOpen, onClose }: Matchin
                                 </div>
                             </div>
 
+                            {/* Toggle Button for Customization */}
                             {bracelet.availableCharms && bracelet.availableCharms.length > 0 && (
                               <Button 
                                 variant="outline" 
                                 size="sm" 
                                 onClick={() => setActiveCustomizingBraceletId(activeCustomizingBraceletId === bracelet.id ? null : bracelet.id)} 
                                 className="mt-3 w-full"
+                                aria-expanded={activeCustomizingBraceletId === bracelet.id}
+                                aria-controls={`customize-${bracelet.id}`}
                               >
                                 {activeCustomizingBraceletId === bracelet.id ? <ChevronUp className="mr-2 h-4 w-4" /> : <ChevronDown className="mr-2 h-4 w-4" />}
                                 {activeCustomizingBraceletId === bracelet.id ? 'Hide Charms' : `Customize Charms for ${bracelet.name}`}
+                                <span className="ml-auto text-xs text-muted-foreground">
+                                  ({(braceletCustomizations[bracelet.id]?.selectedCharms || []).length} selected)
+                                </span>
                               </Button>
                             )}
                              {bracelet.availableCharms.length === 0 && (
                                  <p className="text-sm text-muted-foreground mt-3 text-center">Not customizable with additional charms.</p>
                              )}
 
-
+                            {/* Collapsible Charm Selection Area */}
                             {activeCustomizingBraceletId === bracelet.id && bracelet.availableCharms.length > 0 && (
-                              <div className="mt-4 pt-4 border-t border-border">
+                              <div id={`customize-${bracelet.id}`} className="mt-4 pt-4 border-t border-border">
                                 <h5 className="mb-1 text-md font-semibold text-foreground flex items-center">
                                     <Gem className="mr-2 h-5 w-5 text-primary" />
                                     Select Charms for {bracelet.name}
@@ -274,7 +291,7 @@ export function MatchingBraceletSetDetailModal({ set, isOpen, onClose }: Matchin
                                           <span className="text-sm font-semibold text-accent">+AED {charm.price.toFixed(2)}</span>
                                           <Checkbox
                                             id={`set-charm-${bracelet.id}-${charm.id}`}
-                                            checked={braceletCustomizations[bracelet.id]?.selectedCharms.some(c => c.id === charm.id)}
+                                            checked={(braceletCustomizations[bracelet.id]?.selectedCharms || []).some(c => c.id === charm.id)}
                                             onCheckedChange={() => handleCharmToggleForSetBracelet(bracelet.id, charm)}
                                             aria-label={`Select charm ${charm.name} for ${bracelet.name}`}
                                           />
@@ -291,7 +308,8 @@ export function MatchingBraceletSetDetailModal({ set, isOpen, onClose }: Matchin
             </div>
 
             <DialogFooter className="mt-auto pt-6">
-              <Button variant="outline" onClick={onClose} className="w-full sm:w-auto">
+              {/* Use parent's onClose for Close button */}
+              <Button variant="outline" onClick={onClose} className="w-full sm:w-auto"> 
                 Close
               </Button>
               <Button

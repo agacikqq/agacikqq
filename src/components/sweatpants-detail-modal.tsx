@@ -1,4 +1,3 @@
-
 'use client';
 
 import Image from 'next/image';
@@ -23,7 +22,7 @@ import { useCart } from '@/context/cart-context';
 interface SweatpantsDetailModalProps {
   sweatpants: Sweatpants | null;
   isOpen: boolean;
-  onClose: () => void;
+  onClose: () => void; // Parent component's close handler
 }
 
 export function SweatpantsDetailModal({ sweatpants, isOpen, onClose }: SweatpantsDetailModalProps) {
@@ -32,31 +31,35 @@ export function SweatpantsDetailModal({ sweatpants, isOpen, onClose }: Sweatpant
   const [selectedSize, setSelectedSize] = useState<ProductSize | null>(null);
   const [currentImage, setCurrentImage] = useState<string>('');
   
-  const isEditing = editingItem?.productType === 'sweatpants' && editingItem?.productId === sweatpants?.id;
+  // Determine if we are editing this specific item
+  const isEditing = editingItem?.type === 'sweatpants' && editingItem?.productId === sweatpants?.id;
 
+  // Effect to initialize modal state based on view/edit mode
   useEffect(() => {
     if (isOpen && sweatpants) {
-      if (isEditing && editingItem?.productType === 'sweatpants') {
+      if (isEditing) { 
+        // Populate state from the item being edited
         const editSweatpants = editingItem.item as SweatpantsCartItem;
         setSelectedColor(editSweatpants.selectedColor);
         setSelectedSize(editSweatpants.selectedSize);
+        // Use image from editing item first, then fallback
         setCurrentImage(editSweatpants.selectedColor?.image || editSweatpants.image || sweatpants.images[0]);
       } else {
+        // Populate state for a fresh view
         setSelectedColor(sweatpants.colors[0] || null);
         setSelectedSize(sweatpants.availableSizes[0] || null);
         setCurrentImage(sweatpants.colors[0]?.image || sweatpants.images[0]);
       }
-    } else if (!isOpen) {
-        if (isEditing) {
-            setEditingItem(null);
-        }
     }
-  }, [sweatpants, isOpen, isEditing, editingItem, setEditingItem]);
+    // No else if (!isOpen) needed, onClose handles cleanup
+  }, [sweatpants, isOpen, isEditing, editingItem]); // Add editingItem dependency
   
+  // Effect to update image based on selected color
   useEffect(() => {
     if (selectedColor && selectedColor.image) {
       setCurrentImage(selectedColor.image);
-    } else if (sweatpants && sweatpants.images.length > 0) {
+    } else if (sweatpants && sweatpants.images.length > 0 && !selectedColor?.image) {
+      // Fallback to first sweatpants image if selected color has no specific image
       setCurrentImage(sweatpants.images[0]);
     }
   }, [selectedColor, sweatpants]);
@@ -77,28 +80,38 @@ export function SweatpantsDetailModal({ sweatpants, isOpen, onClose }: Sweatpant
         });
         return;
     }
+    // Prepare item data
     const cartItemData: Omit<SweatpantsCartItem, 'cartItemId' | 'unitPrice' | 'quantity'> = {
       productId: sweatpants.id,
       name: sweatpants.name,
-      image: selectedColor.image || sweatpants.images[0],
+      image: selectedColor.image || sweatpants.images[0], // Use color image or fallback
       productType: 'sweatpants',
       selectedColor,
       selectedSize,
     };
-    addItemToCart(cartItemData);
-    onClose();
+    
+    // Add to cart (context handles add/update)
+    addItemToCart(cartItemData); 
+    
+    // Close modal using parent handler (which should clear editingItem)
+    onClose(); 
+  };
+
+  const handleInternalClose = (open: boolean) => {
+      if (!open) {
+          // Call parent's onClose handler when dialog requests close
+          onClose(); 
+      }
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => {
-        if (!open && isEditing) setEditingItem(null); 
-        onClose();
-    }}>
+    // Use internal close handler for Dialog's onOpenChange
+    <Dialog open={isOpen} onOpenChange={handleInternalClose}> 
       <DialogContent className="max-w-3xl p-0">
         <ScrollArea className="max-h-[90vh]">
         <div className="grid md:grid-cols-2 gap-0">
-          <div className="p-6 flex flex-col">
-            <div className="relative aspect-[3/4] w-full overflow-hidden rounded-lg mb-4">
+          <div className="p-6 flex flex-col bg-card/30"> {/* Image Section Background */}
+            <div className="relative aspect-[3/4] w-full overflow-hidden rounded-lg mb-4 shadow-inner"> {/* Inner shadow */}
               <Image
                 src={currentImage}
                 alt={`${sweatpants.name} - ${selectedColor?.name || ''}`}
@@ -114,7 +127,8 @@ export function SweatpantsDetailModal({ sweatpants, isOpen, onClose }: Sweatpant
                 </Badge>
               )}
             </div>
-            {sweatpants.images.length > 1 && sweatpants.colors.length > 1 && (
+            {/* Thumbnails only if multiple colors have images */}
+            {sweatpants.colors.filter(c => c.image).length > 1 && (
               <div className="grid grid-cols-4 gap-2">
                 {sweatpants.colors.filter(c => c.image).map((colorOption) => (
                   <button
@@ -139,7 +153,7 @@ export function SweatpantsDetailModal({ sweatpants, isOpen, onClose }: Sweatpant
             )}
           </div>
 
-          <div className="p-6 flex flex-col">
+          <div className="p-6 flex flex-col"> {/* Details Section */}
             <DialogHeader className="mb-4">
               <DialogTitle className="text-4xl font-bold tracking-tight text-foreground">{sweatpants.name}</DialogTitle>
               <DialogDescription className="text-base text-muted-foreground pt-1">
@@ -159,7 +173,7 @@ export function SweatpantsDetailModal({ sweatpants, isOpen, onClose }: Sweatpant
             </div>
 
             <div className="mb-6">
-              <h4 className="mb-2 text-lg font-semibold text-foreground">Color: {selectedColor?.name}</h4>
+              <h4 className="mb-2 text-lg font-semibold text-foreground">Color: {selectedColor?.name || 'Select a color'}</h4>
               <div className="flex flex-wrap gap-2">
                 {sweatpants.colors.map((color) => (
                   <Button
@@ -183,7 +197,7 @@ export function SweatpantsDetailModal({ sweatpants, isOpen, onClose }: Sweatpant
             </div>
 
             <div className="mb-6">
-              <h4 className="mb-2 text-lg font-semibold text-foreground">Size: {selectedSize?.name}</h4>
+              <h4 className="mb-2 text-lg font-semibold text-foreground">Size: {selectedSize?.name || 'Select a size'}</h4>
               <div className="flex flex-wrap gap-2">
                 {sweatpants.availableSizes.map((size) => (
                   <Button
@@ -230,7 +244,8 @@ export function SweatpantsDetailModal({ sweatpants, isOpen, onClose }: Sweatpant
             </div>
 
             <DialogFooter className="mt-auto pt-6">
-              <Button variant="outline" onClick={onClose} className="w-full sm:w-auto">
+              {/* Use parent's onClose for Close button */}
+              <Button variant="outline" onClick={onClose} className="w-full sm:w-auto"> 
                 Close
               </Button>
               <Button
@@ -239,7 +254,7 @@ export function SweatpantsDetailModal({ sweatpants, isOpen, onClose }: Sweatpant
                 onClick={handleAddToCart}
                 disabled={!selectedColor || !selectedSize}
               >
-                {isEditing ? 'Update Item' : 'Add to Cart'}
+                {isEditing ? 'Update Item' : 'Add to Cart'} 
               </Button>
             </DialogFooter>
           </div>

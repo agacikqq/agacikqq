@@ -1,4 +1,3 @@
-
 'use client';
 
 import type { ReactNode } from 'react';
@@ -27,7 +26,7 @@ interface CartContextType {
   openCart: () => void;
   closeCart: () => void;
   editingItem: EditingItemState;
-  setEditingItem: (item: EditingItemState) => void;
+  setEditingItem: React.Dispatch<React.SetStateAction<EditingItemState>>;
   getOriginalProductForEditing: (cartItem: CartItem) => Hoodie | Bracelet | MatchingBraceletSet | Sweatpants | undefined;
 }
 
@@ -95,9 +94,9 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [toastQueue]);
 
-  const addToastToQueue = (newToast: { title: string; description: string, variant?: 'default' | 'destructive' }) => {
+  const addToastToQueue = useCallback((newToast: { title: string; description: string, variant?: 'default' | 'destructive' }) => {
     setToastQueue(currentQueue => [...currentQueue, newToast]);
-  };
+  }, []);
 
 
   useEffect(() => {
@@ -149,36 +148,41 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     let toastMsg: { title: string; description: string } | null = null;
     let editingItemToClear = false;
 
-    if (currentEditingItem && currentEditingItem.productType === itemData.productType && currentEditingItem.productId === itemData.productId && currentEditingItem.cartItemId) {
-      let itemReplaced = false;
-      nextItems = currentItems.map(item => {
-        if (item.cartItemId === currentEditingItem.cartItemId) {
-          itemReplaced = true;
-          const updatedItem: CartItem = {
-            ...itemData,
-            cartItemId, 
-            unitPrice,
-            quantity: quantityToAdd, 
-          } as CartItem; 
-          return updatedItem;
-        }
-        return item;
-      });
-      
-      if (!itemReplaced) {
-        if(currentEditingItem.cartItemId !== cartItemId) {
-            nextItems = nextItems.filter(i => i.cartItemId !== currentEditingItem.cartItemId);
-        }
-        const existingNewConfigItemIndex = nextItems.findIndex(i => i.cartItemId === cartItemId);
-        if (existingNewConfigItemIndex > -1) {
-            nextItems[existingNewConfigItemIndex] = { ...nextItems[existingNewConfigItemIndex], quantity: nextItems[existingNewConfigItemIndex].quantity + quantityToAdd };
-        } else {
-            nextItems.push({ ...itemData, cartItemId, unitPrice, quantity: quantityToAdd } as CartItem);
-        }
+    // Check if the item being added/updated matches the item currently being edited (by cartItemId)
+    if (currentEditingItem && currentEditingItem.cartItemId && currentEditingItem.cartItemId === cartItemId) {
+       // This means we are updating the currently edited item with its *new* configuration (which might result in the same cartItemId or a new one)
+       // This logic is tricky if cartItemId changes. Let's assume for now if currentEditingItem.cartItemId matches, we're replacing that exact item.
+       // A more robust way: if currentEditingItem.cartItemId is the ID of the item *before* edit.
+
+       // If the new configuration results in the same cartItemId
+        nextItems = currentItems.map(item =>
+          item.cartItemId === currentEditingItem.cartItemId // Find the item by its original cartId
+            ? { ...itemData, cartItemId, unitPrice, quantity: quantityToAdd } as CartItem // Update it
+            : item
+        );
+        toastMsg = { title: "Item Updated", description: `${itemData.name} has been updated in your cart.` };
+        editingItemToClear = true;
+
+    } else if (currentEditingItem && currentEditingItem.cartItemId && currentEditingItem.cartItemId !== cartItemId) {
+      // This means the edited item's configuration has changed, resulting in a *new* cartItemId.
+      // 1. Remove the old item (identifiable by currentEditingItem.cartItemId).
+      nextItems = currentItems.filter(item => item.cartItemId !== currentEditingItem.cartItemId);
+      // 2. Add or update the new item (identifiable by the new cartItemId).
+      const existingNewConfigItemIndex = nextItems.findIndex(i => i.cartItemId === cartItemId);
+      if (existingNewConfigItemIndex > -1) {
+          // New configuration matches another existing item, so merge quantities
+          nextItems[existingNewConfigItemIndex] = { 
+              ...nextItems[existingNewConfigItemIndex], 
+              quantity: nextItems[existingNewConfigItemIndex].quantity + quantityToAdd 
+          };
+      } else {
+          // New configuration is entirely new, add it
+          nextItems.push({ ...itemData, cartItemId, unitPrice, quantity: quantityToAdd } as CartItem);
       }
-      toastMsg = { title: "Item Updated", description: `${itemData.name} has been updated in your cart.` };
+      toastMsg = { title: "Item Updated", description: `${itemData.name} configuration changed in your cart.` };
       editingItemToClear = true;
-    } else {
+
+    } else { // Not editing, or editingItem has no cartItemId (fresh add from modal not in edit mode)
       const existingItemIndex = currentItems.findIndex(item => item.cartItemId === cartItemId);
       if (existingItemIndex > -1) {
         nextItems = currentItems.map((item, index) =>
@@ -210,7 +214,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
         if (result.editingItemToClear) {
             setEditingItem(null);
         }
-        if (!isCartOpen) {
+        if (!isCartOpen) { // Open cart after adding/updating if it's closed
             setIsCartOpen(true);
         }
         return result.nextItems;
@@ -225,9 +229,13 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
         if (itemToRemove) {
             addToastToQueue({ title: "Item Removed", description: `${itemToRemove.name} has been removed from your cart.`, variant: 'destructive' });
         }
+        // If the removed item was being edited, clear editingItem
+        if (editingItem && editingItem.cartItemId === cartItemId) {
+            setEditingItem(null);
+        }
         return nextItems;
     });
-  }, [addToastToQueue]);
+  }, [addToastToQueue, editingItem]);
 
   const updateItemQuantity = useCallback((cartItemId: string, quantity: number) => {
      setItems(currentItems => {
@@ -240,6 +248,10 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
                 toastInfo = { title: "Item Removed", description: `${currentItem.name} has been removed from your cart.`, variant: 'destructive' };
             }
             nextItems = nextItems.filter(item => item.cartItemId !== cartItemId);
+            // If the removed item was being edited, clear editingItem
+            if (editingItem && editingItem.cartItemId === cartItemId) {
+                setEditingItem(null);
+            }
         } else {
             if (currentItem) {
                 toastInfo = { title: "Quantity Updated", description: `Quantity of ${currentItem.name} changed to ${quantity}.` };
@@ -254,10 +266,11 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
         }
         return nextItems;
     });
-  }, [addToastToQueue]);
+  }, [addToastToQueue, editingItem]);
 
   const clearCart = useCallback(() => {
     setItems([]);
+    setEditingItem(null); // Also clear editing item if cart is cleared
     addToastToQueue({ title: "Cart Cleared", description: "All items have been removed from your cart.", variant: 'destructive' });
   }, [addToastToQueue]);
 
@@ -266,12 +279,12 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
 
   const toggleCart = useCallback(() => setIsCartOpen(prev => !prev), []);
   const openCart = useCallback(() => setIsCartOpen(true), []);
+  
   const closeCart = useCallback(() => {
     setIsCartOpen(false);
-    if (editingItem) { 
-        setEditingItem(null); 
-    }
-  }, [editingItem]); 
+    // Do NOT clear editingItem here. 
+    // It should be cleared by the modal or page when editing is done/cancelled, or if an item is removed.
+  }, []); 
 
   const getOriginalProductForEditing = useCallback((cartItem: CartItem): Hoodie | Bracelet | MatchingBraceletSet | Sweatpants | undefined => {
     switch (cartItem.productType) {
@@ -320,4 +333,3 @@ export const getCartItemIdFromEditingItem = (editingItem: EditingItemState): str
       return undefined;
   }
 };
-
