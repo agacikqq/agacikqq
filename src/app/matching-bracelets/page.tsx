@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -23,24 +24,34 @@ export default function MatchingBraceletsPage() {
     setMatchingSets(mockMatchingBracelets);
   }, []);
 
- // Effect to open the modal when editingItem changes and matches a matchingSet
+ // Effect to open the modal when editingItem changes (e.g. from cart edit button)
   useEffect(() => {
     if (editingItem?.type === 'matchingSet') {
-      if (editingItem.originalSet) { // Use the set data passed in editingItem
-        setSelectedSet(editingItem.originalSet);
+      // editingItem.originalSet should be populated by CartSidebar's handleEditItem
+      if (editingItem.originalSet) { 
+        setSelectedSet(editingItem.originalSet); // This sets the base set for the modal
         setIsModalOpen(true);
       } else {
-         toast({
-            title: "Error",
-            description: "Could not find the matching set details to edit.",
-            variant: "destructive",
-        });
-        setEditingItem(null);
+        // Fallback if originalSet wasn't populated
+        const setToEdit = mockMatchingBracelets.find(ms => ms.id === editingItem.item.productId);
+        if (setToEdit) {
+          setSelectedSet(setToEdit);
+          setIsModalOpen(true);
+        } else {
+          toast({
+              title: "Error",
+              description: "Could not find the matching set details to edit.",
+              variant: "destructive",
+          });
+          setEditingItem(null); // Clear the editing state
+        }
       }
     }
   }, [editingItem, setEditingItem]); 
 
   const handleViewDetails = (set: MatchingBraceletSet) => {
+    // When viewing details fresh (not editing), ensure editingItem is cleared
+    if (editingItem) setEditingItem(null);
     setSelectedSet(set);
     setIsModalOpen(true);
   };
@@ -48,6 +59,7 @@ export default function MatchingBraceletsPage() {
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setSelectedSet(null);
+    // If the modal was closed while editing, clear the editingItem state
     if (editingItem?.type === 'matchingSet') {
         setEditingItem(null);
     }
@@ -106,3 +118,4 @@ export default function MatchingBraceletsPage() {
     </div>
   );
 }
+

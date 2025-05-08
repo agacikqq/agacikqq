@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
@@ -39,12 +40,14 @@ export default function SweatpantsPage() {
     setHasMounted(true);
   }, []);
 
-  // Effect to open the modal when editingItem changes and matches sweatpants
+  // Effect to open the modal when editingItem changes (e.g. from cart edit button)
   useEffect(() => {
     if (editingItem?.type === 'sweatpants') {
+      // Find the base sweatpants product from mockSweatpants
+      // The SweatpantsDetailModal will use editingItem.item (SweatpantsCartItem) for selectedColor/Size
       const itemToEdit = mockSweatpants.find(s => s.id === editingItem.item.productId);
       if (itemToEdit) {
-        setSelectedSweatpants(itemToEdit);
+        setSelectedSweatpants(itemToEdit); // Set base sweatpants for the modal
         setIsModalOpen(true);
       } else {
          toast({
@@ -52,7 +55,7 @@ export default function SweatpantsPage() {
             description: "Could not find the sweatpants details to edit.",
             variant: "destructive",
         });
-        setEditingItem(null); 
+        setEditingItem(null); // Clear the editing state
       }
     }
   }, [editingItem, setEditingItem]); 
@@ -110,6 +113,8 @@ export default function SweatpantsPage() {
   }, [sweatpantsList, activeFilters, searchTerm]);
 
   const handleViewDetails = (item: Sweatpants) => {
+    // When viewing details fresh (not editing), ensure editingItem is cleared
+    if (editingItem) setEditingItem(null);
     setSelectedSweatpants(item);
     setIsModalOpen(true);
   };
@@ -117,6 +122,7 @@ export default function SweatpantsPage() {
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setSelectedSweatpants(null);
+    // If the modal was closed while editing, clear the editingItem state
     if (editingItem?.type === 'sweatpants') {
         setEditingItem(null);
     }
@@ -257,3 +263,4 @@ export default function SweatpantsPage() {
     </div>
   );
 }
+

@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -23,25 +24,34 @@ export default function CollectionsPage() {
     setBracelets(mockBracelets);
   }, []);
 
-  // Effect to open the modal when editingItem changes and matches a bracelet
+  // Effect to open the modal when editingItem changes (e.g. from cart edit button)
   useEffect(() => {
     if (editingItem?.type === 'bracelet') {
-      if (editingItem.originalBracelet) { // Use the bracelet data passed in editingItem
-        setSelectedBracelet(editingItem.originalBracelet);
+      // editingItem.originalBracelet should be populated by CartSidebar's handleEditItem
+      if (editingItem.originalBracelet) { 
+        setSelectedBracelet(editingItem.originalBracelet); // This sets the base bracelet for the modal
         setIsModalOpen(true);
       } else {
-        // This case should ideally not happen if getOriginalProductForEditing works
-         toast({
-            title: "Error",
-            description: "Could not find the bracelet details to edit.",
-            variant: "destructive",
-        });
-        setEditingItem(null);
+        // Fallback if originalBracelet wasn't populated, try finding by ID
+        const braceletToEdit = mockBracelets.find(b => b.id === editingItem.item.productId);
+        if (braceletToEdit) {
+          setSelectedBracelet(braceletToEdit);
+          setIsModalOpen(true);
+        } else {
+          toast({
+              title: "Error",
+              description: "Could not find the bracelet details to edit.",
+              variant: "destructive",
+          });
+          setEditingItem(null); // Clear the editing state
+        }
       }
     }
   }, [editingItem, setEditingItem]); 
 
   const handleViewDetails = (bracelet: Bracelet) => {
+    // When viewing details fresh (not editing), ensure editingItem is cleared
+    if (editingItem) setEditingItem(null);
     setSelectedBracelet(bracelet);
     setIsModalOpen(true);
   };
@@ -49,6 +59,7 @@ export default function CollectionsPage() {
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setSelectedBracelet(null);
+    // If the modal was closed while editing, clear the editingItem state
     if (editingItem?.type === 'bracelet') {
         setEditingItem(null);
     }

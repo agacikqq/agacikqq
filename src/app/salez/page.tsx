@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
@@ -34,29 +35,37 @@ export default function SalezPage() {
     setAllSaleHoodies(saleItems);
   }, []);
 
-  // Effect to open modal if editingItem changes and is a hoodie from this sale page
+  // Effect to open modal if editingItem changes (e.g., from cart edit button)
   useEffect(() => {
     if (editingItem?.type === 'hoodie') {
+      // Check if the hoodie being edited is actually a sale item shown on this page
       const hoodieToEdit = allSaleHoodies.find(h => h.id === editingItem.item.productId);
       
       if (hoodieToEdit) {
-        setSelectedHoodie(hoodieToEdit);
+        // Yes, it's a sale item, open the modal for editing
+        setSelectedHoodie(hoodieToEdit); // Set base hoodie for the modal
         setIsModalOpen(true);
       } else {
-        // If the product ID doesn't match a SALE hoodie, we clear the state
-        // assuming the edit button was clicked on a different page for a non-sale item.
-        // The user shouldn't be able to edit a non-sale item via the /salez page modal.
-        if(editingItem?.cartItemId) { // Only show toast if it seems like a valid item was clicked
+        // The item being edited is a hoodie, but not one currently on sale
+        // Or it's a different type of item entirely.
+        // Don't open the modal here. If navigation happened, the other page's useEffect will handle it.
+        // If navigation didn't happen (e.g., error state), clear the editingItem.
+         if (editingItem?.item?.productId && !allSaleHoodies.some(h => h.id === editingItem.item.productId)) {
+           // Only show toast if it was a hoodie but not a SALE hoodie
            toast({
                 title: "Edit Mismatch",
-                description: "Please edit this item from its original product page.",
-                variant: "destructive",
+                description: "This item is not currently on sale. Please edit it from the main Hoodiez page.",
+                variant: "default", // Use default, not necessarily an error
             });
+         }
+        // Important: Clear editingItem ONLY if it's for a hoodie and NOT found here.
+        // If it's another type, let the corresponding page handle it.
+        if (editingItem?.item?.productId && !allSaleHoodies.some(h => h.id === editingItem.item.productId)) {
+            setEditingItem(null);
         }
-        setEditingItem(null);
       }
     }
-  }, [editingItem, setEditingItem, allSaleHoodies]); 
+  }, [editingItem, setEditingItem, allSaleHoodies]); // Added allSaleHoodies dependency
 
 
   useEffect(() => {
@@ -72,6 +81,8 @@ export default function SalezPage() {
   }, [searchTerm, allSaleHoodies]);
 
   const handleViewDetails = (hoodie: Hoodie) => {
+    // When viewing details fresh (not editing), ensure editingItem is cleared
+    if (editingItem) setEditingItem(null);
     setSelectedHoodie(hoodie);
     setIsModalOpen(true);
   };
@@ -79,6 +90,7 @@ export default function SalezPage() {
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setSelectedHoodie(null);
+    // If the modal was closed while editing, clear the editingItem state
     if (editingItem?.type === 'hoodie') {
         setEditingItem(null);
     }
@@ -170,3 +182,4 @@ export default function SalezPage() {
     </div>
   );
 }
+

@@ -11,6 +11,7 @@ import { Input } from '@/components/ui/input';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter, SheetClose } from '@/components/ui/sheet';
 import { X, Trash2, Edit3, MinusCircle, PlusCircle, ShoppingBag } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
+import { useRouter } from 'next/navigation'; // Added for navigation
 
 const INCLUDED_CHARMS_COUNT = 4;
 const INCLUDED_CHARMS_PER_BRACELET_IN_SET = 4;
@@ -28,6 +29,7 @@ export function CartSidebar() {
     setEditingItem,
     getOriginalProductForEditing,
   } = useCart();
+  const router = useRouter(); // Initialize router
 
   const handleEditItem = (item: CartItem) => {
     const originalProduct = getOriginalProductForEditing(item);
@@ -36,21 +38,39 @@ export function CartSidebar() {
       return;
     }
 
-    // Set the editing state with the item's cartItemId for update handling
+    let targetUrl = '/';
+
     switch (item.productType) {
       case 'hoodie':
         setEditingItem({ type: 'hoodie', item: item as HoodieCartItem, cartItemId: item.cartItemId });
+        targetUrl = '/hoodies';
+        // If the hoodie is a sale item, and we want to redirect to salez page specifically, an additional check would be needed here.
+        // For simplicity, always go to the main product page. The /salez page also listens for hoodie edits.
+        // const hoodie = originalProduct as Hoodie;
+        // if (hoodie.originalPrice && hoodie.originalPrice > hoodie.price) {
+        //   targetUrl = '/salez';
+        // } else {
+        //   targetUrl = '/hoodies';
+        // }
         break;
       case 'sweatpants':
         setEditingItem({ type: 'sweatpants', item: item as SweatpantsCartItem, cartItemId: item.cartItemId });
+        targetUrl = '/sweatpants';
         break;
       case 'bracelet':
         setEditingItem({ type: 'bracelet', item: item as BraceletCartItem, originalBracelet: originalProduct as Bracelet, cartItemId: item.cartItemId });
+        targetUrl = '/collections';
         break;
       case 'matchingSet':
         setEditingItem({ type: 'matchingSet', item: item as MatchingSetCartItem, originalSet: originalProduct as MatchingBraceletSet, cartItemId: item.cartItemId });
+        targetUrl = '/matching-bracelets';
         break;
+      default:
+        toast({ title: "Error", description: "Cannot edit this item type.", variant: "destructive"});
+        return; // Do not proceed if item type is unknown
     }
+    
+    router.push(targetUrl); // Navigate to the product page
     closeCart(); 
   };
   
@@ -207,3 +227,4 @@ export function CartSidebar() {
     </Sheet>
   );
 }
+

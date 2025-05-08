@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
@@ -5,7 +6,7 @@ import { Header } from '@/components/header';
 import { ProductCard } from '@/components/product-card';
 import { ProductDetailModal } from '@/components/product-detail-modal';
 import { mockHoodies } from '@/data/mock-hoodies';
-import type { Hoodie, Filters, ProductColor, ProductSize, ProductDesign, HoodieCartItem } from '@/types';
+import type { Hoodie, Filters, ProductColor, ProductSize, HoodieCartItem } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Search, X, Shirt, SlidersHorizontal } from 'lucide-react'; 
@@ -39,24 +40,28 @@ export default function HoodiesPage() {
     setHasMounted(true);
   }, []);
 
-  // Effect to open the modal when editingItem changes and matches a hoodie
+  // Effect to open the modal when editingItem changes (e.g., from cart edit button)
   useEffect(() => {
     if (editingItem?.type === 'hoodie') {
+      // Find the base hoodie product from mockHoodies
+      // The ProductDetailModal will use editingItem.item (HoodieCartItem) for selectedColor/Size
       const hoodieToEdit = mockHoodies.find(h => h.id === editingItem.item.productId);
       
       if (hoodieToEdit) {
-        setSelectedHoodie(hoodieToEdit); 
+        setSelectedHoodie(hoodieToEdit); // This sets the base hoodie for the modal
         setIsModalOpen(true); 
       } else {
+        // This might happen if the hoodie ID is no longer in mockHoodies (e.g. removed from sale)
+        // Or if navigated here for a non-hoodie item (though type check should prevent this)
         toast({
             title: "Error",
             description: "Could not find the hoodie details to edit.",
             variant: "destructive",
         });
-        setEditingItem(null); 
+        setEditingItem(null); // Clear the editing state to prevent loop or further issues
       }
     }
-  }, [editingItem, setEditingItem]);
+  }, [editingItem, setEditingItem]); // Removed mockHoodies from deps as it's constant
 
 
   const allColors = useMemo(() => {
@@ -112,6 +117,8 @@ export default function HoodiesPage() {
   }, [hoodies, activeFilters, searchTerm]);
 
   const handleViewDetails = (hoodie: Hoodie) => {
+    // When viewing details fresh (not editing), ensure editingItem is cleared
+    if (editingItem) setEditingItem(null);
     setSelectedHoodie(hoodie);
     setIsModalOpen(true);
   };
@@ -119,6 +126,7 @@ export default function HoodiesPage() {
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setSelectedHoodie(null);
+    // If the modal was closed while editing, clear the editingItem state
     if (editingItem?.type === 'hoodie') {
         setEditingItem(null);
     }
@@ -259,3 +267,4 @@ export default function HoodiesPage() {
     </div>
   );
 }
+
