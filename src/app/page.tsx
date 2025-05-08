@@ -6,11 +6,11 @@ import Image from 'next/image';
 import React from 'react';
 import { Header } from '@/components/header';
 import { Button } from '@/components/ui/button';
-import { Footer } from '@/components/footer'; // Import Footer
-import { categories } from '@/data/categories'; // Import categories
+import { Footer } from '@/components/footer'; 
+import { categories } from '@/data/categories.tsx'; 
 
 export default function HomePage() {
-  // Categories are now imported from @/data/categories
+  const displayCategories = categories.filter(category => category.name !== 'All Productz');
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -43,7 +43,7 @@ export default function HomePage() {
               Explore Our Collections
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-              {categories.map((category) => (
+              {displayCategories.map((category) => (
                 <Link href={category.href} key={category.name} legacyBehavior>
                   <a className="block group bg-card p-6 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 ease-in-out transform hover:-translate-y-1">
                     <div className="relative aspect-video w-full overflow-hidden rounded-lg mb-6">

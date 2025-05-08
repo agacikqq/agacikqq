@@ -1,7 +1,7 @@
 
 import type { ReactElement } from 'react';
 import React from 'react';
-import { Shirt, Gem, HeartHandshake, Percent, Slack, Package } from 'lucide-react';
+import { Shirt, Gem, HeartHandshake, Percent, Slack, Package, LayoutGrid } from 'lucide-react';
 
 export interface Category {
   name: string;
@@ -47,10 +47,18 @@ export const categories: Category[] = [
   },
   {
     name: 'Hot Dealz',
-    href: '/salez', // Corrected from /sale to /salez based on existing page
+    href: '/salez',
     icon: <Percent className="h-16 w-16 text-accent" />,
     description: 'Grab amazing discounts on your favorite items.',
     imageSrc: 'https://picsum.photos/seed/saleCat/600/400',
     imageHint: 'sale shopping discount',
   },
+  {
+    name: 'All Productz',
+    href: '/all-products',
+    icon: <LayoutGrid className="h-16 w-16 text-accent" />,
+    description: 'Browse everything cœzii has to offer in one place.',
+    imageSrc: 'https://picsum.photos/seed/allProductsCat/600/400',
+    imageHint: 'various clothing items',
+  }
 ];

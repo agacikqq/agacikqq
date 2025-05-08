@@ -6,7 +6,7 @@ import Image from 'next/image';
 import React from 'react';
 import { Header } from '@/components/header';
 import { Footer } from '@/components/footer';
-import { categories } from '@/data/categories';
+import { categories } from '@/data/categories.tsx';
 import { LayoutGrid } from 'lucide-react';
 
 export default function AllProductsPage() {
