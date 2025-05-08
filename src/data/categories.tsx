@@ -1,7 +1,7 @@
 
 import type { ReactElement } from 'react';
 import React from 'react';
-import { Shirt, Gem, HeartHandshake, Percent, Slack, Package, LayoutGrid } from 'lucide-react';
+import { Shirt, Gem, HeartHandshake, Percent, Slack, LayoutGrid } from 'lucide-react';
 
 export interface Category {
   name: string;
@@ -55,7 +55,7 @@ export const categories: Category[] = [
   },
   {
     name: 'All Productz',
-    href: '/all-products',
+    href: '/browse/all-items', // Changed from '/all-products'
     icon: <LayoutGrid className="h-16 w-16 text-accent" />,
     description: 'Browse everything cœzii has to offer in one place.',
     imageSrc: 'https://picsum.photos/seed/allProductsCat/600/400',
