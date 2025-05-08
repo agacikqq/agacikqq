@@ -36,18 +36,19 @@ export function CartSidebar() {
       return;
     }
 
+    // Set the editing state with the item's cartItemId for update handling
     switch (item.productType) {
       case 'hoodie':
-        setEditingItem({ type: 'hoodie', item: item as HoodieCartItem });
+        setEditingItem({ type: 'hoodie', item: item as HoodieCartItem, cartItemId: item.cartItemId });
         break;
       case 'sweatpants':
-        setEditingItem({ type: 'sweatpants', item: item as SweatpantsCartItem });
+        setEditingItem({ type: 'sweatpants', item: item as SweatpantsCartItem, cartItemId: item.cartItemId });
         break;
       case 'bracelet':
-        setEditingItem({ type: 'bracelet', item: item as BraceletCartItem, originalBracelet: originalProduct as Bracelet });
+        setEditingItem({ type: 'bracelet', item: item as BraceletCartItem, originalBracelet: originalProduct as Bracelet, cartItemId: item.cartItemId });
         break;
       case 'matchingSet':
-        setEditingItem({ type: 'matchingSet', item: item as MatchingSetCartItem, originalSet: originalProduct as MatchingBraceletSet });
+        setEditingItem({ type: 'matchingSet', item: item as MatchingSetCartItem, originalSet: originalProduct as MatchingBraceletSet, cartItemId: item.cartItemId });
         break;
     }
     closeCart(); 
@@ -206,4 +207,3 @@ export function CartSidebar() {
     </Sheet>
   );
 }
-

@@ -1,3 +1,4 @@
+
 'use client';
 
 import Image from 'next/image';
@@ -22,44 +23,37 @@ import { useCart } from '@/context/cart-context';
 interface SweatpantsDetailModalProps {
   sweatpants: Sweatpants | null;
   isOpen: boolean;
-  onClose: () => void; // Parent component's close handler
+  onClose: () => void; 
 }
 
 export function SweatpantsDetailModal({ sweatpants, isOpen, onClose }: SweatpantsDetailModalProps) {
-  const { addItemToCart, editingItem, setEditingItem } = useCart();
+  const { addItemToCart, editingItem } = useCart(); // Removed setEditingItem
   const [selectedColor, setSelectedColor] = useState<ProductColor | null>(null);
   const [selectedSize, setSelectedSize] = useState<ProductSize | null>(null);
   const [currentImage, setCurrentImage] = useState<string>('');
   
-  // Determine if we are editing this specific item
   const isEditing = editingItem?.type === 'sweatpants' && editingItem?.productId === sweatpants?.id;
 
-  // Effect to initialize modal state based on view/edit mode
   useEffect(() => {
     if (isOpen && sweatpants) {
-      if (isEditing) { 
-        // Populate state from the item being edited
-        const editSweatpants = editingItem.item as SweatpantsCartItem;
-        setSelectedColor(editSweatpants.selectedColor);
-        setSelectedSize(editSweatpants.selectedSize);
-        // Use image from editing item first, then fallback
-        setCurrentImage(editSweatpants.selectedColor?.image || editSweatpants.image || sweatpants.images[0]);
+      if (isEditing && editingItem?.item) { 
+        const editSweatpantsCartItem = editingItem.item as SweatpantsCartItem;
+        setSelectedColor(editSweatpantsCartItem.selectedColor);
+        setSelectedSize(editSweatpantsCartItem.selectedSize);
+        setCurrentImage(editSweatpantsCartItem.selectedColor?.image || editSweatpantsCartItem.image || sweatpants.images[0]);
       } else {
-        // Populate state for a fresh view
-        setSelectedColor(sweatpants.colors[0] || null);
+        const initialColor = sweatpants.colors[0] || null;
+        setSelectedColor(initialColor);
         setSelectedSize(sweatpants.availableSizes[0] || null);
-        setCurrentImage(sweatpants.colors[0]?.image || sweatpants.images[0]);
+        setCurrentImage(initialColor?.image || sweatpants.images[0]);
       }
     }
-    // No else if (!isOpen) needed, onClose handles cleanup
-  }, [sweatpants, isOpen, isEditing, editingItem]); // Add editingItem dependency
+  }, [sweatpants, isOpen, isEditing, editingItem]); 
   
-  // Effect to update image based on selected color
   useEffect(() => {
     if (selectedColor && selectedColor.image) {
       setCurrentImage(selectedColor.image);
-    } else if (sweatpants && sweatpants.images.length > 0 && !selectedColor?.image) {
-      // Fallback to first sweatpants image if selected color has no specific image
+    } else if (sweatpants && sweatpants.images.length > 0 && (!selectedColor || !selectedColor.image)) {
       setCurrentImage(sweatpants.images[0]);
     }
   }, [selectedColor, sweatpants]);
@@ -71,7 +65,7 @@ export function SweatpantsDetailModal({ sweatpants, isOpen, onClose }: Sweatpant
   const discountPercent = isOnSale ? Math.round(((sweatpants.originalPrice! - sweatpants.price) / sweatpants.originalPrice!) * 100) : 0;
 
 
-  const handleAddToCart = () => {
+  const handleAddToCartOrUpdate = () => {
     if (!selectedColor || !selectedSize) {
         toast({
             title: "Selection Missing",
@@ -80,38 +74,32 @@ export function SweatpantsDetailModal({ sweatpants, isOpen, onClose }: Sweatpant
         });
         return;
     }
-    // Prepare item data
     const cartItemData: Omit<SweatpantsCartItem, 'cartItemId' | 'unitPrice' | 'quantity'> = {
       productId: sweatpants.id,
       name: sweatpants.name,
-      image: selectedColor.image || sweatpants.images[0], // Use color image or fallback
+      image: selectedColor.image || sweatpants.images[0], 
       productType: 'sweatpants',
       selectedColor,
       selectedSize,
     };
     
-    // Add to cart (context handles add/update)
     addItemToCart(cartItemData); 
-    
-    // Close modal using parent handler (which should clear editingItem)
     onClose(); 
   };
 
   const handleInternalClose = (open: boolean) => {
       if (!open) {
-          // Call parent's onClose handler when dialog requests close
           onClose(); 
       }
   };
 
   return (
-    // Use internal close handler for Dialog's onOpenChange
     <Dialog open={isOpen} onOpenChange={handleInternalClose}> 
       <DialogContent className="max-w-3xl p-0">
         <ScrollArea className="max-h-[90vh]">
         <div className="grid md:grid-cols-2 gap-0">
-          <div className="p-6 flex flex-col bg-card/30"> {/* Image Section Background */}
-            <div className="relative aspect-[3/4] w-full overflow-hidden rounded-lg mb-4 shadow-inner"> {/* Inner shadow */}
+          <div className="p-6 flex flex-col bg-card/30"> 
+            <div className="relative aspect-[3/4] w-full overflow-hidden rounded-lg mb-4 shadow-inner"> 
               <Image
                 src={currentImage}
                 alt={`${sweatpants.name} - ${selectedColor?.name || ''}`}
@@ -127,7 +115,6 @@ export function SweatpantsDetailModal({ sweatpants, isOpen, onClose }: Sweatpant
                 </Badge>
               )}
             </div>
-            {/* Thumbnails only if multiple colors have images */}
             {sweatpants.colors.filter(c => c.image).length > 1 && (
               <div className="grid grid-cols-4 gap-2">
                 {sweatpants.colors.filter(c => c.image).map((colorOption) => (
@@ -153,7 +140,7 @@ export function SweatpantsDetailModal({ sweatpants, isOpen, onClose }: Sweatpant
             )}
           </div>
 
-          <div className="p-6 flex flex-col"> {/* Details Section */}
+          <div className="p-6 flex flex-col"> 
             <DialogHeader className="mb-4">
               <DialogTitle className="text-4xl font-bold tracking-tight text-foreground">{sweatpants.name}</DialogTitle>
               <DialogDescription className="text-base text-muted-foreground pt-1">
@@ -244,14 +231,13 @@ export function SweatpantsDetailModal({ sweatpants, isOpen, onClose }: Sweatpant
             </div>
 
             <DialogFooter className="mt-auto pt-6">
-              {/* Use parent's onClose for Close button */}
               <Button variant="outline" onClick={onClose} className="w-full sm:w-auto"> 
                 Close
               </Button>
               <Button
                 variant="default"
                 className="w-full bg-accent text-accent-foreground hover:bg-accent/90 sm:w-auto"
-                onClick={handleAddToCart}
+                onClick={handleAddToCartOrUpdate}
                 disabled={!selectedColor || !selectedSize}
               >
                 {isEditing ? 'Update Item' : 'Add to Cart'} 

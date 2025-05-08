@@ -1,4 +1,5 @@
 
+
 export interface ProductColor {
   name: string; // e.g., "Ocean Blue"
   value: string; // e.g., "ocean-blue"
@@ -99,13 +100,13 @@ export interface CartItemBase {
 }
 
 export interface HoodieCartItem extends CartItemBase {
-  productType: 'hoodie'; // Keeping 'hoodie' as internal type identifier
+  productType: 'hoodie'; 
   selectedColor: ProductColor;
   selectedSize: ProductSize;
 }
 
 export interface SweatpantsCartItem extends CartItemBase {
-  productType: 'sweatpants'; // Keeping 'sweatpants' as internal type identifier
+  productType: 'sweatpants'; 
   selectedColor: ProductColor;
   selectedSize: ProductSize;
 }
@@ -114,28 +115,25 @@ export interface BraceletCustomization {
   braceletId: string;
   braceletName: string;
   selectedCharms: Charm[];
-  // Price for this specific bracelet's extra charms needs to be calculated based on included count
 }
 export interface BraceletCartItem extends CartItemBase {
-  productType: 'bracelet'; // Keeping 'bracelet' as internal type identifier
+  productType: 'bracelet'; 
   baseBraceletPrice: number;
   selectedCharms: Charm[];
-  // unitPrice will be baseBraceletPrice + price of extra charms (beyond included)
 }
 
 export interface MatchingSetCartItem extends CartItemBase {
   productType: 'matchingSet';
   setBasePrice: number;
   braceletsCustomization: BraceletCustomization[];
-  // unitPrice will be setBasePrice + total price of all extra charms for all bracelets in the set (beyond included per bracelet)
 }
 
 export type CartItem = HoodieCartItem | BraceletCartItem | MatchingSetCartItem | SweatpantsCartItem;
 
 // For re-opening modals for editing
 export type EditingItemState = 
-  | { type: 'hoodie'; item: HoodieCartItem } // Keeping 'hoodie'
-  | { type: 'sweatpants'; item: SweatpantsCartItem } // Keeping 'sweatpants'
-  | { type: 'bracelet'; item: BraceletCartItem; originalBracelet: Bracelet } // Keeping 'bracelet'
-  | { type: 'matchingSet'; item: MatchingSetCartItem; originalSet: MatchingBraceletSet }
+  | { type: 'hoodie'; item: HoodieCartItem; cartItemId: string } 
+  | { type: 'sweatpants'; item: SweatpantsCartItem; cartItemId: string } 
+  | { type: 'bracelet'; item: BraceletCartItem; originalBracelet: Bracelet; cartItemId: string } 
+  | { type: 'matchingSet'; item: MatchingSetCartItem; originalSet: MatchingBraceletSet; cartItemId: string }
   | null;
