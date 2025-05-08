@@ -70,7 +70,7 @@ export default function MatchingBraceletsPage() {
           <div className="mb-12 text-center">
             <h1 className="text-5xl font-extrabold text-primary mb-3 flex items-center justify-center gap-3">
               <HeartHandshake className="h-12 w-12 text-accent animate-pulse" />
-              Matching Bracelet Sets
+              Matching Braceletz Sets
             </h1>
             <p className="text-xl text-muted-foreground">
               Discover perfect pairs and sets to share with someone special or to complete your look.
@@ -88,7 +88,7 @@ export default function MatchingBraceletsPage() {
               <HeartHandshake className="h-24 w-24 text-muted-foreground/50 mx-auto mb-6" />
               <h2 className="text-3xl font-semibold mb-2 text-foreground">No Matching Sets Available</h2>
               <p className="text-lg text-muted-foreground mb-6">
-                Our collection of matching bracelet sets is currently empty. Please check back soon!
+                Our collection of matching braceletz sets is currently empty. Please check back soon!
               </p>
             </div>
           )}

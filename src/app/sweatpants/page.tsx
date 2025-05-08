@@ -145,7 +145,7 @@ export default function SweatpantsPage() {
       <div className="flex flex-col min-h-screen">
         <Header />
         <div className="flex-grow container mx-auto p-4 text-center">
-          <p className="text-3xl font-semibold text-primary animate-pulse">Loading Sweatpants...</p>
+          <p className="text-3xl font-semibold text-primary animate-pulse">Loading Sweatpantz...</p>
         </div>
       </div>
     );
@@ -159,10 +159,10 @@ export default function SweatpantsPage() {
           <div className="mb-12 text-center">
             <h1 className="text-5xl font-extrabold text-primary mb-3 flex items-center justify-center gap-3">
               <Slack className="h-12 w-12 text-accent animate-pulse" />
-              Our Sweatpants Collection
+              Our Sweatpantz Collection
             </h1>
             <p className="text-xl text-muted-foreground">
-              Find your perfect pair of cœzii sweatpants. Filter by color, size, and style.
+              Find your perfect pair of cœzii sweatpantz. Filter by color, size, and style.
             </p>
           </div>
 
@@ -171,7 +171,7 @@ export default function SweatpantsPage() {
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
               <Input
                 type="search"
-                placeholder="Search sweatpants by name or description..."
+                placeholder="Search sweatpantz by name or description..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10 pr-10 py-3 rounded-full focus:ring-2 focus:ring-accent border-muted bg-card/80"
@@ -213,7 +213,7 @@ export default function SweatpantsPage() {
                 </DropdownMenuContent>
               </DropdownMenu>
               <p className="text-lg text-muted-foreground whitespace-nowrap">
-                Showing {filteredSweatpants.length} of {sweatpantsList.length} sweatpants
+                Showing {filteredSweatpants.length} of {sweatpantsList.length} sweatpantz
               </p>
             </div>
           </div>
@@ -227,7 +227,7 @@ export default function SweatpantsPage() {
           ) : (
             <div className="text-center py-10">
                 <Slack className="h-24 w-24 text-muted-foreground/50 mx-auto mb-6" />
-              <h2 className="text-3xl font-semibold mb-2 text-foreground">No Sweatpants Found</h2>
+              <h2 className="text-3xl font-semibold mb-2 text-foreground">No Sweatpantz Found</h2>
               <p className="text-lg text-muted-foreground mb-4">
                 Try adjusting your search or filters.
               </p>

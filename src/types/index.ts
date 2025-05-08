@@ -99,13 +99,13 @@ export interface CartItemBase {
 }
 
 export interface HoodieCartItem extends CartItemBase {
-  productType: 'hoodie';
+  productType: 'hoodie'; // Keeping 'hoodie' as internal type identifier
   selectedColor: ProductColor;
   selectedSize: ProductSize;
 }
 
 export interface SweatpantsCartItem extends CartItemBase {
-  productType: 'sweatpants';
+  productType: 'sweatpants'; // Keeping 'sweatpants' as internal type identifier
   selectedColor: ProductColor;
   selectedSize: ProductSize;
 }
@@ -117,7 +117,7 @@ export interface BraceletCustomization {
   // Price for this specific bracelet's extra charms needs to be calculated based on included count
 }
 export interface BraceletCartItem extends CartItemBase {
-  productType: 'bracelet';
+  productType: 'bracelet'; // Keeping 'bracelet' as internal type identifier
   baseBraceletPrice: number;
   selectedCharms: Charm[];
   // unitPrice will be baseBraceletPrice + price of extra charms (beyond included)
@@ -134,9 +134,8 @@ export type CartItem = HoodieCartItem | BraceletCartItem | MatchingSetCartItem |
 
 // For re-opening modals for editing
 export type EditingItemState = 
-  | { type: 'hoodie'; item: HoodieCartItem }
-  | { type: 'sweatpants'; item: SweatpantsCartItem }
-  | { type: 'bracelet'; item: BraceletCartItem; originalBracelet: Bracelet }
+  | { type: 'hoodie'; item: HoodieCartItem } // Keeping 'hoodie'
+  | { type: 'sweatpants'; item: SweatpantsCartItem } // Keeping 'sweatpants'
+  | { type: 'bracelet'; item: BraceletCartItem; originalBracelet: Bracelet } // Keeping 'bracelet'
   | { type: 'matchingSet'; item: MatchingSetCartItem; originalSet: MatchingBraceletSet }
   | null;
-

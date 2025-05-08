@@ -55,7 +55,7 @@ export default function CollectionsPage() {
       <div className="flex flex-col min-h-screen">
         <Header />
         <div className="flex-grow container mx-auto p-4 text-center">
-          <p className="text-3xl font-semibold text-primary animate-pulse">Loading Bracelets...</p>
+          <p className="text-3xl font-semibold text-primary animate-pulse">Loading Braceletz...</p>
         </div>
       </div>
     );
@@ -69,10 +69,10 @@ export default function CollectionsPage() {
           <div className="mb-12 text-center">
             <h1 className="text-5xl font-extrabold text-primary mb-3 flex items-center justify-center gap-3">
               <Gem className="h-12 w-12 text-accent animate-pulse" />
-              Individual Bracelets
+              Individual Braceletz
             </h1>
             <p className="text-xl text-muted-foreground">
-              Discover our exquisite range of individual bracelets, ready to be personalized with beautiful charms.
+              Discover our exquisite range of individual braceletz, ready to be personalized with beautiful charms.
             </p>
           </div>
 
@@ -85,9 +85,9 @@ export default function CollectionsPage() {
           ) : (
             <div className="text-center py-16">
               <Gem className="h-24 w-24 text-muted-foreground/50 mx-auto mb-6" />
-              <h2 className="text-3xl font-semibold mb-2 text-foreground">No Bracelets Available</h2>
+              <h2 className="text-3xl font-semibold mb-2 text-foreground">No Braceletz Available</h2>
               <p className="text-lg text-muted-foreground mb-6">
-                Our individual bracelet collection is currently empty. Please check back soon!
+                Our individual braceletz collection is currently empty. Please check back soon!
               </p>
             </div>
           )}

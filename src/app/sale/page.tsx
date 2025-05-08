@@ -95,7 +95,7 @@ export default function SalePage() {
               Hot Deals!
             </h1>
             <p className="text-xl text-muted-foreground">
-              Grab these awesome hoodies at discounted prices before they're gone!
+              Grab these awesome hoodiez at discounted prices before they're gone!
             </p>
           </div>
 
@@ -157,4 +157,3 @@ export default function SalePage() {
     </>
   );
 }
-

@@ -15,8 +15,8 @@ const greatVibes = Great_Vibes({ // Changed from dancingScript to greatVibes
 });
 
 export const metadata: Metadata = {
-  title: 'cœzii - Awesome Hoodies for Teens',
-  description: 'Discover the coolest and most comfortable hoodies. Filter by color, size, and design.',
+  title: 'cœzii - Awesome Hoodiez for Teens',
+  description: 'Discover the coolest and most comfortable hoodiez. Filter by color, size, and design.',
 };
 
 export default function RootLayout({

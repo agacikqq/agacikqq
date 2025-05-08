@@ -49,13 +49,13 @@ export function Header() {
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center gap-x-6 lg:gap-x-8">
           <Link href="/hoodies" className="text-lg font-medium text-primary-foreground hover:text-primary-foreground/80 transition-colors">
-            Hoodies
+            Hoodiez
           </Link>
            <Link href="/sweatpants" className="text-lg font-medium text-primary-foreground hover:text-primary-foreground/80 transition-colors">
-            Sweatpants
+            Sweatpantz
           </Link>
           <Link href="/collections" className="text-lg font-medium text-primary-foreground hover:text-primary-foreground/80 transition-colors">
-            Bracelets
+            Braceletz
           </Link>
           <Link href="/matching-bracelets" className="text-lg font-medium text-primary-foreground hover:text-primary-foreground/80 transition-colors">
             Matching Sets
@@ -102,13 +102,13 @@ export function Header() {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
                 <DropdownMenuItem asChild>
-                  <Link href="/hoodies" className="text-base">Hoodies</Link>
+                  <Link href="/hoodies" className="text-base">Hoodiez</Link>
                 </DropdownMenuItem>
                  <DropdownMenuItem asChild>
-                  <Link href="/sweatpants" className="text-base">Sweatpants</Link>
+                  <Link href="/sweatpants" className="text-base">Sweatpantz</Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link href="/collections" className="text-base">Bracelets</Link>
+                  <Link href="/collections" className="text-base">Braceletz</Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link href="/matching-bracelets" className="text-base">Matching Sets</Link>

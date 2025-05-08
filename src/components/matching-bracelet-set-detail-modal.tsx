@@ -161,7 +161,7 @@ export function MatchingBraceletSetDetailModal({ set, isOpen, onClose }: Matchin
                       width={100}
                       height={100}
                       className="h-full w-full object-cover"
-                       data-ai-hint="matching bracelet thumbnail"
+                       data-ai-hint="matching braceletz thumbnail"
                     />
                   </button>
                 ))}
@@ -201,7 +201,7 @@ export function MatchingBraceletSetDetailModal({ set, isOpen, onClose }: Matchin
             <div className="mb-6">
                 <h4 className="mb-3 text-xl font-semibold text-foreground flex items-center">
                     <Users className="mr-2 h-5 w-5 text-primary" />
-                    Bracelets in this Set ({set.bracelets.length})
+                    Braceletz in this Set ({set.bracelets.length})
                 </h4>
                 <div className="space-y-4">
                     {set.bracelets.map((bracelet: Bracelet) => (
@@ -213,7 +213,7 @@ export function MatchingBraceletSetDetailModal({ set, isOpen, onClose }: Matchin
                                     width={80}
                                     height={80}
                                     className="rounded-md object-cover aspect-square border"
-                                    data-ai-hint={`${bracelet.materials.toLowerCase()} bracelet small`}
+                                    data-ai-hint={`${bracelet.materials.toLowerCase()} braceletz small`}
                                 />
                                 <div className="flex-grow">
                                     <h5 className="text-lg font-semibold text-foreground">{bracelet.name}</h5>

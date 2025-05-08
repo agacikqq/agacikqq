@@ -11,28 +11,28 @@ import { Shirt, Gem, HeartHandshake, Percent, Slack } from 'lucide-react'; // Ad
 export default function HomePage() {
   const categories = [
     {
-      name: 'Awesome Hoodies',
+      name: 'Awesome Hoodiez',
       href: '/hoodies',
       icon: <Shirt className="h-16 w-16 text-accent" />,
-      description: 'Explore our wide range of stylish and comfortable hoodies.',
+      description: 'Explore our wide range of stylish and comfortable hoodiez.',
       imageSrc: 'https://picsum.photos/seed/hoodieCat/600/400',
-      imageHint: 'teenager wearing hoodie',
+      imageHint: 'teenager wearing hoodiez',
     },
     {
-      name: 'Comfy Sweatpants',
+      name: 'Comfy Sweatpantz',
       href: '/sweatpants',
       icon: <Slack className="h-16 w-16 text-accent" />, // Using Slack icon as placeholder for sweatpants
-      description: 'Relax in style with our collection of cozy sweatpants.',
+      description: 'Relax in style with our collection of cozy sweatpantz.',
       imageSrc: 'https://picsum.photos/seed/sweatpantsCat/600/400',
-      imageHint: 'person wearing sweatpants',
+      imageHint: 'person wearing sweatpantz',
     },
     {
-      name: 'Individual Bracelets',
+      name: 'Individual Braceletz',
       href: '/collections',
       icon: <Gem className="h-16 w-16 text-accent" />,
-      description: 'Customize your look with unique bracelets and charms.',
+      description: 'Customize your look with unique braceletz and charms.',
       imageSrc: 'https://picsum.photos/seed/braceletCat/600/400',
-      imageHint: 'silver charm bracelet',
+      imageHint: 'silver charm braceletz',
     },
     {
       name: 'Matching Sets',
@@ -40,7 +40,7 @@ export default function HomePage() {
       icon: <HeartHandshake className="h-16 w-16 text-accent" />,
       description: 'Find perfect pairs to share or complete your style.',
       imageSrc: 'https://picsum.photos/seed/matchingCat/600/400',
-      imageHint: 'friends matching bracelets',
+      imageHint: 'friends matching braceletz',
     },
     {
       name: 'Hot Deals',
@@ -63,10 +63,10 @@ export default function HomePage() {
               Welcome to cœzii!
             </h1>
             <p className="text-xl md:text-2xl text-muted-foreground mb-10 max-w-3xl mx-auto">
-              Your one-stop shop for the coolest hoodies, comfiest sweatpants, customizable bracelets, and matching sets. Express yourself with cœzii!
+              Your one-stop shop for the coolest hoodiez, comfiest sweatpantz, customizable braceletz, and matching sets. Express yourself with cœzii!
             </p>
             <Button asChild size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90 text-xl px-10 py-7 rounded-full">
-              <Link href="/hoodies">Shop All Products</Link>
+              <Link href="/hoodies">Shop All Hoodiez</Link>
             </Button>
           </div>
         </section>
@@ -120,7 +120,7 @@ export default function HomePage() {
                         className="rounded-lg mb-6"
                         data-ai-hint="cool trendy clothing"
                     />
-                    <h3 className="text-3xl font-semibold text-card-foreground mb-3">The "Trendsetter" Hoodie</h3>
+                    <h3 className="text-3xl font-semibold text-card-foreground mb-3">The "Trendsetter" Hoodiez</h3>
                     <p className="text-lg text-muted-foreground mb-6">Limited edition design. Get yours before it's gone!</p>
                     <Button asChild size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90">
                         <Link href="/hoodies/cosmic-dreamer-hoodie">Check it Out</Link>

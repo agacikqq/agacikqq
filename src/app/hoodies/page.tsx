@@ -20,6 +20,7 @@ import {
   DropdownMenuCheckboxItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
+  DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
 
 
@@ -151,7 +152,7 @@ export default function HoodiesPage() {
       <div className="flex flex-col min-h-screen">
         <Header />
         <div className="flex-grow container mx-auto p-4 text-center">
-          <p className="text-3xl font-semibold text-primary animate-pulse">Loading Hoodies...</p>
+          <p className="text-3xl font-semibold text-primary animate-pulse">Loading Hoodiez...</p>
         </div>
       </div>
     );
@@ -165,10 +166,10 @@ export default function HoodiesPage() {
           <div className="mb-12 text-center">
             <h1 className="text-5xl font-extrabold text-primary mb-3 flex items-center justify-center gap-3">
               <Shirt className="h-12 w-12 text-accent animate-pulse" />
-              Our Hoodie Collection
+              Our Hoodiez Collection
             </h1>
             <p className="text-xl text-muted-foreground">
-              Discover your next favorite cœzii hoodie. Filter by color, size, and style to find the perfect fit.
+              Discover your next favorite cœzii hoodiez. Filter by color, size, and style to find the perfect fit.
             </p>
           </div>
 
@@ -177,7 +178,7 @@ export default function HoodiesPage() {
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
               <Input
                 type="search"
-                placeholder="Search hoodies by name or description..."
+                placeholder="Search hoodiez by name or description..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10 pr-10 py-3 rounded-full focus:ring-2 focus:ring-accent border-muted bg-card/80"
@@ -219,7 +220,7 @@ export default function HoodiesPage() {
                 </DropdownMenuContent>
               </DropdownMenu>
               <p className="text-lg text-muted-foreground whitespace-nowrap">
-                Showing {filteredHoodies.length} of {hoodies.length} hoodies
+                Showing {filteredHoodies.length} of {hoodies.length} hoodiez
               </p>
             </div>
           </div>
@@ -233,7 +234,7 @@ export default function HoodiesPage() {
           ) : (
             <div className="text-center py-10">
                 <Shirt className="h-24 w-24 text-muted-foreground/50 mx-auto mb-6" />
-              <h2 className="text-3xl font-semibold mb-2 text-foreground">No Hoodies Found</h2>
+              <h2 className="text-3xl font-semibold mb-2 text-foreground">No Hoodiez Found</h2>
               <p className="text-lg text-muted-foreground mb-4">
                 Try adjusting your search or filters.
               </p>
