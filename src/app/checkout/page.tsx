@@ -38,11 +38,10 @@ export default function CheckoutPage() {
 
   // Address state
   const [streetAddress, setStreetAddress] = useState('');
-  const [apartmentSuite, setApartmentSuite] = useState(''); // New field
+  const [apartmentSuite, setApartmentSuite] = useState('');
   const [city, setCity] = useState('');
-  const [stateProvince, setStateProvince] = useState(''); // New field
   const [zipCode, setZipCode] = useState('');
-  const [country, setCountry] = useState('');
+  const [emirate, setEmirate] = useState(''); // Renamed from country
 
 
   useEffect(() => {
@@ -61,10 +60,10 @@ export default function CheckoutPage() {
     e.preventDefault();
     
     // Address validation
-    if (!streetAddress || !city || !country || !stateProvince) { 
+    if (!streetAddress || !city || !emirate) { 
       toast({
         title: 'Missing Shipping Information',
-        description: 'Please fill in all required shipping address details (Street, City, State/Province, Country).',
+        description: 'Please fill in all required shipping address details (Street, City, Emirate).',
         variant: 'destructive',
       });
       return;
@@ -100,7 +99,7 @@ export default function CheckoutPage() {
 
     toast({
       title: 'Payment Successful!',
-      description: `Thank you for your order using ${paymentMethodName}. Your cœzii items are on their way to ${streetAddress}, ${apartmentSuite ? apartmentSuite + ', ' : ''}${city}, ${stateProvince}, ${zipCode ? zipCode + ', ' : ''}${country}!`,
+      description: `Thank you for your order using ${paymentMethodName}. Your cœzii items are on their way to ${streetAddress}, ${apartmentSuite ? apartmentSuite + ', ' : ''}${city}, ${emirate}${zipCode ? ', ' + zipCode : ''}!`,
     });
     clearCart();
     router.push('/'); // Redirect to homepage or an order confirmation page
@@ -281,19 +280,19 @@ export default function CheckoutPage() {
                         />
                       </div>
                        <div>
-                        <Label htmlFor="stateProvince" className="text-lg">State / Province*</Label>
+                        <Label htmlFor="emirate" className="text-lg">Emirate*</Label>
                         <Input 
-                          id="stateProvince" 
+                          id="emirate" 
                           type="text" 
-                          value={stateProvince} 
-                          onChange={(e) => setStateProvince(e.target.value)} 
-                          placeholder="e.g., Dubai (Emirate)" 
+                          value={emirate} 
+                          onChange={(e) => setEmirate(e.target.value)} 
+                          placeholder="e.g., Dubai" 
                           required
                           className="mt-1 text-base"
                         />
                       </div>
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-1 gap-4"> {/* Changed to 1 column for Zip */}
                       <div>
                         <Label htmlFor="zipCode" className="text-lg">ZIP / Postal Code (optional)</Label>
                         <Input 
@@ -302,18 +301,6 @@ export default function CheckoutPage() {
                           value={zipCode} 
                           onChange={(e) => setZipCode(e.target.value)} 
                           placeholder="e.g., 00000"
-                          className="mt-1 text-base"
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="country" className="text-lg">Country*</Label>
-                        <Input 
-                          id="country" 
-                          type="text" 
-                          value={country} 
-                          onChange={(e) => setCountry(e.target.value)} 
-                          placeholder="e.g., United Arab Emirates" 
-                          required
                           className="mt-1 text-base"
                         />
                       </div>
