@@ -50,7 +50,8 @@ export default function CheckoutPage() {
 
   useEffect(() => {
     setHasMounted(true);
-    if (items.length === 0 && hasMounted) { 
+    // Only redirect if cart is empty, component has mounted, AND feedback modal is NOT trying to open.
+    if (items.length === 0 && hasMounted && !isFeedbackModalOpen) { 
       toast({
         title: 'Your cart is empty!',
         description: 'Redirecting you to browse our products.',
@@ -58,7 +59,7 @@ export default function CheckoutPage() {
       });
       router.push('/all-products');
     }
-  }, [items, router, hasMounted]);
+  }, [items, router, hasMounted, isFeedbackModalOpen]); // Added isFeedbackModalOpen to dependencies
 
   const handlePaymentSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -145,7 +146,9 @@ export default function CheckoutPage() {
     );
   }
 
-  if (items.length === 0 && !isFeedbackModalOpen) { // Don't redirect if feedback modal is about to open
+  // This condition ensures that if the feedback modal is open (or about to open), 
+  // we don't show the "empty cart" page, even if items.length is 0.
+  if (items.length === 0 && !isFeedbackModalOpen) {
     return (
       <div className="flex flex-col min-h-screen">
         <Header />
