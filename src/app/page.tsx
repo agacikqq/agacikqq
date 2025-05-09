@@ -30,7 +30,7 @@ export default function HomePage() {
                   <Link href="/hoodies">Shop All Hoodiez</Link>
                 </Button>
                 <Button asChild size="lg" variant="outline" className="text-xl px-10 py-7 rounded-full border-accent text-accent hover:bg-accent/10">
-                  <Link href="/all-products">Explore All Productz</Link>
+                  <Link href="/browse/all-items">Explore All Productz</Link>
                 </Button>
             </div>
           </div>

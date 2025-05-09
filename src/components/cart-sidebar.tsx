@@ -9,9 +9,10 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { Input } from '@/components/ui/input';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter, SheetClose } from '@/components/ui/sheet';
-import { X, Trash2, Edit3, MinusCircle, PlusCircle, ShoppingBag } from 'lucide-react';
+import { X, Trash2, Edit3, MinusCircle, PlusCircle, ShoppingBag, CreditCard } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
-import { useRouter } from 'next/navigation'; // Added for navigation
+import { useRouter } from 'next/navigation'; 
+import Link from 'next/link';
 
 const INCLUDED_CHARMS_COUNT = 4;
 const INCLUDED_CHARMS_PER_BRACELET_IN_SET = 4;
@@ -29,7 +30,7 @@ export function CartSidebar() {
     setEditingItem,
     getOriginalProductForEditing,
   } = useCart();
-  const router = useRouter(); // Initialize router
+  const router = useRouter(); 
 
   const handleEditItem = (item: CartItem) => {
     const originalProduct = getOriginalProductForEditing(item);
@@ -44,14 +45,6 @@ export function CartSidebar() {
       case 'hoodie':
         setEditingItem({ type: 'hoodie', item: item as HoodieCartItem, cartItemId: item.cartItemId });
         targetUrl = '/hoodies';
-        // If the hoodie is a sale item, and we want to redirect to salez page specifically, an additional check would be needed here.
-        // For simplicity, always go to the main product page. The /salez page also listens for hoodie edits.
-        // const hoodie = originalProduct as Hoodie;
-        // if (hoodie.originalPrice && hoodie.originalPrice > hoodie.price) {
-        //   targetUrl = '/salez';
-        // } else {
-        //   targetUrl = '/hoodies';
-        // }
         break;
       case 'sweatpants':
         setEditingItem({ type: 'sweatpants', item: item as SweatpantsCartItem, cartItemId: item.cartItemId });
@@ -67,10 +60,10 @@ export function CartSidebar() {
         break;
       default:
         toast({ title: "Error", description: "Cannot edit this item type.", variant: "destructive"});
-        return; // Do not proceed if item type is unknown
+        return; 
     }
     
-    router.push(targetUrl); // Navigate to the product page
+    router.push(targetUrl); 
     closeCart(); 
   };
   
@@ -86,6 +79,11 @@ export function CartSidebar() {
             {extraCharms.map(charm => <li key={charm.id}>{charm.name} (+AED {charm.price.toFixed(2)})</li>)}
         </ul>
     );
+  };
+
+  const handleProceedToCheckout = () => {
+    closeCart();
+    router.push('/checkout');
   };
 
 
@@ -112,6 +110,11 @@ export function CartSidebar() {
             <p className="text-muted-foreground text-center">
               Looks like you haven&apos;t added anything to your cart yet.
             </p>
+            <SheetClose asChild>
+              <Button asChild variant="link" className="mt-4 text-accent text-lg">
+                <Link href="/all-products">Start Shopping</Link>
+              </Button>
+            </SheetClose>
           </div>
         ) : (
           <>
@@ -213,8 +216,8 @@ export function CartSidebar() {
                   <span>Subtotal:</span>
                   <span>AED {cartTotal.toFixed(2)}</span>
                 </div>
-                <Button size="lg" className="w-full bg-accent text-accent-foreground hover:bg-accent/90">
-                  Proceed to Checkout
+                <Button size="lg" className="w-full bg-accent text-accent-foreground hover:bg-accent/90" onClick={handleProceedToCheckout}>
+                  <CreditCard className="mr-2 h-5 w-5" /> Proceed to Checkout
                 </Button>
                 <Button variant="outline" size="lg" className="w-full" onClick={clearCart}>
                   Clear Cart
