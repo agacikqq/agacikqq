@@ -61,10 +61,10 @@ export default function CheckoutPage() {
     e.preventDefault();
     
     // Address validation
-    if (!streetAddress || !city || !zipCode || !country || !stateProvince) { // Added stateProvince validation
+    if (!streetAddress || !city || !country || !stateProvince) { 
       toast({
         title: 'Missing Shipping Information',
-        description: 'Please fill in all required shipping address details.',
+        description: 'Please fill in all required shipping address details (Street, City, State/Province, Country).',
         variant: 'destructive',
       });
       return;
@@ -100,7 +100,7 @@ export default function CheckoutPage() {
 
     toast({
       title: 'Payment Successful!',
-      description: `Thank you for your order using ${paymentMethodName}. Your cœzii items are on their way to ${streetAddress}, ${apartmentSuite ? apartmentSuite + ', ' : ''}${city}, ${stateProvince}, ${zipCode}, ${country}!`,
+      description: `Thank you for your order using ${paymentMethodName}. Your cœzii items are on their way to ${streetAddress}, ${apartmentSuite ? apartmentSuite + ', ' : ''}${city}, ${stateProvince}, ${zipCode ? zipCode + ', ' : ''}${country}!`,
     });
     clearCart();
     router.push('/'); // Redirect to homepage or an order confirmation page
@@ -295,14 +295,13 @@ export default function CheckoutPage() {
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
-                        <Label htmlFor="zipCode" className="text-lg">ZIP / Postal Code*</Label>
+                        <Label htmlFor="zipCode" className="text-lg">ZIP / Postal Code (optional)</Label>
                         <Input 
                           id="zipCode" 
                           type="text" 
                           value={zipCode} 
                           onChange={(e) => setZipCode(e.target.value)} 
-                          placeholder="e.g., 00000" 
-                          required
+                          placeholder="e.g., 00000"
                           className="mt-1 text-base"
                         />
                       </div>
@@ -465,3 +464,4 @@ export default function CheckoutPage() {
     </div>
   );
 }
+
