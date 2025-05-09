@@ -15,11 +15,14 @@ import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { toast } from '@/hooks/use-toast';
-import { CreditCard, ShoppingBag, Lock, ArrowLeft } from 'lucide-react';
+import { CreditCard, ShoppingBag, Lock, ArrowLeft, Truck, Apple } from 'lucide-react';
 
 const INCLUDED_CHARMS_COUNT = 4;
 const INCLUDED_CHARMS_PER_BRACELET_IN_SET = 4;
+
+type PaymentMethod = 'card' | 'cash' | 'applepay';
 
 export default function CheckoutPage() {
   const { items, cartTotal, cartCount, clearCart } = useCart();
@@ -31,6 +34,7 @@ export default function CheckoutPage() {
   const [cardNumber, setCardNumber] = useState('');
   const [expiryDate, setExpiryDate] = useState('');
   const [cvv, setCvv] = useState('');
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<PaymentMethod>('card');
 
   useEffect(() => {
     setHasMounted(true);
@@ -46,33 +50,38 @@ export default function CheckoutPage() {
 
   const handlePaymentSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Basic validation (mock)
-    if (!nameOnCard || !cardNumber || !expiryDate || !cvv) {
-      toast({
-        title: 'Missing Information',
-        description: 'Please fill in all payment details.',
-        variant: 'destructive',
-      });
-      return;
-    }
-    if (!/^\d{16}$/.test(cardNumber.replace(/\s/g, ''))) {
-      toast({ title: 'Invalid Card', description: 'Please enter a valid 16-digit card number.', variant: 'destructive' });
-      return;
-    }
-    if (!/^(0[1-9]|1[0-2])\/\d{2}$/.test(expiryDate)) {
-        toast({ title: 'Invalid Expiry', description: 'Please use MM/YY format for expiry date.', variant: 'destructive' });
+    
+    if (selectedPaymentMethod === 'card') {
+      if (!nameOnCard || !cardNumber || !expiryDate || !cvv) {
+        toast({
+          title: 'Missing Card Information',
+          description: 'Please fill in all payment details for your card.',
+          variant: 'destructive',
+        });
         return;
-    }
-    if (!/^\d{3,4}$/.test(cvv)) {
-        toast({ title: 'Invalid CVV', description: 'Please enter a valid 3 or 4 digit CVV.', variant: 'destructive' });
+      }
+      if (!/^\d{16}$/.test(cardNumber.replace(/\s/g, ''))) {
+        toast({ title: 'Invalid Card Number', description: 'Please enter a valid 16-digit card number.', variant: 'destructive' });
         return;
+      }
+      if (!/^(0[1-9]|1[0-2])\/\d{2}$/.test(expiryDate)) {
+          toast({ title: 'Invalid Expiry Date', description: 'Please use MM/YY format for expiry date.', variant: 'destructive' });
+          return;
+      }
+      if (!/^\d{3,4}$/.test(cvv)) {
+          toast({ title: 'Invalid CVV', description: 'Please enter a valid 3 or 4 digit CVV.', variant: 'destructive' });
+          return;
+      }
     }
-
 
     // Simulate payment processing
+    let paymentMethodName = "Card";
+    if (selectedPaymentMethod === 'cash') paymentMethodName = "Cash on Delivery";
+    if (selectedPaymentMethod === 'applepay') paymentMethodName = "Apple Pay";
+
     toast({
       title: 'Payment Successful!',
-      description: 'Thank you for your order. Your cœzii items are on their way!',
+      description: `Thank you for your order using ${paymentMethodName}. Your cœzii items are on their way!`,
     });
     clearCart();
     router.push('/'); // Redirect to homepage or an order confirmation page
@@ -102,7 +111,6 @@ export default function CheckoutPage() {
   }
 
   if (items.length === 0) {
-    // This state should ideally be caught by useEffect, but as a fallback:
     return (
       <div className="flex flex-col min-h-screen">
         <Header />
@@ -215,70 +223,124 @@ export default function CheckoutPage() {
               <Card className="shadow-xl">
                 <CardHeader>
                   <CardTitle className="text-3xl text-primary flex items-center">
-                    <Lock className="mr-2 h-7 w-7 text-primary" /> Secure Payment
+                    <Lock className="mr-2 h-7 w-7 text-primary" /> Payment Method
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <form onSubmit={handlePaymentSubmit} className="space-y-6">
-                    <div>
-                      <Label htmlFor="nameOnCard" className="text-lg">Name on Card</Label>
-                      <Input 
-                        id="nameOnCard" 
-                        type="text" 
-                        value={nameOnCard} 
-                        onChange={(e) => setNameOnCard(e.target.value)} 
-                        placeholder="Full Name" 
-                        required 
-                        className="mt-1 text-base"
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="cardNumber" className="text-lg">Card Number</Label>
-                      <Input 
-                        id="cardNumber" 
-                        type="text" 
-                        value={cardNumber} 
-                        onChange={(e) => setCardNumber(e.target.value.replace(/\D/g, '').replace(/(.{4})/g, '$1 ').trim().slice(0, 19))} 
-                        placeholder="0000 0000 0000 0000" 
-                        required 
-                        className="mt-1 text-base"
-                        maxLength={19}
-                      />
-                    </div>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <Label htmlFor="expiryDate" className="text-lg">Expiry Date</Label>
-                        <Input 
-                          id="expiryDate" 
-                          type="text" 
-                          value={expiryDate}
-                          onChange={(e) => {
-                            let val = e.target.value.replace(/\D/g, '');
-                            if (val.length > 2) {
-                                val = val.slice(0,2) + '/' + val.slice(2);
-                            }
-                            setExpiryDate(val.slice(0,5));
-                          }}
-                          placeholder="MM/YY" 
-                          required 
-                          className="mt-1 text-base"
-                          maxLength={5}
-                        />
+                    <RadioGroup
+                      value={selectedPaymentMethod}
+                      onValueChange={(value: string) => setSelectedPaymentMethod(value as PaymentMethod)}
+                      className="space-y-3 mb-6"
+                    >
+                      <Label
+                        htmlFor="payment-card"
+                        className={`flex items-center space-x-3 p-4 border rounded-lg cursor-pointer transition-all ${selectedPaymentMethod === 'card' ? 'border-accent ring-2 ring-accent bg-accent/10' : 'hover:bg-muted/30'}`}
+                      >
+                        <RadioGroupItem value="card" id="payment-card" />
+                        <CreditCard className="h-6 w-6 text-primary" />
+                        <span className="text-lg font-medium">Debit/Credit Card</span>
+                      </Label>
+                      <Label
+                        htmlFor="payment-cash"
+                        className={`flex items-center space-x-3 p-4 border rounded-lg cursor-pointer transition-all ${selectedPaymentMethod === 'cash' ? 'border-accent ring-2 ring-accent bg-accent/10' : 'hover:bg-muted/30'}`}
+                      >
+                        <RadioGroupItem value="cash" id="payment-cash" />
+                        <Truck className="h-6 w-6 text-primary" />
+                        <span className="text-lg font-medium">Cash on Delivery</span>
+                      </Label>
+                      <Label
+                        htmlFor="payment-applepay"
+                        className={`flex items-center space-x-3 p-4 border rounded-lg cursor-pointer transition-all ${selectedPaymentMethod === 'applepay' ? 'border-accent ring-2 ring-accent bg-accent/10' : 'hover:bg-muted/30'}`}
+                      >
+                        <RadioGroupItem value="applepay" id="payment-applepay" />
+                        <Apple className="h-6 w-6 text-primary" />
+                        <span className="text-lg font-medium">Apple Pay</span>
+                      </Label>
+                    </RadioGroup>
+
+                    {selectedPaymentMethod === 'card' && (
+                      <div className="space-y-4 animate-in fade-in duration-300">
+                        <div>
+                          <Label htmlFor="nameOnCard" className="text-lg">Name on Card</Label>
+                          <Input 
+                            id="nameOnCard" 
+                            type="text" 
+                            value={nameOnCard} 
+                            onChange={(e) => setNameOnCard(e.target.value)} 
+                            placeholder="Full Name" 
+                            required={selectedPaymentMethod === 'card'}
+                            className="mt-1 text-base"
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="cardNumber" className="text-lg">Card Number</Label>
+                          <Input 
+                            id="cardNumber" 
+                            type="text" 
+                            value={cardNumber} 
+                            onChange={(e) => setCardNumber(e.target.value.replace(/\D/g, '').replace(/(.{4})/g, '$1 ').trim().slice(0, 19))} 
+                            placeholder="0000 0000 0000 0000" 
+                            required={selectedPaymentMethod === 'card'}
+                            className="mt-1 text-base"
+                            maxLength={19}
+                          />
+                        </div>
+                        <div className="grid grid-cols-2 gap-4">
+                          <div>
+                            <Label htmlFor="expiryDate" className="text-lg">Expiry Date</Label>
+                            <Input 
+                              id="expiryDate" 
+                              type="text" 
+                              value={expiryDate}
+                              onChange={(e) => {
+                                let val = e.target.value.replace(/\D/g, '');
+                                if (val.length > 2) {
+                                    val = val.slice(0,2) + '/' + val.slice(2);
+                                }
+                                setExpiryDate(val.slice(0,5));
+                              }}
+                              placeholder="MM/YY" 
+                              required={selectedPaymentMethod === 'card'}
+                              className="mt-1 text-base"
+                              maxLength={5}
+                            />
+                          </div>
+                          <div>
+                            <Label htmlFor="cvv" className="text-lg">CVV</Label>
+                            <Input 
+                              id="cvv" 
+                              type="text" 
+                              value={cvv} 
+                              onChange={(e) => setCvv(e.target.value.replace(/\D/g, '').slice(0,4))} 
+                              placeholder="123" 
+                              required={selectedPaymentMethod === 'card'}
+                              className="mt-1 text-base"
+                              maxLength={4}
+                            />
+                          </div>
+                        </div>
                       </div>
-                      <div>
-                        <Label htmlFor="cvv" className="text-lg">CVV</Label>
-                        <Input 
-                          id="cvv" 
-                          type="text" 
-                          value={cvv} 
-                          onChange={(e) => setCvv(e.target.value.replace(/\D/g, '').slice(0,4))} 
-                          placeholder="123" 
-                          required 
-                          className="mt-1 text-base"
-                          maxLength={4}
-                        />
+                    )}
+
+                    {selectedPaymentMethod === 'cash' && (
+                      <div className="p-4 border rounded-lg bg-muted/20 text-center animate-in fade-in duration-300">
+                        <Truck className="h-12 w-12 text-primary mx-auto mb-2" />
+                        <p className="text-muted-foreground">You will pay AED {cartTotal.toFixed(2)} upon delivery.</p>
                       </div>
-                    </div>
+                    )}
+
+                    {selectedPaymentMethod === 'applepay' && (
+                       <div className="p-4 border rounded-lg bg-muted/20 text-center animate-in fade-in duration-300">
+                        <Apple className="h-12 w-12 text-primary mx-auto mb-2" />
+                        <p className="text-muted-foreground">Proceed to finalize payment with Apple Pay.</p>
+                        <Button variant="outline" className="mt-3 bg-black text-white hover:bg-gray-800 w-full">
+                            Pay with <Apple className="ml-2 h-5 w-5 fill-white"/>
+                        </Button>
+                      </div>
+                    )}
+
+
                     <CardFooter className="p-0 pt-6">
                       <Button type="submit" size="lg" className="w-full bg-accent text-accent-foreground hover:bg-accent/90 text-xl py-7">
                         Pay AED {cartTotal.toFixed(2)}
@@ -298,3 +360,6 @@ export default function CheckoutPage() {
     </div>
   );
 }
+
+
+    
