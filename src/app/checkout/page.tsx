@@ -38,7 +38,9 @@ export default function CheckoutPage() {
 
   // Address state
   const [streetAddress, setStreetAddress] = useState('');
+  const [apartmentSuite, setApartmentSuite] = useState(''); // New field
   const [city, setCity] = useState('');
+  const [stateProvince, setStateProvince] = useState(''); // New field
   const [zipCode, setZipCode] = useState('');
   const [country, setCountry] = useState('');
 
@@ -59,10 +61,10 @@ export default function CheckoutPage() {
     e.preventDefault();
     
     // Address validation
-    if (!streetAddress || !city || !zipCode || !country) {
+    if (!streetAddress || !city || !zipCode || !country || !stateProvince) { // Added stateProvince validation
       toast({
         title: 'Missing Shipping Information',
-        description: 'Please fill in all shipping address details.',
+        description: 'Please fill in all required shipping address details.',
         variant: 'destructive',
       });
       return;
@@ -98,7 +100,7 @@ export default function CheckoutPage() {
 
     toast({
       title: 'Payment Successful!',
-      description: `Thank you for your order using ${paymentMethodName}. Your cœzii items are on their way to ${streetAddress}, ${city}!`,
+      description: `Thank you for your order using ${paymentMethodName}. Your cœzii items are on their way to ${streetAddress}, ${apartmentSuite ? apartmentSuite + ', ' : ''}${city}, ${stateProvince}, ${zipCode}, ${country}!`,
     });
     clearCart();
     router.push('/'); // Redirect to homepage or an order confirmation page
@@ -243,20 +245,31 @@ export default function CheckoutPage() {
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div>
-                      <Label htmlFor="streetAddress" className="text-lg">Street Address</Label>
+                      <Label htmlFor="streetAddress" className="text-lg">Street Address*</Label>
                       <Input 
                         id="streetAddress" 
                         type="text" 
                         value={streetAddress} 
                         onChange={(e) => setStreetAddress(e.target.value)} 
-                        placeholder="e.g., 123 Main St, Apt 4B" 
+                        placeholder="e.g., 123 Main St" 
                         required
+                        className="mt-1 text-base"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="apartmentSuite" className="text-lg">Apartment, suite, etc. (optional)</Label>
+                      <Input 
+                        id="apartmentSuite" 
+                        type="text" 
+                        value={apartmentSuite} 
+                        onChange={(e) => setApartmentSuite(e.target.value)} 
+                        placeholder="e.g., Apt 4B, Unit 12" 
                         className="mt-1 text-base"
                       />
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
-                        <Label htmlFor="city" className="text-lg">City</Label>
+                        <Label htmlFor="city" className="text-lg">City*</Label>
                         <Input 
                           id="city" 
                           type="text" 
@@ -267,8 +280,22 @@ export default function CheckoutPage() {
                           className="mt-1 text-base"
                         />
                       </div>
+                       <div>
+                        <Label htmlFor="stateProvince" className="text-lg">State / Province*</Label>
+                        <Input 
+                          id="stateProvince" 
+                          type="text" 
+                          value={stateProvince} 
+                          onChange={(e) => setStateProvince(e.target.value)} 
+                          placeholder="e.g., Dubai (Emirate)" 
+                          required
+                          className="mt-1 text-base"
+                        />
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
-                        <Label htmlFor="zipCode" className="text-lg">ZIP / Postal Code</Label>
+                        <Label htmlFor="zipCode" className="text-lg">ZIP / Postal Code*</Label>
                         <Input 
                           id="zipCode" 
                           type="text" 
@@ -279,19 +306,20 @@ export default function CheckoutPage() {
                           className="mt-1 text-base"
                         />
                       </div>
+                      <div>
+                        <Label htmlFor="country" className="text-lg">Country*</Label>
+                        <Input 
+                          id="country" 
+                          type="text" 
+                          value={country} 
+                          onChange={(e) => setCountry(e.target.value)} 
+                          placeholder="e.g., United Arab Emirates" 
+                          required
+                          className="mt-1 text-base"
+                        />
+                      </div>
                     </div>
-                    <div>
-                      <Label htmlFor="country" className="text-lg">Country</Label>
-                      <Input 
-                        id="country" 
-                        type="text" 
-                        value={country} 
-                        onChange={(e) => setCountry(e.target.value)} 
-                        placeholder="e.g., United Arab Emirates" 
-                        required
-                        className="mt-1 text-base"
-                      />
-                    </div>
+                    <p className="text-xs text-muted-foreground">* Required field</p>
                   </CardContent>
                 </Card>
               </div>
