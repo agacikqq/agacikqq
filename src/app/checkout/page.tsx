@@ -18,7 +18,6 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { toast } from '@/hooks/use-toast';
 import { CreditCard, ShoppingBag, Lock, ArrowLeft, Truck, Apple, MapPin } from 'lucide-react';
-import { FeedbackModal } from '@/components/feedback-modal';
 
 const INCLUDED_CHARMS_COUNT = 4;
 const INCLUDED_CHARMS_PER_BRACELET_IN_SET = 4;
@@ -44,14 +43,10 @@ export default function CheckoutPage() {
   const [zipCode, setZipCode] = useState('');
   const [emirate, setEmirate] = useState('');
 
-  // Feedback modal state
-  const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState(false);
-
 
   useEffect(() => {
     setHasMounted(true);
-    // Only redirect if cart is empty, component has mounted, AND feedback modal is NOT trying to open.
-    if (items.length === 0 && hasMounted && !isFeedbackModalOpen) { 
+    if (items.length === 0 && hasMounted) { 
       toast({
         title: 'Your cart is empty!',
         description: 'Redirecting you to browse our products.',
@@ -59,7 +54,7 @@ export default function CheckoutPage() {
       });
       router.push('/all-products');
     }
-  }, [items, router, hasMounted, isFeedbackModalOpen]); // Added isFeedbackModalOpen to dependencies
+  }, [items, router, hasMounted]);
 
   const handlePaymentSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -105,23 +100,9 @@ export default function CheckoutPage() {
       description: `Thank you for your order using ${paymentMethodName}. Your cœzii items are on their way to ${streetAddress}, ${apartmentSuite ? apartmentSuite + ', ' : ''}${city}, ${emirate}${zipCode ? ', ' + zipCode : ''}!`,
     });
     clearCart();
-    setIsFeedbackModalOpen(true); 
+    router.push('/'); 
   };
   
-  const handleFeedbackSubmit = (rating: number, comments: string) => {
-    console.log('Feedback received:', { rating, comments }); // Placeholder for actual submission
-    toast({
-      title: 'Feedback Submitted!',
-      description: 'Thank you for sharing your thoughts with us.',
-    });
-    setIsFeedbackModalOpen(false);
-    router.push('/'); 
-  };
-
-  const handleFeedbackModalClose = () => {
-    setIsFeedbackModalOpen(false);
-    router.push('/'); 
-  };
 
   const renderCharmListMini = (charms: Charm[], includedCount: number) => {
     if (!charms || charms.length === 0) return <p className="text-xs text-muted-foreground">No charms.</p>;
@@ -146,9 +127,7 @@ export default function CheckoutPage() {
     );
   }
 
-  // This condition ensures that if the feedback modal is open (or about to open), 
-  // we don't show the "empty cart" page, even if items.length is 0.
-  if (items.length === 0 && !isFeedbackModalOpen) {
+  if (items.length === 0) {
     return (
       <div className="flex flex-col min-h-screen">
         <Header />
@@ -175,7 +154,6 @@ export default function CheckoutPage() {
       <Header />
       <main className="flex-1 p-4 md:p-8 bg-transparent">
         <div className="container mx-auto">
-          {!isFeedbackModalOpen && ( // Hide checkout form when feedback modal is open
             <>
               <Button variant="outline" onClick={() => router.back()} className="mb-6 text-lg">
                 <ArrowLeft className="mr-2 h-5 w-5" /> Back to Shopping
@@ -468,15 +446,10 @@ export default function CheckoutPage() {
                 </div>
               </form>
             </>
-          )}
         </div>
       </main>
-      <FeedbackModal
-        isOpen={isFeedbackModalOpen}
-        onClose={handleFeedbackModalClose}
-        onSubmit={handleFeedbackSubmit}
-      />
       <Footer />
     </div>
   );
 }
+
