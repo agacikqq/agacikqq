@@ -44,7 +44,7 @@ export default function CheckoutPage() {
   const [apartmentSuite, setApartmentSuite] = useState('');
   const [city, setCity] = useState('');
   const [zipCode, setZipCode] = useState('');
-  const [emirate, setEmirate] = useState('');
+  // const [emirate, setEmirate] = useState(''); // Removed emirate
 
   // Order processing state
   const [orderState, setOrderState] = useState<OrderState>('form');
@@ -108,7 +108,7 @@ export default function CheckoutPage() {
         streetAddress,
         apartmentSuite: apartmentSuite || undefined,
         city,
-        emirate,
+        // emirate, // Removed emirate
         zipCode: zipCode || undefined,
       },
       items: emailOrderItems,
@@ -122,10 +122,10 @@ export default function CheckoutPage() {
     e.preventDefault();
     setOrderState('submitting');
 
-    if (!streetAddress || !city || !emirate) {
+    if (!streetAddress || !city) { // Removed emirate from check
       toast({
         title: 'Missing Shipping Information',
-        description: 'Please fill in all required shipping address details (Street, City, Emirate).',
+        description: 'Please fill in all required shipping address details (Street, City).', // Updated description
         variant: 'destructive',
       });
       setOrderState('form');
@@ -198,7 +198,7 @@ export default function CheckoutPage() {
     e.preventDefault();
     setOrderState('submitting');
 
-    if (!streetAddress || !city || !emirate) {
+    if (!streetAddress || !city ) { // Removed emirate check
       toast({
         title: 'Missing Shipping Information',
         description: 'Please fill in all required shipping address details.',
@@ -220,7 +220,7 @@ export default function CheckoutPage() {
         streetAddress,
         apartmentSuite: apartmentSuite || undefined,
         city,
-        emirate,
+        // emirate, // Removed emirate
         zipCode: zipCode || undefined,
       },
     };
@@ -289,7 +289,7 @@ export default function CheckoutPage() {
         setStreetAddress(confirmedOrderData.shippingAddress.streetAddress);
         setApartmentSuite(confirmedOrderData.shippingAddress.apartmentSuite || '');
         setCity(confirmedOrderData.shippingAddress.city);
-        setEmirate(confirmedOrderData.shippingAddress.emirate);
+        // setEmirate(confirmedOrderData.shippingAddress.emirate); // Removed emirate
         setZipCode(confirmedOrderData.shippingAddress.zipCode || '');
         setOrderState('editingAddress');
     }
@@ -461,14 +461,10 @@ export default function CheckoutPage() {
                             <Label htmlFor="city" className="text-lg">City*</Label>
                             <Input id="city" type="text" value={city} onChange={(e) => setCity(e.target.value)} placeholder="e.g., Dubai" required className="mt-1 text-base"/>
                           </div>
-                          <div>
-                            <Label htmlFor="emirate" className="text-lg">Emirate*</Label>
-                            <Input id="emirate" type="text" value={emirate} onChange={(e) => setEmirate(e.target.value)} placeholder="e.g., Dubai" required className="mt-1 text-base"/>
+                           <div>
+                            <Label htmlFor="zipCode" className="text-lg">ZIP / Postal Code (optional)</Label>
+                            <Input id="zipCode" type="text" value={zipCode} onChange={(e) => setZipCode(e.target.value)} placeholder="e.g., 00000" className="mt-1 text-base"/>
                           </div>
-                        </div>
-                        <div>
-                          <Label htmlFor="zipCode" className="text-lg">ZIP / Postal Code (optional)</Label>
-                          <Input id="zipCode" type="text" value={zipCode} onChange={(e) => setZipCode(e.target.value)} placeholder="e.g., 00000" className="mt-1 text-base"/>
                         </div>
                         <p className="text-xs text-muted-foreground">* Required field</p>
                       </CardContent>
@@ -582,7 +578,7 @@ export default function CheckoutPage() {
                             <p className="text-lg text-muted-foreground">
                                 {confirmedOrderData.shippingAddress.streetAddress}<br />
                                 {confirmedOrderData.shippingAddress.apartmentSuite && `${confirmedOrderData.shippingAddress.apartmentSuite}<br />`}
-                                {confirmedOrderData.shippingAddress.city}, {confirmedOrderData.shippingAddress.emirate}<br />
+                                {confirmedOrderData.shippingAddress.city}<br />
                                 {confirmedOrderData.shippingAddress.zipCode && `${confirmedOrderData.shippingAddress.zipCode}<br />`}
                                 United Arab Emirates
                             </p>

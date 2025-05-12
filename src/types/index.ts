@@ -140,6 +140,8 @@ export type EditingItemState =
   | null;
 
 // Order History
+// The ShippingAddress type within SendOrderConfirmationEmailInput will be updated
+// when the flow file changes, so PastOrder will inherit this change.
 export interface PastOrder extends SendOrderConfirmationEmailInput {
   orderId: string;
   orderDate: string; // ISO string date for easy sorting and display
@@ -159,3 +161,4 @@ export interface RecommendedProduct {
   name: string;
   reason: string;
 }
+

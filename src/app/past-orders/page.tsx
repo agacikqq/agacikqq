@@ -126,7 +126,7 @@ export default function PastOrdersPage() {
                           <address className="not-italic text-muted-foreground text-base">
                             {order.shippingAddress.streetAddress}<br />
                             {order.shippingAddress.apartmentSuite && `${order.shippingAddress.apartmentSuite}<br />`}
-                            {order.shippingAddress.city}, {order.shippingAddress.emirate}<br />
+                            {order.shippingAddress.city}<br />
                             {order.shippingAddress.zipCode && `${order.shippingAddress.zipCode}<br />`}
                             United Arab Emirates
                           </address>
@@ -179,4 +179,3 @@ export default function PastOrdersPage() {
     </div>
   );
 }
-

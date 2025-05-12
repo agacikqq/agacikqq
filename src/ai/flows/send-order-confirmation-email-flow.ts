@@ -25,7 +25,6 @@ const ShippingAddressSchema = z.object({
   streetAddress: z.string(),
   apartmentSuite: z.string().optional(),
   city: z.string(),
-  emirate: z.string(),
   zipCode: z.string().optional(),
 });
 export type ShippingAddress = z.infer<typeof ShippingAddressSchema>;
@@ -106,7 +105,7 @@ const sendOrderConfirmationEmailFlow = ai.defineFlow(
         <p>
           ${shippingAddress.streetAddress}<br>
           ${shippingAddress.apartmentSuite ? shippingAddress.apartmentSuite + '<br>' : ''}
-          ${shippingAddress.city}, ${shippingAddress.emirate}<br>
+          ${shippingAddress.city}<br>
           ${shippingAddress.zipCode ? shippingAddress.zipCode + '<br>' : ''}
           United Arab Emirates
         </p>
