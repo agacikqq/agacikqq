@@ -44,26 +44,6 @@ export default function PastOrdersPage() {
     setExpandedOrderId(prevId => (prevId === orderId ? null : orderId));
   };
   
-  const renderItemDetails = (item: EmailOrderItem) => {
-    return (
-      <div className="flex items-start space-x-3 p-3 border rounded-md bg-card/50 shadow-sm my-2">
-        <Image 
-          src={`https://picsum.photos/seed/${item.name}/60/80`} 
-          alt={item.name} 
-          width={60} 
-          height={80} 
-          className="rounded-md object-cover aspect-[3/4]"
-          data-ai-hint="product item past order"
-        />
-        <div className="flex-1">
-          <p className="font-semibold text-foreground">{item.name} (x{item.quantity})</p>
-          <p className="text-sm text-muted-foreground">Unit Price: AED {item.unitPrice.toFixed(2)}</p>
-          {item.details && <p className="text-xs text-muted-foreground mt-1"><em>Details: {item.details}</em></p>}
-        </div>
-        <p className="font-semibold text-accent text-lg">AED {item.itemTotal.toFixed(2)}</p>
-      </div>
-    );
-  };
 
   if (!hasMounted || isLoading) {
     return (
@@ -162,7 +142,24 @@ export default function PastOrdersPage() {
                       <h4 className="text-xl font-semibold text-primary mb-3">Items in this Order</h4>
                       <ScrollArea className="h-[250px] pr-3">
                         <div className="space-y-3">
-                          {order.items.map((item, index) => renderItemDetails(item))}
+                          {order.items.map((item, index) => (
+                            <div key={`${order.orderId}-item-${index}`} className="flex items-start space-x-3 p-3 border rounded-md bg-card/50 shadow-sm my-2">
+                              <Image 
+                                src={`https://picsum.photos/seed/${encodeURIComponent(item.name)}/60/80`} 
+                                alt={item.name} 
+                                width={60} 
+                                height={80} 
+                                className="rounded-md object-cover aspect-[3/4]"
+                                data-ai-hint="product item past order"
+                              />
+                              <div className="flex-1">
+                                <p className="font-semibold text-foreground">{item.name} (x{item.quantity})</p>
+                                <p className="text-sm text-muted-foreground">Unit Price: AED {item.unitPrice.toFixed(2)}</p>
+                                {item.details && <p className="text-xs text-muted-foreground mt-1"><em>Details: {item.details}</em></p>}
+                              </div>
+                              <p className="font-semibold text-accent text-lg">AED {item.itemTotal.toFixed(2)}</p>
+                            </div>
+                          ))}
                         </div>
                       </ScrollArea>
                     </CardContent>
@@ -182,3 +179,4 @@ export default function PastOrdersPage() {
     </div>
   );
 }
+
