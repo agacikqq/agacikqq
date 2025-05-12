@@ -98,7 +98,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     if (toastQueue.length > 0) {
       const toastToShow = toastQueue[0];
-      toast(toastToShow); // Assuming toast is synchronous or handles its own queueing well
+      toast(toastToShow); 
       setToastQueue(currentQueue => currentQueue.slice(1));
     }
   }, [toastQueue]);
@@ -119,7 +119,6 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     if (items.length > 0 || localStorage.getItem('cartItems')) {
         localStorage.setItem('cartItems', JSON.stringify(items));
     } else if (items.length === 0 && localStorage.getItem('cartItems')) {
-        // Clear local storage only if it exists and items array is now empty
         localStorage.removeItem('cartItems');
     }
   }, [items]);
@@ -155,13 +154,12 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       let toastMsg: { title: string; description: string, variant?: 'default' | 'destructive' } | null = null;
       let editingItemToClear = false;
 
-      if (editingItem && editingItem.cartItemId) { // Indicates an update operation
+      if (editingItem && editingItem.cartItemId) { 
         editingItemToClear = true;
         const oldCartItemId = editingItem.cartItemId;
-        const originalQuantity = editingItem.item.quantity; // Use the quantity of the item being edited
+        const originalQuantity = editingItem.item.quantity; 
 
         if (oldCartItemId === newCartItemId) {
-          // Configuration hasn't changed the ID, just update properties of the item.
           nextItems = currentItems.map(item =>
             item.cartItemId === oldCartItemId
               ? { ...itemDataFromModal, cartItemId: newCartItemId, unitPrice: newUnitPrice, quantity: originalQuantity } as CartItem
@@ -169,19 +167,13 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
           );
           toastMsg = { title: "Item Updated", description: `${itemDataFromModal.name} has been updated in your cart.` };
         } else {
-          // Configuration changed, resulting in a new cartItemId.
-          // 1. Remove the old item.
           nextItems = currentItems.filter(item => item.cartItemId !== oldCartItemId);
-          // 2. Add/merge the new item.
           const existingItemWithNewConfigIndex = nextItems.findIndex(i => i.cartItemId === newCartItemId);
           if (existingItemWithNewConfigIndex > -1) {
-            // New configuration matches another existing item, so merge quantities.
             nextItems[existingItemWithNewConfigIndex] = {
               ...nextItems[existingItemWithNewConfigIndex],
               quantity: nextItems[existingItemWithNewConfigIndex].quantity + originalQuantity,
-              // unitPrice should be newUnitPrice if we are "moving" the item here
               unitPrice: newUnitPrice, 
-              // Also update other properties like image, selectedColor, selectedSize for hoodies/sweatpants
               ...(itemDataFromModal.productType === 'hoodie' && { selectedColor: (itemDataFromModal as HoodieCartItem).selectedColor, selectedSize: (itemDataFromModal as HoodieCartItem).selectedSize, image: itemDataFromModal.image }),
               ...(itemDataFromModal.productType === 'sweatpants' && { selectedColor: (itemDataFromModal as SweatpantsCartItem).selectedColor, selectedSize: (itemDataFromModal as SweatpantsCartItem).selectedSize, image: itemDataFromModal.image }),
               ...(itemDataFromModal.productType === 'bracelet' && { selectedCharms: (itemDataFromModal as BraceletCartItem).selectedCharms, image: itemDataFromModal.image }),
@@ -189,13 +181,12 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
             };
             toastMsg = { title: "Item Updated & Merged", description: `${itemDataFromModal.name} configuration changed and merged.` };
           } else {
-            // New configuration is entirely new, add it with original quantity.
             nextItems.push({ ...itemDataFromModal, cartItemId: newCartItemId, unitPrice: newUnitPrice, quantity: originalQuantity } as CartItem);
             toastMsg = { title: "Item Updated", description: `${itemDataFromModal.name} configuration changed in your cart.` };
           }
         }
-      } else { // Adding a new item (not an update from edit mode)
-        const quantityToAdd = 1; // New items from modal are always quantity 1 initially
+      } else { 
+        const quantityToAdd = 1; 
         const existingItemIndex = currentItems.findIndex(item => item.cartItemId === newCartItemId);
         if (existingItemIndex > -1) {
           nextItems = currentItems.map((item, index) =>
@@ -212,7 +203,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
 
       if (toastMsg) addToastToQueue(toastMsg);
       if (editingItemToClear) setEditingItem(null);
-      if (!isCartOpen) setIsCartOpen(true); // Open cart if it was closed
+      if (!isCartOpen) setIsCartOpen(true); 
       return nextItems;
     });
   }, [editingItem, isCartOpen, addToastToQueue, setEditingItem, setIsCartOpen]);
@@ -311,7 +302,5 @@ export const useCart = () => {
 
 export const getCartItemIdFromEditingItem = (editingItem: EditingItemState): string | undefined => {
   if (!editingItem) return undefined;
-  
-  // The structure of EditingItemState ensures `item` exists and has `cartItemId`
   return editingItem.item.cartItemId;
 };

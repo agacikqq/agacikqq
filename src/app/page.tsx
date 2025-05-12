@@ -3,14 +3,56 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Header } from '@/components/header';
 import { Button } from '@/components/ui/button';
 import { Footer } from '@/components/footer'; 
 import { categories } from '@/data/categories.tsx'; 
+import { RecommendedProductsSection } from '@/components/recommended-products-section';
+import type { RecommendedProduct as RecommendedProductType, SummarizedProduct } from '@/ai/flows/recommend-products-flow';
+import { useCart } from '@/context/cart-context';
+
+// This function needs to be invokable from the client if we refresh recommendations based on cart changes
+// For initial load, it can be called on the server (if page.tsx is server component)
+// Or, if page.tsx must be client due to other hooks, then this is called in useEffect.
+// For now, let's assume page.tsx is a client component and calls this in useEffect.
+// However, to avoid calling AI on every render, better to fetch once or pass from server.
+
+// Making page.tsx a client component for simplicity with useCart hook.
+// The AI call will happen client-side in this setup. For SSR AI call, page.tsx would be server and pass data to client child.
 
 export default function HomePage() {
   const displayCategories = categories.filter(category => category.name !== 'All Productz');
+  const { items: cartItems } = useCart();
+  const [recommendations, setRecommendations] = useState<RecommendedProductType[]>([]);
+  const [isLoadingRecommendations, setIsLoadingRecommendations] = useState(true);
+
+  useEffect(() => {
+    const fetchRecommendations = async () => {
+      setIsLoadingRecommendations(true);
+      try {
+        // Dynamically import the server action
+        const { recommendProducts } = await import('@/ai/flows/recommend-products-flow');
+
+        const summarizedCartItems: SummarizedProduct[] = cartItems.map(item => ({
+          id: item.productId,
+          name: item.name,
+          productType: item.productType,
+          description: '', // Description not strictly needed from cart for this summarization
+        }));
+
+        const recs = await recommendProducts({ currentCartItems: summarizedCartItems, numberOfRecommendations: 4 });
+        setRecommendations(recs);
+      } catch (error) {
+        console.error("Failed to fetch recommendations:", error);
+        setRecommendations([]); // Set to empty on error
+      } finally {
+        setIsLoadingRecommendations(false);
+      }
+    };
+
+    fetchRecommendations();
+  }, [cartItems]); // Re-fetch recommendations if cart changes
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -72,6 +114,12 @@ export default function HomePage() {
           </div>
         </section>
         
+        {/* Recommended Products Section */}
+        <RecommendedProductsSection 
+          recommendations={recommendations} 
+          isLoading={isLoadingRecommendations} 
+        />
+        
         {/* Featured Product Placeholder */}
         <section className="py-16 md:py-20 bg-muted/30">
             <div className="container mx-auto px-4 text-center">
@@ -88,7 +136,7 @@ export default function HomePage() {
                     <h3 className="text-3xl font-semibold text-card-foreground mb-3">The "Trendsetter" Hoodiez</h3>
                     <p className="text-lg text-muted-foreground mb-6">Limited edition design. Get yours before it's gone!</p>
                     <Button asChild size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90">
-                        <Link href="/hoodies/cosmic-dreamer-hoodie">Check it Out</Link>
+                        <Link href="/hoodies/1">Check it Out</Link>
                     </Button>
                 </div>
             </div>

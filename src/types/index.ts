@@ -133,14 +133,29 @@ export type CartItem = HoodieCartItem | BraceletCartItem | MatchingSetCartItem |
 
 // For re-opening modals for editing
 export type EditingItemState = 
-  | { type: 'hoodie'; item: HoodieCartItem; cartItemId: string } 
-  | { type: 'sweatpants'; item: SweatpantsCartItem; cartItemId: string } 
-  | { type: 'bracelet'; item: BraceletCartItem; originalBracelet: Bracelet; cartItemId: string } 
-  | { type: 'matchingSet'; item: MatchingSetCartItem; originalSet: MatchingBraceletSet; cartItemId: string }
+  | { type: 'hoodie'; item: HoodieCartItem; cartItemId: string; productId: string } // Added productId
+  | { type: 'sweatpants'; item: SweatpantsCartItem; cartItemId: string; productId: string } // Added productId
+  | { type: 'bracelet'; item: BraceletCartItem; originalBracelet: Bracelet; cartItemId: string; productId: string } // Added productId
+  | { type: 'matchingSet'; item: MatchingSetCartItem; originalSet: MatchingBraceletSet; cartItemId: string; productId: string } // Added productId
   | null;
 
 // Order History
 export interface PastOrder extends SendOrderConfirmationEmailInput {
   orderId: string;
   orderDate: string; // ISO string date for easy sorting and display
+}
+
+// For AI Flow - Product Recommendation
+export interface SummarizedProduct {
+  id: string;
+  name: string;
+  productType: 'hoodie' | 'sweatpants' | 'bracelet' | 'matchingSet';
+  description: string;
+}
+
+export interface RecommendedProduct {
+  productId: string;
+  productType: 'hoodie' | 'sweatpants' | 'bracelet' | 'matchingSet';
+  name: string;
+  reason: string;
 }
