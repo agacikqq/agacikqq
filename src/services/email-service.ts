@@ -1,4 +1,3 @@
-
 'use server';
 
 /**
@@ -22,13 +21,20 @@ export interface EmailParams {
  * @returns A promise that resolves with the status of the email sending attempt.
  */
 export async function sendEmail(params: EmailParams): Promise<{ success: boolean; message: string }> {
-  console.log('--- Simulating Email Send ---');
-  console.log(`To: ${params.to}`);
+  console.log('\n**************************************************');
+  console.log('***           SIMULATING EMAIL SEND            ***');
+  console.log('**************************************************');
+  console.log(`Recipient (To): ${params.to}`);
   console.log(`Subject: ${params.subject}`);
-  console.log('Body (HTML):');
+  console.log('--- HTML Body Start ---');
   console.log(params.htmlBody);
-  console.log('--- Email Simulation End ---');
+  console.log('--- HTML Body End ---');
+  console.log('\nNOTE: This is a SIMULATED email. No actual email has been dispatched to an inbox.');
+  console.log('In a production environment, this service would integrate with a real email provider.');
+  console.log('Verify the recipient, subject, and body above for correctness based on the order.');
+  console.log('**************************************************\n');
 
   // Simulate a successful email send
-  return { success: true, message: 'Email sent successfully (simulated)' };
+  return { success: true, message: 'Email sent successfully (simulated, check console log)' };
 }
+
