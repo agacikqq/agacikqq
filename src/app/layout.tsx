@@ -7,7 +7,7 @@ import { SidebarProvider } from '@/components/ui/sidebar';
 import { ThemeProvider } from '@/components/theme-provider';
 import { CartProvider } from '@/context/cart-context';
 import { CartSidebar } from '@/components/cart-sidebar';
-import { PageTurnButton } from '@/components/page-turn-button'; // New import
+import { PageTurnButton } from '@/components/page-turn-button'; 
 
 const poppins = Poppins({
   subsets: ['latin'],
@@ -26,7 +26,8 @@ export const metadata: Metadata = {
   description: 'Discover the coolest and most comfortable hoodiez. Filter by color, size, and design.',
 };
 
-const pageSequence = ['/hoodies', '/sweatpants', '/collections', '/matching-bracelets'];
+// Define the sequence of pages for the page turn button
+const pageSequence = ['/hoodies', '/sweatpants', '/collections', '/matching-bracelets', '/salez', '/browse/all-items'];
 
 export default function RootLayout({
   children,

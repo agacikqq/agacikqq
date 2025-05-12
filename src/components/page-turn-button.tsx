@@ -18,15 +18,20 @@ export function PageTurnButton({ pageSequence }: PageTurnButtonProps) {
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
+    // Determine if the button should be visible on the current page
     setIsVisible(pageSequence.includes(pathname));
   }, [pathname, pageSequence]);
 
   const handleTurnPage = () => {
     const currentIndex = pageSequence.indexOf(pathname);
+    
     if (currentIndex === -1) { // Current page not in sequence
-        // Optionally, navigate to the first page in sequence if button is somehow shown
-        // router.push(pageSequence[0]);
-        return;
+      // Default to the first page in sequence if button is somehow shown on an unsequenced page
+      // or if the sequence is empty.
+      if (pageSequence.length > 0) {
+        router.push(pageSequence[0]);
+      }
+      return;
     }
 
     const nextIndex = (currentIndex + 1) % pageSequence.length;
@@ -36,10 +41,9 @@ export function PageTurnButton({ pageSequence }: PageTurnButtonProps) {
     router.push(nextPage);
 
     // Reset animation state after a short delay.
-    // This is useful if the component instance persists across navigations.
     const timer = setTimeout(() => {
       setIsAnimating(false);
-    }, 300); // Corresponds to animation duration
+    }, 500); // Animation duration + buffer
 
     return () => clearTimeout(timer);
   };
@@ -66,3 +70,4 @@ export function PageTurnButton({ pageSequence }: PageTurnButtonProps) {
     </Button>
   );
 }
+
