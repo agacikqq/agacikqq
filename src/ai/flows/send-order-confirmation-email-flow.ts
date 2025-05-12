@@ -128,10 +128,14 @@ const sendOrderConfirmationEmailFlow = ai.defineFlow(
         subject,
         htmlBody,
       });
+      // The sendEmail service (mock) returns a success: true and a message about simulation.
+      // We pass this directly back.
       return emailResult;
     } catch (error) {
-      console.error('Error sending confirmation email:', error);
-      return { success: false, message: 'Failed to send confirmation email.' };
+      // This catch block handles errors if the sendEmail service itself throws an unhandled exception.
+      console.error('Error calling email service within flow:', error);
+      return { success: false, message: 'Failed to process email sending due to an internal error.' };
     }
   }
 );
+

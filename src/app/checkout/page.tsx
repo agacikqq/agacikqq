@@ -172,12 +172,12 @@ export default function CheckoutPage() {
         setConfirmedOrderData(emailInput);
         setOrderState('confirmed');
         toast({
-          title: 'Order Confirmed!',
-          description: 'Please review your order details below. An email has been sent.',
+          title: 'Order Confirmed (Simulated)!',
+          description: `Email simulation successful. Check your Next.js server console for details. Message: ${emailResult.message}`,
         });
       } else {
         toast({
-          title: 'Order Failed (Email Error)',
+          title: 'Order Failed',
           description: `Your order could not be placed: ${emailResult.message}. Please try again.`,
           variant: 'destructive',
         });
@@ -231,12 +231,12 @@ export default function CheckoutPage() {
         setConfirmedOrderData(updatedEmailInput);
         setOrderState('confirmed');
         toast({
-          title: 'Address Updated & Confirmation Resent!',
-          description: 'Your shipping address has been updated and a new confirmation email sent.',
+          title: 'Address Updated & Confirmation Resent (Simulated)!',
+          description: `Email simulation successful. Check your Next.js server console for details. Message: ${emailResult.message}`,
         });
       } else {
         toast({
-          title: 'Update Failed (Email Error)',
+          title: 'Update Failed',
           description: `Could not update address: ${emailResult.message}. Please try again.`,
           variant: 'destructive',
         });
@@ -575,7 +575,7 @@ export default function CheckoutPage() {
                         <CardTitle className="text-3xl text-primary flex items-center gap-2"><CheckCircle className="h-8 w-8 text-green-500" /> Order Confirmed!</CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-6">
-                        <p className="text-lg">Thank you, {confirmedOrderData.customerName}! Your order has been successfully placed. A confirmation email has been sent to {confirmedOrderData.recipientEmail}.</p>
+                        <p className="text-lg">Thank you, {confirmedOrderData.customerName}! Your order has been successfully placed. A <strong>simulated</strong> confirmation email has been logged to the server console for {confirmedOrderData.recipientEmail}.</p>
                         
                         <div>
                             <h3 className="text-2xl font-semibold text-primary mb-2">Shipping Address</h3>
@@ -646,3 +646,4 @@ export default function CheckoutPage() {
     </div>
   );
 }
+
