@@ -45,7 +45,9 @@ export default function RootLayout({
         >
           <CartProvider>
             <SidebarProvider>
-              <div className="flex flex-col flex-1">
+              {/* This div structures the overall layout including sticky header, main content, and footer */}
+              <div className="flex flex-col flex-1"> 
+                {/* children will be wrapped by template.tsx which applies animations */}
                 {children}
               </div>
               <CartSidebar />
@@ -58,4 +60,3 @@ export default function RootLayout({
     </html>
   );
 }
-
