@@ -1,4 +1,5 @@
 
+import type { SendOrderConfirmationEmailInput } from '@/ai/flows/send-order-confirmation-email-flow';
 
 export interface ProductColor {
   name: string; // e.g., "Ocean Blue"
@@ -137,3 +138,9 @@ export type EditingItemState =
   | { type: 'bracelet'; item: BraceletCartItem; originalBracelet: Bracelet; cartItemId: string } 
   | { type: 'matchingSet'; item: MatchingSetCartItem; originalSet: MatchingBraceletSet; cartItemId: string }
   | null;
+
+// Order History
+export interface PastOrder extends SendOrderConfirmationEmailInput {
+  orderId: string;
+  orderDate: string; // ISO string date for easy sorting and display
+}

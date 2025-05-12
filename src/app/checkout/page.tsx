@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -5,7 +6,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useCart } from '@/context/cart-context';
-import type { CartItem, HoodieCartItem, BraceletCartItem, MatchingSetCartItem, SweatpantsCartItem, Charm } from '@/types';
+import type { CartItem, HoodieCartItem, BraceletCartItem, MatchingSetCartItem, SweatpantsCartItem, Charm, PastOrder } from '@/types';
 import { Header } from '@/components/header';
 import { Footer } from '@/components/footer';
 import { Button } from '@/components/ui/button';
@@ -253,6 +254,28 @@ export default function CheckoutPage() {
   };
 
   const handleCompleteOrder = () => {
+    if (confirmedOrderData) {
+      const pastOrder: PastOrder = {
+        ...confirmedOrderData,
+        orderId: `order-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
+        orderDate: new Date().toISOString(),
+      };
+
+      try {
+        const existingOrdersString = localStorage.getItem('pastOrders');
+        const existingOrders: PastOrder[] = existingOrdersString ? JSON.parse(existingOrdersString) : [];
+        existingOrders.unshift(pastOrder); // Add to the beginning of the array
+        localStorage.setItem('pastOrders', JSON.stringify(existingOrders));
+      } catch (e) {
+        console.error("Failed to save past order to localStorage", e);
+        toast({
+          title: 'Storage Error',
+          description: 'Could not save order to history due to a storage issue.',
+          variant: 'destructive'
+        });
+      }
+    }
+
     clearCart();
     router.push('/');
     toast({
@@ -268,9 +291,6 @@ export default function CheckoutPage() {
         setCity(confirmedOrderData.shippingAddress.city);
         setEmirate(confirmedOrderData.shippingAddress.emirate);
         setZipCode(confirmedOrderData.shippingAddress.zipCode || '');
-        // Keep payment details as they were, or clear if needed for security, but for this mock, it's simpler to keep.
-        // Name on card, card number etc. are already in state.
-        // Selected payment method is also in state.
         setOrderState('editingAddress');
     }
   };
@@ -299,7 +319,7 @@ export default function CheckoutPage() {
     );
   }
 
-  if (items.length === 0 && orderState === 'form') { // only redirect if cart is empty AND we are in the initial form state
+  if (items.length === 0 && orderState === 'form') { 
     return (
       <div className="flex flex-col min-h-screen">
         <Header />
@@ -349,16 +369,14 @@ export default function CheckoutPage() {
             </p>
           </div>
 
-          {/* FORM / EDITING ADDRESS STATE */}
           {(orderState === 'form' || orderState === 'editingAddress') && (
             <form onSubmit={orderState === 'form' ? handleSubmitInitialOrder : handleUpdateAddressAndResend}>
               <fieldset disabled={isLoading} className="space-y-8">
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                  {/* Order Summary & Shipping Address */}
                   <div className="lg:col-span-2 space-y-8">
                     <Card className="shadow-xl">
                       <CardHeader>
-                        <CardTitle className="text-3xl text-primary">Order Summary ({cartCount} items)</CardTitle>
+                        <CardTitle className="text-3xl text-primary">Order Summary ({orderState === 'form' ? cartCount : confirmedOrderData?.items.reduce((sum, i) => sum + i.quantity, 0) || 0} items)</CardTitle>
                       </CardHeader>
                       <CardContent>
                         <ScrollArea className="h-[300px] pr-4">
@@ -366,7 +384,7 @@ export default function CheckoutPage() {
                             {(orderState === 'form' ? items : confirmedOrderData?.items || []).map((item: CartItem | EmailOrderItem, index) => (
                               <div key={(item as CartItem).cartItemId || `confirmed-item-${index}`} className="flex items-start space-x-4 p-4 border rounded-lg shadow-sm bg-card/50">
                                 <Image
-                                  src={(item as CartItem).image || `https://picsum.photos/seed/${item.name}/60/80`} // Fallback for EmailOrderItem if image not present
+                                  src={(item as CartItem).image || `https://picsum.photos/seed/${item.name}/60/80`} 
                                   alt={item.name}
                                   width={60}
                                   height={((item as CartItem).productType === 'hoodie' || (item as CartItem).productType === 'sweatpants') ? 80 : 60}
@@ -404,7 +422,6 @@ export default function CheckoutPage() {
                                       ))}
                                     </div>
                                   )}
-                                   {/* For EmailOrderItem during confirmation/editing address state */}
                                   {('details' in item && item.details) && (
                                       <p className="text-xs text-muted-foreground"><em>Details: {item.details}</em></p>
                                   )}
@@ -458,7 +475,6 @@ export default function CheckoutPage() {
                     </Card>
                   </div>
 
-                  {/* Payment Details */}
                   <div className="lg:col-span-1">
                     <Card className="shadow-xl">
                       <CardHeader>
@@ -467,7 +483,7 @@ export default function CheckoutPage() {
                         </CardTitle>
                       </CardHeader>
                       <CardContent>
-                        <fieldset disabled={orderState === 'editingAddress'} className="space-y-6"> {/* Disable payment method change when editing address */}
+                        <fieldset disabled={orderState === 'editingAddress'} className="space-y-6">
                           <RadioGroup
                             value={selectedPaymentMethod}
                             onValueChange={(value: string) => setSelectedPaymentMethod(value as PaymentMethod)}
@@ -552,7 +568,6 @@ export default function CheckoutPage() {
             </form>
           )}
 
-          {/* CONFIRMED STATE */}
           {orderState === 'confirmed' && confirmedOrderData && (
             <div className="space-y-8">
                 <Card className="shadow-xl">
@@ -631,4 +646,3 @@ export default function CheckoutPage() {
     </div>
   );
 }
-

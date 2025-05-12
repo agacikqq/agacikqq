@@ -2,7 +2,7 @@
 'use client';
 
 import Link from 'next/link';
-import { ShoppingCart, Menu, Package } from 'lucide-react'; 
+import { ShoppingCart, Menu, Package, History } from 'lucide-react'; 
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import { ThemeToggleButton } from '@/components/theme-toggle-button';
 import { Button } from '@/components/ui/button';
@@ -68,6 +68,9 @@ export function Header() {
           <Link href="/salez" className="text-lg font-medium text-primary-foreground hover:text-primary-foreground/80 transition-colors">
             Salez
           </Link>
+          <Link href="/past-orders" className="text-lg font-medium text-primary-foreground hover:text-primary-foreground/80 transition-colors flex items-center gap-1">
+            <History className="h-5 w-5" /> Past Orderz
+          </Link>
         </nav>
 
         {/* Right side items: Theme Toggle, Cart & Mobile Sidebar/Dropdown Trigger */}
@@ -125,6 +128,10 @@ export function Header() {
                 <DropdownMenuItem asChild>
                   <Link href="/salez" className="text-base">Salez</Link>
                 </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                  <Link href="/past-orders" className="text-base flex items-center gap-2"><History className="h-4 w-4" /> Past Orderz</Link>
+                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
@@ -134,4 +141,3 @@ export function Header() {
     </header>
   );
 }
-
