@@ -18,6 +18,8 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { toast } from '@/hooks/use-toast';
 import { CreditCard, ShoppingBag, Lock, ArrowLeft, Truck, Apple, MapPin } from 'lucide-react';
+import { sendOrderConfirmationEmail, type SendOrderConfirmationEmailInput, type EmailOrderItem } from '@/ai/flows/send-order-confirmation-email-flow';
+
 
 const INCLUDED_CHARMS_COUNT = 4;
 const INCLUDED_CHARMS_PER_BRACELET_IN_SET = 4;
@@ -56,7 +58,7 @@ export default function CheckoutPage() {
     }
   }, [items, router, hasMounted]);
 
-  const handlePaymentSubmit = (e: React.FormEvent) => {
+  const handlePaymentSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!streetAddress || !city || !emirate) { 
@@ -95,10 +97,77 @@ export default function CheckoutPage() {
     if (selectedPaymentMethod === 'cash') paymentMethodName = "Cash on Delivery";
     if (selectedPaymentMethod === 'applepay') paymentMethodName = "Apple Pay";
 
-    toast({
-      title: 'Payment Successful!',
-      description: `Thank you for your order using ${paymentMethodName}. Your cœzii items are on their way to ${streetAddress}, ${apartmentSuite ? apartmentSuite + ', ' : ''}${city}, ${emirate}${zipCode ? ', ' + zipCode : ''}!`,
+    // Send confirmation email
+    const customerName = nameOnCard || "Valued Coezii Customer";
+    const emailOrderItems: EmailOrderItem[] = items.map(item => {
+      let details = '';
+      if (item.productType === 'hoodie') {
+        const hoodieItem = item as HoodieCartItem;
+        details = `Color: ${hoodieItem.selectedColor.name}, Size: ${hoodieItem.selectedSize.name}`;
+      } else if (item.productType === 'sweatpants') {
+        const sweatpantsItem = item as SweatpantsCartItem;
+        details = `Color: ${sweatpantsItem.selectedColor.name}, Size: ${sweatpantsItem.selectedSize.name}`;
+      } else if (item.productType === 'bracelet') {
+        const braceletItem = item as BraceletCartItem;
+        const included = braceletItem.selectedCharms.slice(0, INCLUDED_CHARMS_COUNT).map(c => c.name).join(', ');
+        const extra = braceletItem.selectedCharms.slice(INCLUDED_CHARMS_COUNT).map(c => `${c.name} (+AED ${c.price.toFixed(2)})`).join(', ');
+        details = `Charms: ${included || 'None'}${extra ? (included ? '; ' : '') + extra : ''}`;
+      } else if (item.productType === 'matchingSet') {
+        const setItem = item as MatchingSetCartItem;
+        details = setItem.braceletsCustomization.map(bc => {
+          const included = bc.selectedCharms.slice(0, INCLUDED_CHARMS_PER_BRACELET_IN_SET).map(c => c.name).join(', ');
+          const extra = bc.selectedCharms.slice(INCLUDED_CHARMS_PER_BRACELET_IN_SET).map(c => `${c.name} (+AED ${c.price.toFixed(2)})`).join(', ');
+          return `${bc.braceletName} Charms: ${included || 'None'}${extra ? (included ? '; ' : '') + extra : ''}`;
+        }).join(' | ');
+      }
+
+      return {
+        name: item.name,
+        quantity: item.quantity,
+        unitPrice: item.unitPrice,
+        itemTotal: item.unitPrice * item.quantity,
+        details: details,
+      };
     });
+
+    const emailInput: SendOrderConfirmationEmailInput = {
+      customerName,
+      shippingAddress: {
+        streetAddress,
+        apartmentSuite: apartmentSuite || undefined,
+        city,
+        emirate,
+        zipCode: zipCode || undefined,
+      },
+      items: emailOrderItems,
+      cartTotal,
+      paymentMethod: paymentMethodName,
+      recipientEmail: 'trefon.agatha@icloud.com', // Hardcoded recipient email
+    };
+
+    try {
+      const emailResult = await sendOrderConfirmationEmail(emailInput);
+      if (emailResult.success) {
+        toast({
+          title: 'Payment Successful & Confirmation Sent!',
+          description: `Thank you for your order using ${paymentMethodName}. A confirmation email has been sent. Your cœzii items are on their way to ${streetAddress}, ${apartmentSuite ? apartmentSuite + ', ' : ''}${city}, ${emirate}${zipCode ? ', ' + zipCode : ''}!`,
+        });
+      } else {
+        toast({
+          title: 'Payment Successful (Email Failed)',
+          description: `Your order is confirmed, but we couldn't send a confirmation email: ${emailResult.message}. Your items are on their way!`,
+          variant: 'destructive',
+        });
+      }
+    } catch (error) {
+      console.error("Error sending confirmation email flow:", error);
+      toast({
+        title: 'Payment Successful (Email Error)',
+        description: 'Your order is confirmed, but there was an error sending the confirmation email. Your items are on their way!',
+        variant: 'destructive',
+      });
+    }
+
     clearCart();
     router.push('/'); 
   };
@@ -452,4 +521,3 @@ export default function CheckoutPage() {
     </div>
   );
 }
-
