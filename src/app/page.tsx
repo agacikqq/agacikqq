@@ -136,7 +136,7 @@ export default function HomePage() {
                     <h3 className="text-3xl font-semibold text-card-foreground mb-3">The "Trendsetter" Hoodiez</h3>
                     <p className="text-lg text-muted-foreground mb-6">Limited edition design. Get yours before it's gone!</p>
                     <Button asChild size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90">
-                        <Link href="/hoodies/1">Check it Out</Link>
+                        <Link href="/hoodies">Check it Out</Link>
                     </Button>
                 </div>
             </div>

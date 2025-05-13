@@ -1,7 +1,8 @@
+
 import type {NextConfig} from 'next';
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  output: 'export', // Added for static HTML export
   basePath: '/agacikqq',
   typescript: {
     ignoreBuildErrors: true,
