@@ -1,9 +1,11 @@
 
 import type {NextConfig} from 'next';
 
+const isGithubActions = process.env.GITHUB_ACTIONS === 'true';
+
 const nextConfig: NextConfig = {
   output: 'export', // Added for static HTML export
-  basePath: '/agacikqq',
+  basePath: isGithubActions ? '/agacikqq' : '', // Conditional basePath
   typescript: {
     ignoreBuildErrors: true,
   },
@@ -11,6 +13,7 @@ const nextConfig: NextConfig = {
     ignoreDuringBuilds: true,
   },
   images: {
+    unoptimized: true, // Disable image optimization for static export
     remotePatterns: [
       {
         protocol: 'https',
@@ -18,6 +21,12 @@ const nextConfig: NextConfig = {
         port: '',
         pathname: '/**',
       },
+      { // Added placeholder.co for consistency
+        protocol: 'https',
+        hostname: 'placehold.co',
+        port: '',
+        pathname: '/**',
+      }
     ],
   },
 };
